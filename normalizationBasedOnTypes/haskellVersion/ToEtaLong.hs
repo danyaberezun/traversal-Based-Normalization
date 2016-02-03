@@ -2,10 +2,10 @@ module ToEtaLong (generateLNF, postprocess, toEtaLong) where
 
 import DataTypes
 
---==============================================================
+-- ==============================================================
 --  Main function : toEtaLong that generates an eta-long form
 --  from typed lambda expression
---==============================================================
+-- ==============================================================
 
 -- postprocess to concat neiber LamChlbdas
 -- Bool -- is itselft an ardument or not

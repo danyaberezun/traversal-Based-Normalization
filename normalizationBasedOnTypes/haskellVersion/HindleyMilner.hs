@@ -1,13 +1,13 @@
-module HindleyMilner (typeTerm, simpleTypeToChType) where
+module HindleyMilner (typeTerm, simpleTypeToChType, parseExpr, parse, typeTerm2, typeTerm3, substituteTyVar, unifyTypes) where
 
---================================================================
+-- ================================================================
 --  file contains an algorithm W
 --  Main function : typeTerm
 --    typeTerm :: Environment -> String -> ChL
 --      where Environment contains information about free variable
 --        String is a simple lambda expression
 --      produces a Chl (typed a la Church lambda expression)
---===============================================================
+-- ===============================================================
 
 import qualified Data.Map as Map
 import Data.Maybe
@@ -65,7 +65,15 @@ inferType e@(ULApp e1 e2) t@(tv:tvs) env = do
             let Just (Arrow tp1' tp2') = Map.lookup e1 env'''
             return (Map.insert e tp2' env''', tvs'')
           -- types are not compatible --> error
-          else fail ("ERROR: Can't apply \"" ++ show e1 ++ "\" to \"" ++ show e2 ++ "\". Incopatible types.")
+          --else fail ("ERROR: Can't apply \"" ++ show e1 ++ "; type: " ++ show tp1 ++ "\" to \"" ++ show e2 ++ "; type: " ++ show tp' ++ "\". Incopatible types." ++ " " ++ show (areTypesCompatible tp' tp1))
+
+          else if areTypesCompatible tp' tp1
+            then do
+              env''' <- unifyTypes (tp', tp1) env''
+              let Just (Arrow tp1' tp2') = Map.lookup e1 env'''
+              return (Map.insert e tp2' env''', tvs'')
+          else fail ("ERROR: Can't apply \"" ++ show e1 ++ "; type: " ++ show tp1 ++ "->" ++ show tp2 ++ "\" to \"" ++ show e2 ++ "; type: " ++ show tp' ++ "\". Incopatible types." ++ " " ++ show (areTypesCompatible tp' tp1))
+
       ULApp _ _ -> do
         -- infer type of e1
         (env'', tvs'') <- inferType e1 tvs' env'
@@ -80,28 +88,59 @@ inferType e@(ULApp e1 e2) t@(tv:tvs) env = do
 -- -> current envinrinment
 -- -> new envinronment or an error messenge
 unifyTypes :: (SimpleType, SimpleType) -> Environment -> Either String Environment
-unifyTypes (AtomType, AtomType) env         = return env
-unifyTypes (TyVar n, t) env                 = return $ Map.map (substituteTyVar n t) env
-unifyTypes (t, TyVar n) env                 = return $ Map.map (substituteTyVar n t) env
-unifyTypes (Arrow t1 t2, Arrow t1' t2') env = do
-  env' <- unifyTypes (t1, t1') env
-  unifyTypes (t2, t2') env'
-unifyTypes (t1, t2) env = fail $ "ERROR: Can't unify type (" ++ show t1 ++ ") with (" ++ show t2 ++ ")."
+unifyTypes (t1, t2) env = do
+  (typeSubsts, en) <- myunifyTypes (t1, t2) env []
+  return (Map.map (substTT typeSubsts) (Map.map (substTT typeSubsts) en))
+
+listInsert (n, t) l --env
+  | contains n l = (n,t) : l
+  | otherwise = case t of
+      TyVar m -> if (contains m l) then l++[(n,t)] else (n,t):l
+      _       -> (n,t):l
+  where
+    contains n [] = False
+    contains n ((m, _):l)
+      | n == m    = True
+      | otherwise = contains n l
+
+myunifyTypes (TyVar n, t) env l                = return (listInsert (n, t) l, Map.map (substituteTyVar n t) env)
+myunifyTypes (t, TyVar n) env l                = return (listInsert (n, t) l, Map.map (substituteTyVar n t) env)
+myunifyTypes (Arrow t1 t2, Arrow t1' t2') env l = do
+  let
+    t1''  = substTT l t1
+    t1''' = substTT l t1'
+  (typeSubsts, env') <- myunifyTypes (t1'', t1''') env l
+  let
+    t2''  = substTT typeSubsts t2
+    t2''' = substTT typeSubsts t2'
+  myunifyTypes (t2'', t2''') env' typeSubsts
+myunifyTypes (t1, t2) env l = fail $ "ERROR: Can't unify type (" ++ show t1 ++ ") with (" ++ show t2 ++ ")."
+
+substTT :: [(String, SimpleType)] -> SimpleType -> SimpleType
+substTT l (TyVar n) = getL l n
+substTT l (Arrow t1 t2) = Arrow (substTT l t1) (substTT l t2)
+getL :: [(String, SimpleType)] -> String -> SimpleType
+getL [] n = (TyVar n)
+getL ((n', t):xs) n
+  | n' == n   = t
+  | otherwise = getL xs n
+
 
 -- returns True if the first type can be unified with the second one
 areTypesCompatible :: SimpleType -> SimpleType -> Bool
 areTypesCompatible AtomType       _              = True
 areTypesCompatible TyVar{}        _              = True
+--areTypesCompatible _              TyVar{}        = True
 areTypesCompatible (Arrow t1 t2) (Arrow t1' t2') = areTypesCompatible t1 t1' && areTypesCompatible t2 t2'
 areTypesCompatible _             _               = False
 
 -- types substitution
--- String (a type name that will be replaced by type)
+-- String (a subexpression)
 -- -> Type (a type to be substituted insted of the type name variable)
 -- -> Type (a type where to provide substitution)
 -- -> Type (the result)
-substituteTyVar :: String -> SimpleType -> SimpleType -> SimpleType
-substituteTyVar _ _ AtomType = AtomType
+--substituteTyVar :: String -> SimpleType -> SimpleType -> SimpleType
+--substituteTyVar _ _ AtomType = AtomType
 substituteTyVar n t (TyVar n')
   | n' == n   = t
   | otherwise = TyVar n'
@@ -132,6 +171,21 @@ parseAbs = do
 -- generate names for types
 generateNames :: [String]
 generateNames = [a : if n == 0 then "" else show n | n <- [0..], a <- ['\945'..'\968']]
+
+--typeTerm2 :: Environment -> String -> (UntypedLambda, Map.Map UntypedLambda ChType)
+typeTerm2 env0 s = case parse parseExpr "" (filter (not . isSpace) s) of
+  Left  msg  -> error $ show msg
+  Right term -> case inferType term generateNames env0 of
+    Left msg       -> error msg
+    Right (env, _) -> (term, Map.lookup term env)
+    --Right (env, _) -> (term, Map.map (simpleTypeToChType) env)
+
+typeTerm3 env0 s = case parse parseExpr "" (filter (not . isSpace) s) of
+  Left  msg  -> error $ show msg
+  Right term -> case inferType term generateNames env0 of
+    Left msg       -> error msg
+    Right (env, _) -> (term, env)
+
 
 typeTerm :: Environment -> String -> ChL
 typeTerm env0 = annotateTerm . typeTerm' where

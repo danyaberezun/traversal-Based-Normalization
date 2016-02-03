@@ -2,9 +2,9 @@ module DataTypes where
 import Data.List
 import qualified Data.Map as Map
 
---=========================================================================
+-- =========================================================================
 --  file contains data types that is used on all stages of this algorithm
---=========================================================================
+-- =========================================================================
 
 -- environment for type-inference
 type Environment = Map.Map UntypedLambda SimpleType
@@ -48,7 +48,7 @@ data ChL     = LamChl  AnnVars ChL  | App  ChL  ChL    | V  Var deriving (Eq)
 -- typed LamChlbda expressions a la Church with long application
 data ChL2    = LamChl2 AnnVars ChL2 | App2 ChL2 [ChL2] | V2 Var deriving (Eq)
 instance Show ChL where
-  show (LamChl vs t)  = "\\" ++ show' vs ++ " . " ++ show t where
+  show (LamChl vs t)  = "(\\" ++ show' vs ++ " . " ++ show t ++ ")" where
     show' []          = ""
     show' ((v, t):vs) = v ++ " : " ++ show t ++ " " ++ show' vs
   show (App t1 t2)    = "(" ++ show t1 ++ " @ " ++ show t2 ++ ")"

@@ -6,10 +6,10 @@ import Debug.Trace
 
 import DataTypes
 
---==============================================================
+-- ==============================================================
 --  Main function : normalize that nprmalizes expressions that is
 --    in eta-long form
---==============================================================
+-- ==============================================================
 
 data TT = TTA A | TTB B deriving (Eq)
 instance Show TT where
