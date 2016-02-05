@@ -1,0 +1,199 @@
+=============================================================================
+NPR example
+=============================================================================
+
+Input term: ((\ h . \ z . ((h @ (\ x . ((h @ (\ q . x)) @ a))) @ (z @ a))) @ (\ f . \ y . f @ ((g @ (\ b . b)) @ y))) @ (g @ (\ n . n))
+
+Typed Version
+(\h : (o->o)->o->o z : o->o  . (h @ (\x : o  . (h @ (\q : o  . x)(\ . a)))(\ . (z @ (\ . a)))) @ (\f : o->o y : o  . (f @ (\ . (g @ (\b : o  . b)(\ . y)))))(\aa1 : o  . (g @ (\n : o  . n)(\ . aa1))))
+
+Eta-long form
+Root \ . @ (\ h z . h (\ x . h (\ q . x )(\ . a ))(\ . z (\ . a )))(\ f y . f (\ . g (\ b . b )(\ . y )))(\ aa1 . g (\ n . n )(\ . aa1 ))
+
+Traversals tree
+\ ; backpointer = 1; child № 0
+|  g; backpointer = 1; child № 0
+|  |  \ ; backpointer = 14; child № 2
+|  |  |  g; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 20; child № 2
+|  |  |  |  |  a ; backpointer = 1; child № 0
+|  |  |  |  \ n ; backpointer = 20; child № 1
+|  |  |  |  |  n ; backpointer = 21; child № 0
+|  |  \ b ; backpointer = 14; child № 1
+|  |  |  b ; backpointer = 15; child № 0
+
+Traversals length: [16,22,24]
+
+Eta-long beta-normal form
+\.g(\b .b )(\.g(\n .n )(\.a ))
+=============================================================================
+=============================================================================
+SUCC example
+=============================================================================
+
+Input term: (\ n . \ s . \ z . s @ ((n @ s) @ z)) @ ( \ s1 . \ z1 . (m @ s1) @ z1)
+
+Typed Version
+\aa1 : o->o bb1 : o  . (\n : (o->o)->o->o s : o->o z : o  . (s @ (\ . (n @ (\cc1 : o  . (s @ (\ . cc1)))(\ . z)))) @ (\s1 : o->o z1 : o  . (m @ (\dd1 : o  . (s1 @ (\ . dd1)))(\ . z1)))(\ee1 : o  . (aa1 @ (\ . ee1)))(\ . bb1))
+
+Eta-long form
+Root \ aa1 bb1 . @ (\ n s z . s (\ . n (\ cc1 . s (\ . cc1 ))(\ . z )))(\ s1 z1 . m (\ dd1 . s1 (\ . dd1 ))(\ . z1 ))(\ ee1 . aa1 (\ . ee1 ))(\ . bb1 )
+
+Traversals tree
+\ aa1 bb1 ; backpointer = 1; child № 0
+|  aa1; backpointer = 1; child № 0
+|  |  \ ; backpointer = 6; child № 1
+|  |  |  m; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 12; child № 2
+|  |  |  |  |  bb1 ; backpointer = 1; child № 0
+|  |  |  |  \ dd1 ; backpointer = 12; child № 1
+|  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  \ ; backpointer = 18; child № 1
+|  |  |  |  |  |  |  dd1 ; backpointer = 13; child № 0
+
+Traversals length: [24,18]
+
+Eta-long beta-normal form
+\aa1 bb1 .aa1(\.m(\dd1 .aa1(\.dd1 ))(\.bb1 ))
+=============================================================================
+=============================================================================
+SUCC TWO example
+=============================================================================
+
+Input term: (\ n . \ s . \ z . (n @ s) @ (s @ z)) @ (\ p . \ o . p @ (p @ o))
+
+Typed Version
+\aa1 : o->o bb1 : o  . (\n : (o->o)->o->o s : o->o z : o  . (n @ (\cc1 : o  . (s @ (\ . cc1)))(\ . (s @ (\ . z)))) @ (\p : o->o o : o  . (p @ (\ . (p @ (\ . o)))))(\dd1 : o  . (aa1 @ (\ . dd1)))(\ . bb1))
+
+Eta-long form
+Root \ aa1 bb1 . @ (\ n s z . n (\ cc1 . s (\ . cc1 ))(\ . s (\ . z )))(\ p o . p (\ . p (\ . o )))(\ dd1 . aa1 (\ . dd1 ))(\ . bb1 )
+
+Traversals tree
+\ aa1 bb1 ; backpointer = 1; child № 0
+|  aa1; backpointer = 1; child № 0
+|  |  \ ; backpointer = 10; child № 1
+|  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 20; child № 1
+|  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  \ ; backpointer = 30; child № 1
+|  |  |  |  |  |  |  bb1 ; backpointer = 1; child № 0
+
+Traversals length: [36]
+
+Eta-long beta-normal form
+\aa1 bb1 .aa1(\.aa1(\.aa1(\.bb1 )))
+=============================================================================
+=============================================================================
+MULT example (already in normal form)
+=============================================================================
+
+Input term: \ m . \ n . \ s . m @ (n @ s)
+
+Typed Version
+\m : o->o n : o->o s : o  . (m @ (\ . (n @ (\ . s))))
+
+Eta-long form
+Root \ m n s . m (\ . n (\ . s ))
+
+Traversals tree
+\ m n s ; backpointer = 1; child № 0
+|  m; backpointer = 1; child № 0
+|  |  \ ; backpointer = 2; child № 1
+|  |  |  n; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 4; child № 1
+|  |  |  |  |  s ; backpointer = 1; child № 0
+
+Traversals length: [6]
+
+Eta-long beta-normal form
+\m n s .m(\.n(\.s ))
+=============================================================================
+=============================================================================
+MULT THREE TWO example
+=============================================================================
+
+Input term: ((\ m . \ n . \ s . m @ (n @ s)) @ (\ w . \ p . w @ (w @ (w @ p)))) @ (\ d . \ l . d @ (d @ l))
+
+Typed Version
+\aa1 : o->o bb1 : o  . (\m : (o->o)->o->o n : (o->o)->o->o s : o->o cc1 : o  . (m @ (\dd1 : o  . (n @ (\ee1 : o  . (s @ (\ . ee1)))(\ . dd1)))(\ . cc1)) @ (\w : o->o p : o  . (w @ (\ . (w @ (\ . (w @ (\ . p)))))))(\d : o->o l : o  . (d @ (\ . (d @ (\ . l)))))(\ff1 : o  . (aa1 @ (\ . ff1)))(\ . bb1))
+
+Eta-long form
+Root \ aa1 bb1 . @ (\ m n s cc1 . m (\ dd1 . n (\ ee1 . s (\ . ee1 ))(\ . dd1 ))(\ . cc1 ))(\ w p . w (\ . w (\ . w (\ . p ))))(\ d l . d (\ . d (\ . l )))(\ ff1 . aa1 (\ . ff1 ))(\ . bb1 )
+
+Traversals tree
+\ aa1 bb1 ; backpointer = 1; child № 0
+|  aa1; backpointer = 1; child № 0
+|  |  \ ; backpointer = 14; child № 1
+|  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 24; child № 1
+|  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  \ ; backpointer = 42; child № 1
+|  |  |  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  |  |  \ ; backpointer = 52; child № 1
+|  |  |  |  |  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  |  |  |  |  \ ; backpointer = 70; child № 1
+|  |  |  |  |  |  |  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  |  |  |  |  |  |  \ ; backpointer = 80; child № 1
+|  |  |  |  |  |  |  |  |  |  |  |  |  bb1 ; backpointer = 1; child № 0
+
+Traversals length: [94]
+
+Eta-long beta-normal form
+\aa1 bb1 .aa1(\.aa1(\.aa1(\.aa1(\.aa1(\.aa1(\.bb1 ))))))
+=============================================================================
+=============================================================================
+FIB TWO example
+=============================================================================
+
+Input term: (\ n . (\ p4 . p4 @ (\ x4 . \ y4 . y4)) @ ((n @ (\ p . ((\ x3 . \ y3 . \ f3 . (f3 @ x3) @ y3) @ ((\ p0 . p0 @ (\ x6 . \ y0 . y0)) @ p)) @ (((\ m0 . \ n0 . \ f0 . \ x0 . (m0 @ f0) @ ((n0 @ f0) @ x0)) @ ((\ p1 . p1 @ (\ x5 . \ y5 . x5)) @ p)) @ ((\ p2 . p2 @ (\ x2 . \ y2 . y2)) @ p)))) @ (((\ x1 . \ y1 . \ f1 . (f1 @ x1) @ y1) @ (\ e . \ r . r)) @ (\ q . \ w . q @ w)))) @ (\ z1 . \ z2 . z1 @ (z1 @ z2))
+
+Typed Version
+\aa1 : o->o bb1 : o  . (\n : (((((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->(((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->((((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->(((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o cc1 : o->o dd1 : o  . (\p4 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o ee1 : o->o ff1 : o  . (p4 @ (\x4 : (o->o)->o->o y4 : (o->o)->o->o gg1 : o->o hh1 : o  . (y4 @ (\ii1 : o  . (gg1 @ (\ . ii1)))(\ . hh1)))(\jj1 : o  . (ee1 @ (\ . jj1)))(\ . ff1)) @ (\kk1 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ll1 : o->o mm1 : o  . (n @ (\p : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o nn1 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o oo1 : o->o pp1 : o  . (\x3 : (o->o)->o->o y3 : (o->o)->o->o f3 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o qq1 : o->o rr1 : o  . (f3 @ (\ss1 : o->o tt1 : o  . (x3 @ (\uu1 : o  . (ss1 @ (\ . uu1)))(\ . tt1)))(\vv1 : o->o ww1 : o  . (y3 @ (\xx1 : o  . (vv1 @ (\ . xx1)))(\ . ww1)))(\yy1 : o  . (qq1 @ (\ . yy1)))(\ . rr1)) @ (\zz1 : o->o aa2 : o  . (\p0 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o bb2 : o->o cc2 : o  . (p0 @ (\x6 : (o->o)->o->o y0 : (o->o)->o->o dd2 : o->o ee2 : o  . (y0 @ (\ff2 : o  . (dd2 @ (\ . ff2)))(\ . ee2)))(\gg2 : o  . (bb2 @ (\ . gg2)))(\ . cc2)) @ (\hh2 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ii2 : o->o jj2 : o  . (p @ (\kk2 : (o->o)->o->o ll2 : (o->o)->o->o mm2 : o->o nn2 : o  . (hh2 @ (\oo2 : o->o pp2 : o  . (kk2 @ (\qq2 : o  . (oo2 @ (\ . qq2)))(\ . pp2)))(\rr2 : o->o ss2 : o  . (ll2 @ (\tt2 : o  . (rr2 @ (\ . tt2)))(\ . ss2)))(\uu2 : o  . (mm2 @ (\ . uu2)))(\ . nn2)))(\vv2 : o  . (ii2 @ (\ . vv2)))(\ . jj2)))(\ww2 : o  . (zz1 @ (\ . ww2)))(\ . aa2)))(\xx2 : o->o yy2 : o  . (\m0 : (o->o)->o->o n0 : (o->o)->o->o f0 : o->o x0 : o  . (m0 @ (\zz2 : o  . (f0 @ (\ . zz2)))(\ . (n0 @ (\aa3 : o  . (f0 @ (\ . aa3)))(\ . x0)))) @ (\bb3 : o->o cc3 : o  . (\p1 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o dd3 : o->o ee3 : o  . (p1 @ (\x5 : (o->o)->o->o y5 : (o->o)->o->o ff3 : o->o gg3 : o  . (x5 @ (\hh3 : o  . (ff3 @ (\ . hh3)))(\ . gg3)))(\ii3 : o  . (dd3 @ (\ . ii3)))(\ . ee3)) @ (\jj3 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o kk3 : o->o ll3 : o  . (p @ (\mm3 : (o->o)->o->o nn3 : (o->o)->o->o oo3 : o->o pp3 : o  . (jj3 @ (\qq3 : o->o rr3 : o  . (mm3 @ (\ss3 : o  . (qq3 @ (\ . ss3)))(\ . rr3)))(\tt3 : o->o uu3 : o  . (nn3 @ (\vv3 : o  . (tt3 @ (\ . vv3)))(\ . uu3)))(\ww3 : o  . (oo3 @ (\ . ww3)))(\ . pp3)))(\xx3 : o  . (kk3 @ (\ . xx3)))(\ . ll3)))(\yy3 : o  . (bb3 @ (\ . yy3)))(\ . cc3)))(\zz3 : o->o aa4 : o  . (\p2 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o bb4 : o->o cc4 : o  . (p2 @ (\x2 : (o->o)->o->o y2 : (o->o)->o->o dd4 : o->o ee4 : o  . (y2 @ (\ff4 : o  . (dd4 @ (\ . ff4)))(\ . ee4)))(\gg4 : o  . (bb4 @ (\ . gg4)))(\ . cc4)) @ (\hh4 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ii4 : o->o jj4 : o  . (p @ (\kk4 : (o->o)->o->o ll4 : (o->o)->o->o mm4 : o->o nn4 : o  . (hh4 @ (\oo4 : o->o pp4 : o  . (kk4 @ (\qq4 : o  . (oo4 @ (\ . qq4)))(\ . pp4)))(\rr4 : o->o ss4 : o  . (ll4 @ (\tt4 : o  . (rr4 @ (\ . tt4)))(\ . ss4)))(\uu4 : o  . (mm4 @ (\ . uu4)))(\ . nn4)))(\vv4 : o  . (ii4 @ (\ . vv4)))(\ . jj4)))(\ww4 : o  . (zz3 @ (\ . ww4)))(\ . aa4)))(\xx4 : o  . (xx2 @ (\ . xx4)))(\ . yy2)))(\yy4 : (o->o)->o->o zz4 : (o->o)->o->o aa5 : o->o bb5 : o  . (nn1 @ (\cc5 : o->o dd5 : o  . (yy4 @ (\ee5 : o  . (cc5 @ (\ . ee5)))(\ . dd5)))(\ff5 : o->o gg5 : o  . (zz4 @ (\hh5 : o  . (ff5 @ (\ . hh5)))(\ . gg5)))(\ii5 : o  . (aa5 @ (\ . ii5)))(\ . bb5)))(\jj5 : o  . (oo1 @ (\ . jj5)))(\ . pp1)))(\kk5 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ll5 : o->o mm5 : o  . (\x1 : (o->o)->o->o y1 : (o->o)->o->o f1 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o nn5 : o->o oo5 : o  . (f1 @ (\pp5 : o->o qq5 : o  . (x1 @ (\rr5 : o  . (pp5 @ (\ . rr5)))(\ . qq5)))(\ss5 : o->o tt5 : o  . (y1 @ (\uu5 : o  . (ss5 @ (\ . uu5)))(\ . tt5)))(\vv5 : o  . (nn5 @ (\ . vv5)))(\ . oo5)) @ (\e : o->o r : o  . r)(\q : o->o w : o  . (q @ (\ . w)))(\ww5 : (o->o)->o->o xx5 : (o->o)->o->o yy5 : o->o zz5 : o  . (kk5 @ (\aa6 : o->o bb6 : o  . (ww5 @ (\cc6 : o  . (aa6 @ (\ . cc6)))(\ . bb6)))(\dd6 : o->o ee6 : o  . (xx5 @ (\ff6 : o  . (dd6 @ (\ . ff6)))(\ . ee6)))(\gg6 : o  . (yy5 @ (\ . gg6)))(\ . zz5)))(\hh6 : o  . (ll5 @ (\ . hh6)))(\ . mm5)))(\ii6 : (o->o)->o->o jj6 : (o->o)->o->o kk6 : o->o ll6 : o  . (kk1 @ (\mm6 : o->o nn6 : o  . (ii6 @ (\oo6 : o  . (mm6 @ (\ . oo6)))(\ . nn6)))(\pp6 : o->o qq6 : o  . (jj6 @ (\rr6 : o  . (pp6 @ (\ . rr6)))(\ . qq6)))(\ss6 : o  . (kk6 @ (\ . ss6)))(\ . ll6)))(\tt6 : o  . (ll1 @ (\ . tt6)))(\ . mm1)))(\uu6 : o  . (cc1 @ (\ . uu6)))(\ . dd1)) @ (\z1 : ((((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->(((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o z2 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o vv6 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ww6 : o->o xx6 : o  . (z1 @ (\yy6 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o zz6 : o->o aa7 : o  . (z1 @ (\bb7 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o cc7 : o->o dd7 : o  . (z2 @ (\ee7 : (o->o)->o->o ff7 : (o->o)->o->o gg7 : o->o hh7 : o  . (bb7 @ (\ii7 : o->o jj7 : o  . (ee7 @ (\kk7 : o  . (ii7 @ (\ . kk7)))(\ . jj7)))(\ll7 : o->o mm7 : o  . (ff7 @ (\nn7 : o  . (ll7 @ (\ . nn7)))(\ . mm7)))(\oo7 : o  . (gg7 @ (\ . oo7)))(\ . hh7)))(\pp7 : o  . (cc7 @ (\ . pp7)))(\ . dd7)))(\qq7 : (o->o)->o->o rr7 : (o->o)->o->o ss7 : o->o tt7 : o  . (yy6 @ (\uu7 : o->o vv7 : o  . (qq7 @ (\ww7 : o  . (uu7 @ (\ . ww7)))(\ . vv7)))(\xx7 : o->o yy7 : o  . (rr7 @ (\zz7 : o  . (xx7 @ (\ . zz7)))(\ . yy7)))(\aa8 : o  . (ss7 @ (\ . aa8)))(\ . tt7)))(\bb8 : o  . (zz6 @ (\ . bb8)))(\ . aa7)))(\cc8 : (o->o)->o->o dd8 : (o->o)->o->o ee8 : o->o ff8 : o  . (vv6 @ (\gg8 : o->o hh8 : o  . (cc8 @ (\ii8 : o  . (gg8 @ (\ . ii8)))(\ . hh8)))(\jj8 : o->o kk8 : o  . (dd8 @ (\ll8 : o  . (jj8 @ (\ . ll8)))(\ . kk8)))(\mm8 : o  . (ee8 @ (\ . mm8)))(\ . ff8)))(\nn8 : o  . (ww6 @ (\ . nn8)))(\ . xx6)))(\oo8 : o  . (aa1 @ (\ . oo8)))(\ . bb1))
+
+Eta-long form
+Root \ aa1 bb1 . @ (\ n cc1 dd1 . @ (\ p4 ee1 ff1 . p4 (\ x4 y4 gg1 hh1 . y4 (\ ii1 . gg1 (\ . ii1 ))(\ . hh1 ))(\ jj1 . ee1 (\ . jj1 ))(\ . ff1 ))(\ kk1 ll1 mm1 . n (\ p nn1 oo1 pp1 . @ (\ x3 y3 f3 qq1 rr1 . f3 (\ ss1 tt1 . x3 (\ uu1 . ss1 (\ . uu1 ))(\ . tt1 ))(\ vv1 ww1 . y3 (\ xx1 . vv1 (\ . xx1 ))(\ . ww1 ))(\ yy1 . qq1 (\ . yy1 ))(\ . rr1 ))(\ zz1 aa2 . @ (\ p0 bb2 cc2 . p0 (\ x6 y0 dd2 ee2 . y0 (\ ff2 . dd2 (\ . ff2 ))(\ . ee2 ))(\ gg2 . bb2 (\ . gg2 ))(\ . cc2 ))(\ hh2 ii2 jj2 . p (\ kk2 ll2 mm2 nn2 . hh2 (\ oo2 pp2 . kk2 (\ qq2 . oo2 (\ . qq2 ))(\ . pp2 ))(\ rr2 ss2 . ll2 (\ tt2 . rr2 (\ . tt2 ))(\ . ss2 ))(\ uu2 . mm2 (\ . uu2 ))(\ . nn2 ))(\ vv2 . ii2 (\ . vv2 ))(\ . jj2 ))(\ ww2 . zz1 (\ . ww2 ))(\ . aa2 ))(\ xx2 yy2 . @ (\ m0 n0 f0 x0 . m0 (\ zz2 . f0 (\ . zz2 ))(\ . n0 (\ aa3 . f0 (\ . aa3 ))(\ . x0 )))(\ bb3 cc3 . @ (\ p1 dd3 ee3 . p1 (\ x5 y5 ff3 gg3 . x5 (\ hh3 . ff3 (\ . hh3 ))(\ . gg3 ))(\ ii3 . dd3 (\ . ii3 ))(\ . ee3 ))(\ jj3 kk3 ll3 . p (\ mm3 nn3 oo3 pp3 . jj3 (\ qq3 rr3 . mm3 (\ ss3 . qq3 (\ . ss3 ))(\ . rr3 ))(\ tt3 uu3 . nn3 (\ vv3 . tt3 (\ . vv3 ))(\ . uu3 ))(\ ww3 . oo3 (\ . ww3 ))(\ . pp3 ))(\ xx3 . kk3 (\ . xx3 ))(\ . ll3 ))(\ yy3 . bb3 (\ . yy3 ))(\ . cc3 ))(\ zz3 aa4 . @ (\ p2 bb4 cc4 . p2 (\ x2 y2 dd4 ee4 . y2 (\ ff4 . dd4 (\ . ff4 ))(\ . ee4 ))(\ gg4 . bb4 (\ . gg4 ))(\ . cc4 ))(\ hh4 ii4 jj4 . p (\ kk4 ll4 mm4 nn4 . hh4 (\ oo4 pp4 . kk4 (\ qq4 . oo4 (\ . qq4 ))(\ . pp4 ))(\ rr4 ss4 . ll4 (\ tt4 . rr4 (\ . tt4 ))(\ . ss4 ))(\ uu4 . mm4 (\ . uu4 ))(\ . nn4 ))(\ vv4 . ii4 (\ . vv4 ))(\ . jj4 ))(\ ww4 . zz3 (\ . ww4 ))(\ . aa4 ))(\ xx4 . xx2 (\ . xx4 ))(\ . yy2 ))(\ yy4 zz4 aa5 bb5 . nn1 (\ cc5 dd5 . yy4 (\ ee5 . cc5 (\ . ee5 ))(\ . dd5 ))(\ ff5 gg5 . zz4 (\ hh5 . ff5 (\ . hh5 ))(\ . gg5 ))(\ ii5 . aa5 (\ . ii5 ))(\ . bb5 ))(\ jj5 . oo1 (\ . jj5 ))(\ . pp1 ))(\ kk5 ll5 mm5 . @ (\ x1 y1 f1 nn5 oo5 . f1 (\ pp5 qq5 . x1 (\ rr5 . pp5 (\ . rr5 ))(\ . qq5 ))(\ ss5 tt5 . y1 (\ uu5 . ss5 (\ . uu5 ))(\ . tt5 ))(\ vv5 . nn5 (\ . vv5 ))(\ . oo5 ))(\ e r . r )(\ q w . q (\ . w ))(\ ww5 xx5 yy5 zz5 . kk5 (\ aa6 bb6 . ww5 (\ cc6 . aa6 (\ . cc6 ))(\ . bb6 ))(\ dd6 ee6 . xx5 (\ ff6 . dd6 (\ . ff6 ))(\ . ee6 ))(\ gg6 . yy5 (\ . gg6 ))(\ . zz5 ))(\ hh6 . ll5 (\ . hh6 ))(\ . mm5 ))(\ ii6 jj6 kk6 ll6 . kk1 (\ mm6 nn6 . ii6 (\ oo6 . mm6 (\ . oo6 ))(\ . nn6 ))(\ pp6 qq6 . jj6 (\ rr6 . pp6 (\ . rr6 ))(\ . qq6 ))(\ ss6 . kk6 (\ . ss6 ))(\ . ll6 ))(\ tt6 . ll1 (\ . tt6 ))(\ . mm1 ))(\ uu6 . cc1 (\ . uu6 ))(\ . dd1 ))(\ z1 z2 vv6 ww6 xx6 . z1 (\ yy6 zz6 aa7 . z1 (\ bb7 cc7 dd7 . z2 (\ ee7 ff7 gg7 hh7 . bb7 (\ ii7 jj7 . ee7 (\ kk7 . ii7 (\ . kk7 ))(\ . jj7 ))(\ ll7 mm7 . ff7 (\ nn7 . ll7 (\ . nn7 ))(\ . mm7 ))(\ oo7 . gg7 (\ . oo7 ))(\ . hh7 ))(\ pp7 . cc7 (\ . pp7 ))(\ . dd7 ))(\ qq7 rr7 ss7 tt7 . yy6 (\ uu7 vv7 . qq7 (\ ww7 . uu7 (\ . ww7 ))(\ . vv7 ))(\ xx7 yy7 . rr7 (\ zz7 . xx7 (\ . zz7 ))(\ . yy7 ))(\ aa8 . ss7 (\ . aa8 ))(\ . tt7 ))(\ bb8 . zz6 (\ . bb8 ))(\ . aa7 ))(\ cc8 dd8 ee8 ff8 . vv6 (\ gg8 hh8 . cc8 (\ ii8 . gg8 (\ . ii8 ))(\ . hh8 ))(\ jj8 kk8 . dd8 (\ ll8 . jj8 (\ . ll8 ))(\ . kk8 ))(\ mm8 . ee8 (\ . mm8 ))(\ . ff8 ))(\ nn8 . ww6 (\ . nn8 ))(\ . xx6 ))(\ oo8 . aa1 (\ . oo8 ))(\ . bb1 )
+
+Traversals tree
+\ aa1 bb1 ; backpointer = 1; child № 0
+|  aa1; backpointer = 1; child № 0
+|  |  \ ; backpointer = 182; child № 1
+|  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 548; child № 1
+|  |  |  |  |  bb1 ; backpointer = 1; child № 0
+
+Traversals length: [738]
+
+Eta-long beta-normal form
+\aa1 bb1 .aa1(\.aa1(\.bb1 ))
+=============================================================================
+=============================================================================
+FIB FOUR example
+=============================================================================
+
+Input term: (\ n . (\ p4 . p4 @ (\ x4 . \ y4 . y4)) @ ((n @ (\ p . ((\ x3 . \ y3 . \ f3 . (f3 @ x3) @ y3) @ ((\ p0 . p0 @ (\ x6 . \ y0 . y0)) @ p)) @ (((\ m0 . \ n0 . \ f0 . \ x0 . (m0 @ f0) @ ((n0 @ f0) @ x0)) @ ((\ p1 . p1 @ (\ x5 . \ y5 . x5)) @ p)) @ ((\ p2 . p2 @ (\ x2 . \ y2 . y2)) @ p)))) @ (((\ x1 . \ y1 . \ f1 . (f1 @ x1) @ y1) @ (\ e . \ r . r)) @ (\ q . \ w . q @ w)))) @ (\ z1 . \ z2 . z1 @ (z1 @ (z1 @ (z1 @ z2))))
+
+Typed Version
+\aa1 : o->o bb1 : o  . (\n : (((((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->(((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->((((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->(((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o cc1 : o->o dd1 : o  . (\p4 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o ee1 : o->o ff1 : o  . (p4 @ (\x4 : (o->o)->o->o y4 : (o->o)->o->o gg1 : o->o hh1 : o  . (y4 @ (\ii1 : o  . (gg1 @ (\ . ii1)))(\ . hh1)))(\jj1 : o  . (ee1 @ (\ . jj1)))(\ . ff1)) @ (\kk1 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ll1 : o->o mm1 : o  . (n @ (\p : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o nn1 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o oo1 : o->o pp1 : o  . (\x3 : (o->o)->o->o y3 : (o->o)->o->o f3 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o qq1 : o->o rr1 : o  . (f3 @ (\ss1 : o->o tt1 : o  . (x3 @ (\uu1 : o  . (ss1 @ (\ . uu1)))(\ . tt1)))(\vv1 : o->o ww1 : o  . (y3 @ (\xx1 : o  . (vv1 @ (\ . xx1)))(\ . ww1)))(\yy1 : o  . (qq1 @ (\ . yy1)))(\ . rr1)) @ (\zz1 : o->o aa2 : o  . (\p0 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o bb2 : o->o cc2 : o  . (p0 @ (\x6 : (o->o)->o->o y0 : (o->o)->o->o dd2 : o->o ee2 : o  . (y0 @ (\ff2 : o  . (dd2 @ (\ . ff2)))(\ . ee2)))(\gg2 : o  . (bb2 @ (\ . gg2)))(\ . cc2)) @ (\hh2 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ii2 : o->o jj2 : o  . (p @ (\kk2 : (o->o)->o->o ll2 : (o->o)->o->o mm2 : o->o nn2 : o  . (hh2 @ (\oo2 : o->o pp2 : o  . (kk2 @ (\qq2 : o  . (oo2 @ (\ . qq2)))(\ . pp2)))(\rr2 : o->o ss2 : o  . (ll2 @ (\tt2 : o  . (rr2 @ (\ . tt2)))(\ . ss2)))(\uu2 : o  . (mm2 @ (\ . uu2)))(\ . nn2)))(\vv2 : o  . (ii2 @ (\ . vv2)))(\ . jj2)))(\ww2 : o  . (zz1 @ (\ . ww2)))(\ . aa2)))(\xx2 : o->o yy2 : o  . (\m0 : (o->o)->o->o n0 : (o->o)->o->o f0 : o->o x0 : o  . (m0 @ (\zz2 : o  . (f0 @ (\ . zz2)))(\ . (n0 @ (\aa3 : o  . (f0 @ (\ . aa3)))(\ . x0)))) @ (\bb3 : o->o cc3 : o  . (\p1 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o dd3 : o->o ee3 : o  . (p1 @ (\x5 : (o->o)->o->o y5 : (o->o)->o->o ff3 : o->o gg3 : o  . (x5 @ (\hh3 : o  . (ff3 @ (\ . hh3)))(\ . gg3)))(\ii3 : o  . (dd3 @ (\ . ii3)))(\ . ee3)) @ (\jj3 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o kk3 : o->o ll3 : o  . (p @ (\mm3 : (o->o)->o->o nn3 : (o->o)->o->o oo3 : o->o pp3 : o  . (jj3 @ (\qq3 : o->o rr3 : o  . (mm3 @ (\ss3 : o  . (qq3 @ (\ . ss3)))(\ . rr3)))(\tt3 : o->o uu3 : o  . (nn3 @ (\vv3 : o  . (tt3 @ (\ . vv3)))(\ . uu3)))(\ww3 : o  . (oo3 @ (\ . ww3)))(\ . pp3)))(\xx3 : o  . (kk3 @ (\ . xx3)))(\ . ll3)))(\yy3 : o  . (bb3 @ (\ . yy3)))(\ . cc3)))(\zz3 : o->o aa4 : o  . (\p2 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o bb4 : o->o cc4 : o  . (p2 @ (\x2 : (o->o)->o->o y2 : (o->o)->o->o dd4 : o->o ee4 : o  . (y2 @ (\ff4 : o  . (dd4 @ (\ . ff4)))(\ . ee4)))(\gg4 : o  . (bb4 @ (\ . gg4)))(\ . cc4)) @ (\hh4 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ii4 : o->o jj4 : o  . (p @ (\kk4 : (o->o)->o->o ll4 : (o->o)->o->o mm4 : o->o nn4 : o  . (hh4 @ (\oo4 : o->o pp4 : o  . (kk4 @ (\qq4 : o  . (oo4 @ (\ . qq4)))(\ . pp4)))(\rr4 : o->o ss4 : o  . (ll4 @ (\tt4 : o  . (rr4 @ (\ . tt4)))(\ . ss4)))(\uu4 : o  . (mm4 @ (\ . uu4)))(\ . nn4)))(\vv4 : o  . (ii4 @ (\ . vv4)))(\ . jj4)))(\ww4 : o  . (zz3 @ (\ . ww4)))(\ . aa4)))(\xx4 : o  . (xx2 @ (\ . xx4)))(\ . yy2)))(\yy4 : (o->o)->o->o zz4 : (o->o)->o->o aa5 : o->o bb5 : o  . (nn1 @ (\cc5 : o->o dd5 : o  . (yy4 @ (\ee5 : o  . (cc5 @ (\ . ee5)))(\ . dd5)))(\ff5 : o->o gg5 : o  . (zz4 @ (\hh5 : o  . (ff5 @ (\ . hh5)))(\ . gg5)))(\ii5 : o  . (aa5 @ (\ . ii5)))(\ . bb5)))(\jj5 : o  . (oo1 @ (\ . jj5)))(\ . pp1)))(\kk5 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ll5 : o->o mm5 : o  . (\x1 : (o->o)->o->o y1 : (o->o)->o->o f1 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o nn5 : o->o oo5 : o  . (f1 @ (\pp5 : o->o qq5 : o  . (x1 @ (\rr5 : o  . (pp5 @ (\ . rr5)))(\ . qq5)))(\ss5 : o->o tt5 : o  . (y1 @ (\uu5 : o  . (ss5 @ (\ . uu5)))(\ . tt5)))(\vv5 : o  . (nn5 @ (\ . vv5)))(\ . oo5)) @ (\e : o->o r : o  . r)(\q : o->o w : o  . (q @ (\ . w)))(\ww5 : (o->o)->o->o xx5 : (o->o)->o->o yy5 : o->o zz5 : o  . (kk5 @ (\aa6 : o->o bb6 : o  . (ww5 @ (\cc6 : o  . (aa6 @ (\ . cc6)))(\ . bb6)))(\dd6 : o->o ee6 : o  . (xx5 @ (\ff6 : o  . (dd6 @ (\ . ff6)))(\ . ee6)))(\gg6 : o  . (yy5 @ (\ . gg6)))(\ . zz5)))(\hh6 : o  . (ll5 @ (\ . hh6)))(\ . mm5)))(\ii6 : (o->o)->o->o jj6 : (o->o)->o->o kk6 : o->o ll6 : o  . (kk1 @ (\mm6 : o->o nn6 : o  . (ii6 @ (\oo6 : o  . (mm6 @ (\ . oo6)))(\ . nn6)))(\pp6 : o->o qq6 : o  . (jj6 @ (\rr6 : o  . (pp6 @ (\ . rr6)))(\ . qq6)))(\ss6 : o  . (kk6 @ (\ . ss6)))(\ . ll6)))(\tt6 : o  . (ll1 @ (\ . tt6)))(\ . mm1)))(\uu6 : o  . (cc1 @ (\ . uu6)))(\ . dd1)) @ (\z1 : ((((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o)->(((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o z2 : (((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o)->(o->o)->o->o vv6 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ww6 : o->o xx6 : o  . (z1 @ (\yy6 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o zz6 : o->o aa7 : o  . (z1 @ (\bb7 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o cc7 : o->o dd7 : o  . (z1 @ (\ee7 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ff7 : o->o gg7 : o  . (z1 @ (\hh7 : ((o->o)->o->o)->((o->o)->o->o)->(o->o)->o->o ii7 : o->o jj7 : o  . (z2 @ (\kk7 : (o->o)->o->o ll7 : (o->o)->o->o mm7 : o->o nn7 : o  . (hh7 @ (\oo7 : o->o pp7 : o  . (kk7 @ (\qq7 : o  . (oo7 @ (\ . qq7)))(\ . pp7)))(\rr7 : o->o ss7 : o  . (ll7 @ (\tt7 : o  . (rr7 @ (\ . tt7)))(\ . ss7)))(\uu7 : o  . (mm7 @ (\ . uu7)))(\ . nn7)))(\vv7 : o  . (ii7 @ (\ . vv7)))(\ . jj7)))(\ww7 : (o->o)->o->o xx7 : (o->o)->o->o yy7 : o->o zz7 : o  . (ee7 @ (\aa8 : o->o bb8 : o  . (ww7 @ (\cc8 : o  . (aa8 @ (\ . cc8)))(\ . bb8)))(\dd8 : o->o ee8 : o  . (xx7 @ (\ff8 : o  . (dd8 @ (\ . ff8)))(\ . ee8)))(\gg8 : o  . (yy7 @ (\ . gg8)))(\ . zz7)))(\hh8 : o  . (ff7 @ (\ . hh8)))(\ . gg7)))(\ii8 : (o->o)->o->o jj8 : (o->o)->o->o kk8 : o->o ll8 : o  . (bb7 @ (\mm8 : o->o nn8 : o  . (ii8 @ (\oo8 : o  . (mm8 @ (\ . oo8)))(\ . nn8)))(\pp8 : o->o qq8 : o  . (jj8 @ (\rr8 : o  . (pp8 @ (\ . rr8)))(\ . qq8)))(\ss8 : o  . (kk8 @ (\ . ss8)))(\ . ll8)))(\tt8 : o  . (cc7 @ (\ . tt8)))(\ . dd7)))(\uu8 : (o->o)->o->o vv8 : (o->o)->o->o ww8 : o->o xx8 : o  . (yy6 @ (\yy8 : o->o zz8 : o  . (uu8 @ (\aa9 : o  . (yy8 @ (\ . aa9)))(\ . zz8)))(\bb9 : o->o cc9 : o  . (vv8 @ (\dd9 : o  . (bb9 @ (\ . dd9)))(\ . cc9)))(\ee9 : o  . (ww8 @ (\ . ee9)))(\ . xx8)))(\ff9 : o  . (zz6 @ (\ . ff9)))(\ . aa7)))(\gg9 : (o->o)->o->o hh9 : (o->o)->o->o ii9 : o->o jj9 : o  . (vv6 @ (\kk9 : o->o ll9 : o  . (gg9 @ (\mm9 : o  . (kk9 @ (\ . mm9)))(\ . ll9)))(\nn9 : o->o oo9 : o  . (hh9 @ (\pp9 : o  . (nn9 @ (\ . pp9)))(\ . oo9)))(\qq9 : o  . (ii9 @ (\ . qq9)))(\ . jj9)))(\rr9 : o  . (ww6 @ (\ . rr9)))(\ . xx6)))(\ss9 : o  . (aa1 @ (\ . ss9)))(\ . bb1))
+
+Eta-long form
+Root \ aa1 bb1 . @ (\ n cc1 dd1 . @ (\ p4 ee1 ff1 . p4 (\ x4 y4 gg1 hh1 . y4 (\ ii1 . gg1 (\ . ii1 ))(\ . hh1 ))(\ jj1 . ee1 (\ . jj1 ))(\ . ff1 ))(\ kk1 ll1 mm1 . n (\ p nn1 oo1 pp1 . @ (\ x3 y3 f3 qq1 rr1 . f3 (\ ss1 tt1 . x3 (\ uu1 . ss1 (\ . uu1 ))(\ . tt1 ))(\ vv1 ww1 . y3 (\ xx1 . vv1 (\ . xx1 ))(\ . ww1 ))(\ yy1 . qq1 (\ . yy1 ))(\ . rr1 ))(\ zz1 aa2 . @ (\ p0 bb2 cc2 . p0 (\ x6 y0 dd2 ee2 . y0 (\ ff2 . dd2 (\ . ff2 ))(\ . ee2 ))(\ gg2 . bb2 (\ . gg2 ))(\ . cc2 ))(\ hh2 ii2 jj2 . p (\ kk2 ll2 mm2 nn2 . hh2 (\ oo2 pp2 . kk2 (\ qq2 . oo2 (\ . qq2 ))(\ . pp2 ))(\ rr2 ss2 . ll2 (\ tt2 . rr2 (\ . tt2 ))(\ . ss2 ))(\ uu2 . mm2 (\ . uu2 ))(\ . nn2 ))(\ vv2 . ii2 (\ . vv2 ))(\ . jj2 ))(\ ww2 . zz1 (\ . ww2 ))(\ . aa2 ))(\ xx2 yy2 . @ (\ m0 n0 f0 x0 . m0 (\ zz2 . f0 (\ . zz2 ))(\ . n0 (\ aa3 . f0 (\ . aa3 ))(\ . x0 )))(\ bb3 cc3 . @ (\ p1 dd3 ee3 . p1 (\ x5 y5 ff3 gg3 . x5 (\ hh3 . ff3 (\ . hh3 ))(\ . gg3 ))(\ ii3 . dd3 (\ . ii3 ))(\ . ee3 ))(\ jj3 kk3 ll3 . p (\ mm3 nn3 oo3 pp3 . jj3 (\ qq3 rr3 . mm3 (\ ss3 . qq3 (\ . ss3 ))(\ . rr3 ))(\ tt3 uu3 . nn3 (\ vv3 . tt3 (\ . vv3 ))(\ . uu3 ))(\ ww3 . oo3 (\ . ww3 ))(\ . pp3 ))(\ xx3 . kk3 (\ . xx3 ))(\ . ll3 ))(\ yy3 . bb3 (\ . yy3 ))(\ . cc3 ))(\ zz3 aa4 . @ (\ p2 bb4 cc4 . p2 (\ x2 y2 dd4 ee4 . y2 (\ ff4 . dd4 (\ . ff4 ))(\ . ee4 ))(\ gg4 . bb4 (\ . gg4 ))(\ . cc4 ))(\ hh4 ii4 jj4 . p (\ kk4 ll4 mm4 nn4 . hh4 (\ oo4 pp4 . kk4 (\ qq4 . oo4 (\ . qq4 ))(\ . pp4 ))(\ rr4 ss4 . ll4 (\ tt4 . rr4 (\ . tt4 ))(\ . ss4 ))(\ uu4 . mm4 (\ . uu4 ))(\ . nn4 ))(\ vv4 . ii4 (\ . vv4 ))(\ . jj4 ))(\ ww4 . zz3 (\ . ww4 ))(\ . aa4 ))(\ xx4 . xx2 (\ . xx4 ))(\ . yy2 ))(\ yy4 zz4 aa5 bb5 . nn1 (\ cc5 dd5 . yy4 (\ ee5 . cc5 (\ . ee5 ))(\ . dd5 ))(\ ff5 gg5 . zz4 (\ hh5 . ff5 (\ . hh5 ))(\ . gg5 ))(\ ii5 . aa5 (\ . ii5 ))(\ . bb5 ))(\ jj5 . oo1 (\ . jj5 ))(\ . pp1 ))(\ kk5 ll5 mm5 . @ (\ x1 y1 f1 nn5 oo5 . f1 (\ pp5 qq5 . x1 (\ rr5 . pp5 (\ . rr5 ))(\ . qq5 ))(\ ss5 tt5 . y1 (\ uu5 . ss5 (\ . uu5 ))(\ . tt5 ))(\ vv5 . nn5 (\ . vv5 ))(\ . oo5 ))(\ e r . r )(\ q w . q (\ . w ))(\ ww5 xx5 yy5 zz5 . kk5 (\ aa6 bb6 . ww5 (\ cc6 . aa6 (\ . cc6 ))(\ . bb6 ))(\ dd6 ee6 . xx5 (\ ff6 . dd6 (\ . ff6 ))(\ . ee6 ))(\ gg6 . yy5 (\ . gg6 ))(\ . zz5 ))(\ hh6 . ll5 (\ . hh6 ))(\ . mm5 ))(\ ii6 jj6 kk6 ll6 . kk1 (\ mm6 nn6 . ii6 (\ oo6 . mm6 (\ . oo6 ))(\ . nn6 ))(\ pp6 qq6 . jj6 (\ rr6 . pp6 (\ . rr6 ))(\ . qq6 ))(\ ss6 . kk6 (\ . ss6 ))(\ . ll6 ))(\ tt6 . ll1 (\ . tt6 ))(\ . mm1 ))(\ uu6 . cc1 (\ . uu6 ))(\ . dd1 ))(\ z1 z2 vv6 ww6 xx6 . z1 (\ yy6 zz6 aa7 . z1 (\ bb7 cc7 dd7 . z1 (\ ee7 ff7 gg7 . z1 (\ hh7 ii7 jj7 . z2 (\ kk7 ll7 mm7 nn7 . hh7 (\ oo7 pp7 . kk7 (\ qq7 . oo7 (\ . qq7 ))(\ . pp7 ))(\ rr7 ss7 . ll7 (\ tt7 . rr7 (\ . tt7 ))(\ . ss7 ))(\ uu7 . mm7 (\ . uu7 ))(\ . nn7 ))(\ vv7 . ii7 (\ . vv7 ))(\ . jj7 ))(\ ww7 xx7 yy7 zz7 . ee7 (\ aa8 bb8 . ww7 (\ cc8 . aa8 (\ . cc8 ))(\ . bb8 ))(\ dd8 ee8 . xx7 (\ ff8 . dd8 (\ . ff8 ))(\ . ee8 ))(\ gg8 . yy7 (\ . gg8 ))(\ . zz7 ))(\ hh8 . ff7 (\ . hh8 ))(\ . gg7 ))(\ ii8 jj8 kk8 ll8 . bb7 (\ mm8 nn8 . ii8 (\ oo8 . mm8 (\ . oo8 ))(\ . nn8 ))(\ pp8 qq8 . jj8 (\ rr8 . pp8 (\ . rr8 ))(\ . qq8 ))(\ ss8 . kk8 (\ . ss8 ))(\ . ll8 ))(\ tt8 . cc7 (\ . tt8 ))(\ . dd7 ))(\ uu8 vv8 ww8 xx8 . yy6 (\ yy8 zz8 . uu8 (\ aa9 . yy8 (\ . aa9 ))(\ . zz8 ))(\ bb9 cc9 . vv8 (\ dd9 . bb9 (\ . dd9 ))(\ . cc9 ))(\ ee9 . ww8 (\ . ee9 ))(\ . xx8 ))(\ ff9 . zz6 (\ . ff9 ))(\ . aa7 ))(\ gg9 hh9 ii9 jj9 . vv6 (\ kk9 ll9 . gg9 (\ mm9 . kk9 (\ . mm9 ))(\ . ll9 ))(\ nn9 oo9 . hh9 (\ pp9 . nn9 (\ . pp9 ))(\ . oo9 ))(\ qq9 . ii9 (\ . qq9 ))(\ . jj9 ))(\ rr9 . ww6 (\ . rr9 ))(\ . xx6 ))(\ ss9 . aa1 (\ . ss9 ))(\ . bb1 )
+
+Traversals tree
+\ aa1 bb1 ; backpointer = 1; child № 0
+|  aa1; backpointer = 1; child № 0
+|  |  \ ; backpointer = 302; child № 1
+|  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  \ ; backpointer = 788; child № 1
+|  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  \ ; backpointer = 1402; child № 1
+|  |  |  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  |  |  \ ; backpointer = 1892; child № 1
+|  |  |  |  |  |  |  |  |  aa1; backpointer = 1; child № 0
+|  |  |  |  |  |  |  |  |  |  \ ; backpointer = 2386; child № 1
+|  |  |  |  |  |  |  |  |  |  |  bb1 ; backpointer = 1; child № 0
+
+Traversals length: [2704]
+
+Eta-long beta-normal form
+\aa1 bb1 .aa1(\.aa1(\.aa1(\.aa1(\.aa1(\.bb1 )))))
+=============================================================================

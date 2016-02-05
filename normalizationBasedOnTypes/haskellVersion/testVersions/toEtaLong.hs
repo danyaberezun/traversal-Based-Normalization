@@ -1,14 +1,18 @@
-module ToEtaLong (generateLNF, postprocess, toEtaLong) where
+-- typed LamChlbda expressions a la Church
+type Var     = String
+data ChType  = O | P ChType ChType deriving (Eq, Show)
+type AnnVar  = (Var, ChType)
+type AnnVars = [AnnVar]
+data ChL     = LamChl  AnnVars ChL  | App  ChL  ChL    | V  Var deriving (Eq, Show)
+data ChL2    = LamChl2 AnnVars ChL2 | App2 ChL2 [ChL2] | V2 Var deriving (Eq, Show)
 
-import DataTypes
+-- Eta-long form
+type Vars   = [Var]
+data B      = At As | CB Var As deriving (Eq, Show)
+data A      = Lam Vars B deriving (Eq, Show)
+type As     = [A]
+data LNF    = Root A deriving Show
 
--- ==============================================================
---  Main function : toEtaLong that generates an eta-long form
---  from typed lambda expression
--- ==============================================================
-
--- postprocess to concat neiber LamChlbdas
--- Bool -- is itselft an ardument or not
 postprocess :: ChL -> Bool -> ChL2
 postprocess (LamChl anvs1 (LamChl anvs2 t)) _ = postprocess (LamChl (anvs1 ++ anvs2) t) False
 postprocess (LamChl anvs t) _ = LamChl2 anvs (postprocess t False)
@@ -82,3 +86,15 @@ toEtaLong' t banvs free_names True = case getType t banvs of
 	P ty1 ty2 ->
 		let new_name = head free_names
 		in toEtaLong' (LamChl [(new_name, ty1)] (App t (V new_name))) banvs (tail free_names) True
+
+-- outdated examples
+ex = LamChl [("x", (P O (P O O)))] (App (V "x") (V "a"))
+run_ex = toEtaLong ex [("a", O)] ["z"] O False
+ex_R     = App (V "g") (LamChl [("bPr", O)] (V "bPr"))
+run_ex_R = toEtaLong ex_R [("g", P (P O O) (P O O))] ["w"] O False
+ex_P     = LamChl [("f", P O O), ("y", O)] (App (V "f") (App (App (V "g") (LamChl [("b", O)] (V "b"))) (V "y")))
+run_ex_P = toEtaLong ex_P [("g", P (P O O) (P O O))] [] O False
+ex_N     = LamChl [("h", P (P O O) (P O O)), ("z", P O O)] (App (App (V "h") (LamChl [("x", O)] (App (App (V "h") (LamChl [("xPr", O)] (V "x"))) (V "a")))) (App (V "z") (V "a")))
+run_ex_N = toEtaLong ex_N [("g", P (P O O) (P O O)), ("a", O)] [] O False
+ex_NPR   = (App (App ex_N ex_P) ex_R)
+run_NPR  = toEtaLong ex_NPR [("g", P (P O O) (P O O)), ("a", O)] ["w"] O False
