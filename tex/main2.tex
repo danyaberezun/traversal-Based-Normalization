@@ -1,0 +1,179 @@
+\documentclass[a4paper, 12pt]{article} %размер бумаги устанавливаем А4, шрифт 15пунктов
+\usepackage[margin=0.5in]{geometry}
+% \usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[utf8]{inputenc}%кодировка
+\usepackage[russian]{babel}%используем русский и английский языки с переносами
+% \graphicspath{{/}}%путь к рисункам
+\usepackage{cite}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{ amssymb }
+\usepackage{ amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\graphicspath{{pictures/}}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dred}{rgb}{0.545,0,0}
+\definecolor{dblue}{rgb}{0,0,0.545}
+\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+
+\usepackage{minted}
+
+\usepackage[labelformat=empty]{caption}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{CMU Serif}
+\setsansfont{CMU Sans Serif}
+\setmonofont{CMU Typewriter Text}
+
+\usepackage{stmaryrd}
+\usepackage{amsfonts}
+\newcommand\abs[1]{\left|#1\right|}
+
+\usepackage{tikz}
+\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
+\usepackage{lscape}
+\usepackage{pdflscape}
+
+\lstset{
+  frame=none,
+  xleftmargin=2pt,
+  stepnumber=1,
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\ttfamily\tiny\color[gray]{0.3},
+  belowcaptionskip=\bigskipamount,
+  captionpos=b,
+  escapeinside={*'}{'*},
+  language=haskell,
+  tabsize=2,
+  emphstyle={\bf},
+  commentstyle=\it,
+  stringstyle=\mdseries\rmfamily,
+  showspaces=false,
+  keywordstyle=\bfseries\rmfamily,
+  columns=flexible,
+  basicstyle=\small\sffamily,
+  showstringspaces=false,
+  morecomment=[l]\%,
+}
+
+\begin{document}
+\begin{itemize}
+\item $(\lambda x y\ .\ x\ @_2\ x)\ @_1\ (\lambda z\ .\ z)$
+  \begin{enumerate}
+  \item $\Lambda^{Unpyted}$
+    \begin{itemize}
+    \item Output:
+      \begin{center}
+        \begin{tabular}{ c | c | c | c | c | c }
+            ($\lambda x . \lambda$ y . xy)($\lambda z$ . z) & False & 0 & 0 & 0 & 0 \\ \hline
+            $\lambda x . \lambda y$ . xy                    & False & 1 & 1 & 1 & 1 \\ \hline
+            $\lambda y$ . xy                                & False & 2 & 0 & 0 & 2 \\ \hline
+            xy                                              & False & 3 & 0 & 0 & 3 \\ \hline
+            x                                               & False & 4 & 4 & 4 & 2 \\ \hline
+            $\lambda z$ . z                                 & False & 5 & 4 & 4 & 1 \\ \hline
+            z                                               & False & 6 & 0 & 0 & 6 \\ \hline
+            y                                               & False & 7 & 0 & 0 & 3 \\
+        \end{tabular}
+      \end{center}
+    \item Pretty-print:
+      \[\tikzmark{1}{$@_1$}\ \tikzmark{2}{$\lambda x$}\ \tikzmark{3}{$\lambda y$}\ \tikzmark{4}{$@_2$}\ \tikzmark{5}{$x$}\ \tikzmark{6}{$\lambda z$}\ \tikzmark{7}{$z$}\ \tikzmark{8}{$y$}\]
+      \begin{tikzpicture}[remember picture,overlay]
+        \color{red}{\draw[->] (2.north) to[bend right] (1.north);}
+        \color{green}{\draw[->] (2.south) to[bend left] (1.south);}
+        \color{green}{\draw[->] (3.south) to[bend left] (2.south);}
+        \color{green}{\draw[->] (4.south) to[bend left] (3.south);}
+        \color{red}{\draw[->] (5.north) to[bend right] (4.north);}
+        \color{green}{\draw[->] (5.south) to[bend left] (2.south);}
+        \color{red}{\draw[->] (6.north) to[bend right] (4.north);}
+        \color{green}{\draw[->] (6.south) to[bend left] (1.south);}
+        \color{green}{\draw[->] (7.south) to[bend left] (6.south);}
+        \color{green}{\draw[->] (8.south) to[bend left] (3.south);}
+      \end{tikzpicture}
+    \end{itemize}
+  \item $\Lambda^{SimpleTyped}$
+    \begin{itemize}
+    \item $\eta$-long form: $\lambda\ .\ @\ (\lambda x y . x (\lambda . y ))\ (\lambda z . z )\ (\lambda . a1 )$ where a1 is free variable with type 'o'
+    \item Output:
+      \begin{center}
+        \begin{tabular}{ c | c }
+            Root & 1 \\ \hline
+            $@$ & 0 \\ \hline
+            $\lambda x y$ & 2 \\ \hline
+            x & 3 \\ \hline
+            $\lambda z$ & 2 \\ \hline
+            z & 5 \\ \hline
+            $\lambda$ & 4 \\ \hline
+            y & 3 \\ \hline
+            $\lambda$ & 2 \\ \hline
+            a1 & 1 \\
+        \end{tabular}
+      \end{center}
+    \item Pretty-print:\\ \\
+      \[\tikzmark{1}{$Root$}\ \tikzmark{2}{$@$}\ \tikzmark{3}{$\lambda x y$}\ \tikzmark{4}{$x$}\ \tikzmark{5}{$\lambda z$}\ \tikzmark{6}{$z$}\ \tikzmark{7}{$\lambda$}\ \tikzmark{8}{$y$}\ \tikzmark{9}{$\lambda$}\ \tikzmark{10}{$a1$}\]
+      \begin{tikzpicture}[remember picture,overlay]
+        \color{red}{\draw[->] (2.north) to[bend right] (1.north);}
+        \color{red}{\draw[->] (3.north) to[bend right] (2.north);}
+        \color{red}{\draw[->] (4.north) to[bend right] (3.north);}
+        \color{red}{\draw[->] (5.north) to[bend right] (2.north);}
+        \color{red}{\draw[->] (6.north) to[bend right] (5.north);}
+        \color{red}{\draw[->] (7.north) to[bend right] (4.north);}
+        \color{red}{\draw[->] (8.north) to[bend right] (3.north);}
+        \color{red}{\draw[->] (9.north) to[bend right] (2.north);}
+        \color{red}{\draw[->] (10.north) to[bend right] (1.north);}
+      \end{tikzpicture}
+    \end{itemize}
+  \end{enumerate}
+\item $(\lambda x y\ .\ x\ @_2\ x)\ @_1\ (\lambda z\ .\ z)$ with $\Lambda^{Unpyted}$
+  \begin{itemize}
+  \item Output:
+    \begin{center}
+      \begin{tabular}{ c | c | c | c | c | c }
+          ($\lambda x . \lambda$ y . xx)($\lambda z$ . z) & False & 0 & 0 & 0 & 0 \\ \hline
+          $\lambda x . \lambda y$ . xx                    & False & 1 & 1 & 1 & 1 \\ \hline
+          $\lambda y$ . xx                                & False & 2 & 0 & 0 & 2 \\ \hline
+          xy                                              & False & 3 & 0 & 0 & 3 \\ \hline
+          x                                               & False & 4 & 4 & 4 & 2 \\ \hline
+          $\lambda z$ . z                                 & False & 5 & 4 & 4 & 1 \\ \hline
+          z                                               & False & 6 & 0 & 0 & 6 \\ \hline
+          x                                               & False & 7 & 0 & 0 & 2 \\ \hline
+          $\lambda z$ . z                                 & False & 8 & 0 & 0 & 1 \\ \hline
+          z                                               & False & 9 & 0 & 0 & 9 \\
+      \end{tabular}
+    \end{center}
+  \item Pretty-print:
+    \[\tikzmark{1}{$@_1$}\ \tikzmark{2}{$\lambda x$}\ \tikzmark{3}{$\lambda y$}\ \tikzmark{4}{$@_2$}\ \tikzmark{5}{$x$}\ \tikzmark{6}{$\lambda z$}\ \tikzmark{7}{$z$}\ \tikzmark{8}{$x$}\ \tikzmark{9}{$\lambda z$}\ \tikzmark{10}{$z$}\]
+    \begin{tikzpicture}[remember picture,overlay]
+      \color{red}{\draw[->] (2.north) to[bend right] (1.north);}
+      \color{green}{\draw[->] (2.south) to[bend left] (1.south);}
+      \color{green}{\draw[->] (3.south) to[bend left] (2.south);}
+      \color{green}{\draw[->] (4.south) to[bend left] (3.south);}
+      \color{red}{\draw[->] (5.north) to[bend right] (4.north);}
+      \color{green}{\draw[->] (5.south) to[bend left] (2.south);}
+      \color{red}{\draw[->] (6.north) to[bend right] (4.north);}
+      \color{green}{\draw[->] (6.south) to[bend left] (1.south);}
+      \color{green}{\draw[->] (7.south) to[bend left] (6.south);}
+      \color{green}{\draw[->] (8.south) to[bend left] (2.south);}
+      \color{green}{\draw[->] (9.south) to[bend left] (1.south);}
+      \color{green}{\draw[->] (10.south) to[bend left] (9.south);}
+    \end{tikzpicture}
+  \end{itemize}
+\end{itemize}
+
+
+\end{document}
+
+
+
+
+
+
+
+
