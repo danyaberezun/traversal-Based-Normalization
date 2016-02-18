@@ -36,7 +36,7 @@ isBinderApplied (Tr tr@((_, (_, (_, BIP bip))):_)) z len = let
     -- TODO: м.б. поменять
     (ULAbs _ x _, (_, (LUP lup, _))):_ -> Nothing
     _ -> error "isBinderApplied: not an abstraction by BIP from Variable ii)"
-isBinderApplied _ _ _ = error "isBinderApplied: not a BIP pointer on input"
+isBinderApplied tr _ _ = error $ "isBinderApplied: not a BIP pointer on input" ++ show tr
 
 travers :: Traversal -> [String] -> Int -> Traversal
 travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len = case x of
@@ -48,8 +48,8 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len = case x of
     False -> if up_x == 0 then Tr $ (x_e, (True, (LUP up_x, bi_x))):trs
       else case drop (len - up_x) tr of
         tr'@((ULApp _ _ r, (_, (up_a, _))):_) -> case r of
-          ULAbs _ _ _ -> travers (Tr $ (r, (False, (LUP $ up2int up_a, computeBP r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
-          _           -> travers (Tr $ (r, (False, (    up_a, computeBP r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
+          ULAbs _ _ _ -> travers (Tr $ (r, (False, (LUP $ up2int up_a, computeBP' r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
+          _           -> travers (Tr $ (r, (False, (    up_a, computeBP' r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
     -- (BVar) rule
     -- TODO: дописать
     True  -> case isBinderApplied (Tr tr) z len of
@@ -63,8 +63,8 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len = case x of
         if up_x == 0 then Tr $ (x_e, (True, (LUP up_x, bi_x))):trs
         else case drop (len - up_x) tr of
           tr'@((ULApp _ _ r, (_, (up_a, _))):_) -> case r of
-            ULAbs _ _ _ -> travers (Tr $ (r, (False, (LUP $ up2int up_a, computeBP r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
-            _           -> travers (Tr $ (r, (False, (    up_a, computeBP r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
+            ULAbs _ _ _ -> travers (Tr $ (r, (False, (LUP $ up2int up_a, computeBP' r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
+            _           -> travers (Tr $ (r, (False, (    up_a, computeBP' r up_x))):(x_e, (True, (LUP up_x, bi_x))):trs) bv (len+1)
   (ULVar _ z, (_, (CAP up_x, _))) -> error "travers: (VAR): variable has a CAP pointer"
 
   -- (App) rule
@@ -94,6 +94,10 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len = case x of
       ULVar _ z | elem z bv -> findDynamicBinder z (Tr (drop (len - i) tr)) i
       ULVar _ z | otherwise -> BIP 0
       _ -> LCP i
+    computeBP' e i = case computeBP e i of
+      LCP j -> DCP j
+      k ->k
+
 
 --TODO: hideNodes
 
