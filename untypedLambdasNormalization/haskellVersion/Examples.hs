@@ -1,6 +1,10 @@
-module Examples (examples) where
+module Examples (examples, examples_names) where
 
-examples = [ex, ex_1, ex_LO1, ex_LO2, ex_LO3, ex_LO4, ex_6, ex_7]
+examples = [ex_1, ex_2, ex_3, ex_4, ex_4', ex_5, ex_succ2, ex_9, ex_11,
+	ex_f0, ex_f1, ex_f2, ex_LO1, ex_LO2, ex_LO3, ex_LO4, ex_1, ex_6, ex_7]
+examples_names = ["ex\\_1", "ex\\_2", "ex\\_3", "ex\\_4", "ex\\_4'", "ex\\_5", "succ two",
+	"ex\\_9", "ex\\_11", "ex\\_f0", "ex\\_f1", "ex\\_f2", "ex\\_LO1", "ex\\_LO2", "ex\\_LO3",
+	"ex\\_LO4", "ex\\_1", "NPR", "mut three two"]
 
 ex = "(\\a . (\\w . w @ (w @ a)) @ s) @ (s @ z)"
 ex_1 = "(g @ (\\ n . n))"

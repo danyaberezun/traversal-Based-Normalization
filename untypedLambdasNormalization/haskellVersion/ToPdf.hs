@@ -1,15 +1,21 @@
 module ToPdf (showPdf) where
 import Data.List
+import Data.Char
 
 import DataTypes
 
-showPdf :: [Traversal] -> [[Char]] -> [Char]
-showPdf trs ns =
-    (fst $ mapAccumL (\acc (x, n) -> case x of
-      Tr xs -> (acc ++ "\\newpage\nexample $" ++ termToTex n ++ "$\n" ++ showPdf_traversal xs, (x,n))) document_begin (zip trs ns)) ++ document_end
+showPdf :: [Traversal] -> [[Char]] -> [[Char]] -> [Char]
+showPdf trs ns exameples_names =
+    (fst $ fst $ mapAccumL (\(acc, na:names) (x, n) -> case x of
+      Tr xs -> ((acc ++ "\\newpage\n\\section*{Example " ++ na ++ "}\n Input term: \\ $"
+      	++ termToTex n 1 ++ "$\n" ++ showPdf_traversal xs
+      	++ "\\\\[1in] Normal form: $" ++ (display . reverse $ xs) ++ "$\n"
+      	, names), (x, n))) (document_begin, exameples_names) (zip trs ns)) ++ document_end
   where
-    termToTex [] = []
-    termToTex (y:ys) = if y == '\\' then "\\lambda " ++ termToTex ys else y : (termToTex ys)
+    termToTex [] _ = []
+    termToTex (y:ys) i = if y == '\\' then "\\lambda " ++ termToTex ys i
+    	else if y == '@' then "@_{" ++ show i ++ "}" ++ termToTex ys ((+) i 1)
+    	else y : termToTex ys i
     document_begin   = "\\documentclass[a4paper, 10pt]{article}\n\\usepackage{tikz}\n\\usepackage{lscape}\n\\usetikzlibrary{arrows}\n\\newcommand{\\tikzmark}[3][]{\\tikz[remember picture,baseline] \\node [inner xsep=0pt,anchor=base,#1](#2) {#3};}\n\\begin{document}\n\\begin{landscape}\n"
     document_end = "\\end{landscape}\\end{document}\n"
     showPdf_traversal :: [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))] -> [Char]
@@ -35,12 +41,37 @@ showPdf trs ns =
       tikz_begin :: [Char]
       tikz_begin = "\\begin{tikzpicture}[remember picture,overlay]\n"
       tikz_end :: [Char]
-      tikz_end = "\\end{tikzpicture}\n"
+      tikz_end = "\\end{tikzpicture}"
       tikz_head :: [Char]
       tikz_head = "\\[" ++ (generate_tikz_items 1 tr) ++ "\\]\n"
       generate_tikz_items i [] = ""
       generate_tikz_items i ((t, _):tr) =
         "\\ \\ \\tikzmark{" ++ show i ++ "}{$" ++ show_item t ++ "$}" ++ generate_tikz_items ((+) i 1) tr
       show_item (ULAbs _ x _) = "\\lambda " ++ x
-      show_item (ULApp _ _ _) = "@"
+      show_item (ULApp i _ _) = "@_{" ++ i ++ "}"
       show_item (ULVar _ z  ) = z
+
+display :: [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))] -> [Char]
+display = fst . toLambda . throwOut
+  where
+    throwOut :: [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))]
+      -> [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))]
+    throwOut [] = []
+    throwOut (x@(x_e, (False, _)):trs) = throwOut trs
+    throwOut (x@(x_e, (True , _)):trs) = x : throwOut trs
+    toLambda :: [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))]
+      -> ([Char], [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))])
+    toLambda [] = ("", [])
+    toLambda (x@(ULVar _ z, (_, _)):trs) =
+        (z, trs)
+    toLambda (x@(x_e, (_, _)):trs) = let
+        (str', trs') = toLambda trs
+      in case x_e of
+        ULAbs name z _ -> ("\\lambda " ++ z ++ " . " ++ str', trs')
+        ULApp name _ _ -> let
+            (str'', trs'') = toLambda trs'
+            str'''  = if member '@' str' then "(" ++ str' ++ ")" else str'
+            str'''' = if member '@' str'' then "(" ++ str'' ++ ")" else str''
+          in (str''' ++ " @ " ++ str'''', trs'')
+
+member x xs = (/=) (filter ((==) x) xs) []

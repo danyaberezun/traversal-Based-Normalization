@@ -3,9 +3,9 @@ module DataTypes where
 import Data.List
 
 -- untyped simple lambda expression
-data UntypedLambda = ULVar Char String
-  | ULApp Char UntypedLambda UntypedLambda
-  | ULAbs Char String UntypedLambda
+data UntypedLambda = ULVar String String
+  | ULApp String UntypedLambda UntypedLambda
+  | ULAbs String String UntypedLambda
   deriving (Eq, Ord)
 instance Show UntypedLambda where
   show (ULVar _ v)                   = v
@@ -17,6 +17,12 @@ instance Show UntypedLambda where
 data ULambda = UVar String
   | UApp ULambda ULambda
   | UAbs String ULambda
+instance Show ULambda where
+  show (UVar v)                = v
+  show (UApp e1@(UAbs _ _) e2) = "(" ++ show e1 ++ ")" ++ show e2
+  show (UApp e (UVar v))       = show e ++ v
+  show (UApp e1 e2)            = show e1 ++ "(" ++ show e2 ++ ")"
+  show (UAbs v e)              = "\\" ++ v ++ " . " ++ show e
 
 -- term (is the end of sub-traversal, (history pointer, (pointer to last unfinished application, (lambda associate pointer, binder pointer)))
 data UnfinishedPointer = CAP Int | LUP Int deriving (Show, Eq)
