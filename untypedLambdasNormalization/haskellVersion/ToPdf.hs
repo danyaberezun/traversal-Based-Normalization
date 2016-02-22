@@ -16,7 +16,7 @@ showPdf trs ns exameples_names =
     termToTex (y:ys) i = if y == '\\' then "\\lambda " ++ termToTex ys i
     	else if y == '@' then "@_{" ++ show i ++ "}" ++ termToTex ys ((+) i 1)
     	else y : termToTex ys i
-    document_begin   = "\\documentclass[a4paper, 10pt]{article}\n\\usepackage{tikz}\n\\usepackage{lscape}\n\\usetikzlibrary{arrows}\n\\newcommand{\\tikzmark}[3][]{\\tikz[remember picture,baseline] \\node [inner xsep=0pt,anchor=base,#1](#2) {#3};}\n\\begin{document}\n\\begin{landscape}\n"
+    document_begin   = "\\documentclass[10pt]{article}\n\\usepackage{pgfplots}\n\\usepackage[paperheight=50in,paperwidth=20in]{geometry}\n\\usepackage{lscape}\n\\usetikzlibrary{arrows}\n\\newcommand{\\tikzmark}[3][]{\\tikz[remember picture,baseline] \\node [inner xsep=0pt,anchor=base,#1](#2) {#3};}\n\\begin{document}\n\\begin{landscape}\n"
     document_end = "\\end{landscape}\\end{document}\n"
     showPdf_traversal :: [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))] -> [Char]
     showPdf_traversal tr' = show_tikz where
@@ -39,7 +39,7 @@ showPdf trs ns exameples_names =
           ++ (if bp /= 0 then "\t \\color{green}{\\draw[->] (" ++ show i ++ ".south) to[bend left] (" ++ show bp ++ ".south);}\n"
             else "")
       tikz_begin :: [Char]
-      tikz_begin = "\\begin{tikzpicture}[remember picture,overlay]\n"
+      tikz_begin = "\\begin{tikzpicture}[remember picture,overlay,scale=6,domain=0:1]\n"
       tikz_end :: [Char]
       tikz_end = "\\end{tikzpicture}"
       tikz_head :: [Char]
