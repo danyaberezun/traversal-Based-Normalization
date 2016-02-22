@@ -1,9 +1,11 @@
 module Examples (examples, examples_names) where
 
-examples = [p_zero, p_one_three, p_two_three_four, p_three_three_four_five]
-examples_names = ["p zero", "p one three", "p two three four", "p three three four five"]
+examples = [p_zero, p_one_three, p_two_three_four, p_three_three_four_five, p_one, p_two]
+examples_names = ["p zero", "p one three", "p two three four", "p three three four five", "p one", "p two"]
 
 p_zero = "(\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . z2)"
+p_one  = "(\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ z2)"
+p_two  = "(\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ (s2 @ z2))"
 p_one_three  = "((\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ z2)) @ (\\ s3 . \\ z3 . s3 @ (s3 @ (s3 @ z3)))"
 p_two_three_four = "(((\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ (s2 @ z2))) @ (\\ s3 . \\ z3 . s3 @ (s3 @ (s3 @ z3)))) @ (\\ s4 . \\ z4 . s4 @ (s4 @ (s4 @ (s4 @ z4))))"
 p_three_three_four_five = "((((\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ (s2 @ (s2 @ z2)))) @ (\\ s3 . \\ z3 . s3 @ (s3 @ (s3 @ z3)))) @ (\\ s4 . \\ z4 . s4 @ (s4 @ (s4 @ (s4 @ z4))))) @ (\\ s5 . \\ z5. s5 @ (s5 @ (s5 @ (s5 @ (s5 @ z5)))))"
