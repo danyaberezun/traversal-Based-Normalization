@@ -9,6 +9,7 @@ import Examples
 import ToPdf
 import DataTypes
 import Parsing
+import AuxiliaryFunctions
 
 computeBoundVariables :: UntypedLambda -> [String]
 computeBoundVariables t = computeBoundVariables' t [] where
@@ -23,18 +24,6 @@ findDynamicBinder z tr len = findDynamicBinder' z tr len tr where
   findDynamicBinder' z (Tr tr@((_, (_, (_, bi_z))):_)) len trr
     | (bp2int bi_z) == len = error $ "findDynamicBinder' " ++ show bi_z ++ " " ++ show len ++ "\n" ++ show (Tr tr)
     | otherwise   = findDynamicBinder' z (Tr (drop (len - (bp2int bi_z)) tr)) (bp2int bi_z) trr
-
-isBinderApplied :: Traversal -> String -> Int -> Maybe (UntypedLambda, Int)
-isBinderApplied (Tr tr@((_, (_, (_, BIP bip))):_)) z len = let
-    tr' = drop (len - bip) tr
-  in case tr' of
-    (ULAbs _ x _, (_, (CAP cap, _))):_ -> case drop (bip - cap) tr' of
-      (ULApp _ _ r, (_, (_, _))):_ -> Just (r, cap)
-      _ -> error "isBinderApplied: not an abstraction by BIP from Variable i)"
-    -- TODO: м.б. поменять
-    (ULAbs _ x _, (_, (LUP lup, _))):_ -> Nothing
-    _ -> error "isBinderApplied: not an abstraction by BIP from Variable ii)"
-isBinderApplied tr _ _ = error $ "isBinderApplied: not a BIP pointer on input" ++ show tr
 
 -- TODO: clean up code
 travers :: Traversal -> [String] -> Int -> Bool -> Traversal
@@ -124,8 +113,6 @@ hideNodes (Tr tr) len =
       in {-trace ("hideNode' general case : " ++ show (Tr $ x : trs)) $-} if member len is
         then ((x_e, (False, (bp_x, bi_x))) : t, l)
         else (x : t, l)
-    member x xs = (/=) (filter ((==) x) xs) []
-
 
 normalize :: UntypedLambda -> Traversal
 normalize t =
