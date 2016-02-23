@@ -35,9 +35,9 @@ showPdf trs ns exameples_names =
                 color = case np' of
                   CAP _ -> "red"
                   LUP _ -> "brown"
-              in "\t \\color{" ++ color ++ "}{\\draw[->] (" ++ show i ++ ".north) to[bend right] (" ++ show np ++ ".north);}\n"
+              in "\t {\\color{" ++ color ++ "}\\draw[->] (" ++ show i ++ ".north) to[bend right] (" ++ show np ++ ".north);}\n"
             else "")
-          ++ (if bp /= 0 then "\t \\color{green}{\\draw[->] (" ++ show i ++ ".south) to[bend left] (" ++ show bp ++ ".south);}\n"
+          ++ (if bp /= 0 then "\t {\\color{green}\\draw[->] (" ++ show i ++ ".south) to[bend left] (" ++ show bp ++ ".south);}\n"
             else "")
       tikz_begin :: [Char]
       tikz_begin = "\\begin{tikzpicture}[remember picture,overlay,scale=6,domain=0:1]\n"
