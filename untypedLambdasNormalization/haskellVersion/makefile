@@ -1,6 +1,6 @@
 all: cleanExceptPdf
-	ghc TwoBackPointersVersion.hs
-	./TwoBackPointersVersion
+	ghc Main.hs
+	./Main
 	xelatex --shell-escape examples.tex
 	xelatex --shell-escape examples.tex
 	make cleanExceptPdf
