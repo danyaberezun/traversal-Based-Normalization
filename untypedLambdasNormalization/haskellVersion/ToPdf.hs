@@ -54,7 +54,7 @@ showPdf trs ns exameples_names =
           ++ "$"++ show_item t ++ "$}" ++ (if b then "}" else "")
           ++ (let
                 len = ((length tr') - (length tr))
-              in case isBinderApplied (Tr $ drop (length tr) tr') z len of 
+              in case isBinderApplied2 (Tr $ drop (length tr) tr') z len of 
                   Nothing -> "\\ \\ {\\color{red}\\tikzmark{}{$||$}}"
                   Just _ -> "\\ \\ {\\color{brown}\\tikzmark{}{=}}")
           ++ generate_tikz_items ((+) i 1) tr

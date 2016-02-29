@@ -1,7 +1,9 @@
 module Examples (examples, examples_names) where
 
-examples = [p_zero, p_one_three, p_two_three_four, p_three_three_four_five, p_one, p_two]
-examples_names = ["p zero", "p one three", "p two three four", "p three three four five", "p one", "p two"]
+examples = [p_zero, p_one_three, p_two_three_four, p_three_three_four_five, p_one, p_two,
+	ex_mult_free_m_n]
+examples_names = ["p zero", "p one three", "p two three four", "p three three four five", "p one", "p two",
+	"ex mult free m n"]
 
 p_zero = "(\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . z2)"
 p_one  = "(\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ z2)"
@@ -9,6 +11,7 @@ p_two  = "(\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x 
 p_one_three  = "((\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ z2)) @ (\\ s3 . \\ z3 . s3 @ (s3 @ (s3 @ z3)))"
 p_two_three_four = "(((\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ (s2 @ z2))) @ (\\ s3 . \\ z3 . s3 @ (s3 @ (s3 @ z3)))) @ (\\ s4 . \\ z4 . s4 @ (s4 @ (s4 @ (s4 @ z4))))"
 p_three_three_four_five = "((((\\ t . (((t @ (\\ n . \\ a . \\ x . n @ (\\ s . \\ z . (a @ s) @ ((x @ s) @ z)))) @ (\\ a1 . a1)) @ (\\ s1 . \\ z1 . z1))) @ (\\ s2 . \\ z2 . s2 @ (s2 @ (s2 @ z2)))) @ (\\ s3 . \\ z3 . s3 @ (s3 @ (s3 @ z3)))) @ (\\ s4 . \\ z4 . s4 @ (s4 @ (s4 @ (s4 @ z4))))) @ (\\ s5 . \\ z5. s5 @ (s5 @ (s5 @ (s5 @ (s5 @ z5)))))"
+ex_mult_free_m_n = "\\ s . \\ z . (m @ (n @ s)) @ z"
 
 --examples = [ex_1, ex_2, ex_3, ex_4, ex_4', ex_5, ex_succ2, ex_9, ex_11,
 --	ex_f0, ex_f1, ex_f2, ex_LO1, ex_LO2, ex_LO3, ex_LO4, ex_1, ex_6, ex_7]
