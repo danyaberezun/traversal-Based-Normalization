@@ -1,0 +1,446 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage[margin=0.5in]{geometry}
+% \usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[utf8]{inputenc}%кодировка
+\usepackage[russian]{babel}%используем русский и английский языки с переносами
+% \graphicspath{{/}}%путь к рисункам
+\usepackage{cite}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{ amssymb }
+\usepackage{ amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\graphicspath{{pictures/}}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dred}{rgb}{0.545,0,0}
+\definecolor{dblue}{rgb}{0,0,0.545}
+\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+
+\usepackage{pythontex}
+\usepackage{minted}
+
+% for printing trees
+\usepackage{verbatim}
+
+\usepackage[labelformat=empty]{caption}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{CMU Serif}
+\setsansfont{CMU Sans Serif}
+\setmonofont{CMU Typewriter Text}
+
+\usepackage{stmaryrd}
+\usepackage{amsfonts}
+\newcommand\abs[1]{\left|#1\right|}
+
+\usepackage{tikz}
+\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
+\usepackage{lscape}
+\usepackage{pdflscape}
+
+\lstset{
+  frame=none,
+  xleftmargin=2pt,
+  stepnumber=1,
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\ttfamily\tiny\color[gray]{0.3},
+  belowcaptionskip=\bigskipamount,
+  captionpos=b,
+  escapeinside={*'}{'*},
+  language=haskell,
+  tabsize=2,
+  emphstyle={\bf},
+  commentstyle=\it,
+  stringstyle=\mdseries\rmfamily,
+  showspaces=false,
+  keywordstyle=\bfseries\rmfamily,
+  columns=flexible,
+  basicstyle=\small\sffamily,
+  showstringspaces=false,
+  morecomment=[l]\%,
+}
+
+\usetikzlibrary{calc}
+
+\begin{document}
+
+\section{Labelled Transition System для Traversals}
+\begin{itemize}
+\item Вход: $\lambda$-терм $M \in \Lambda$ вида $\Lambda @ \Lambda$ | $\Lambda\ x\ .\ \Lambda$ | $x$;
+\item Пространство состояний --- множество цепочек вида $n_1,\ \dots,\ n_m,\ \dots$, где $\forall i,\ n_i$ --- узел дерева для $M$;
+\item Метка перехода --- добавляемый узел дерева.
+\end{itemize}
+
+\subsection{Rules}
+\begin{enumerate}
+\item (BVars)
+  \begin{itemize}
+  \item (BVar -- Lam)
+  \[\tikzmark{}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{\lambda y}$
+
+  \[\tikzmark{}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ {\color{blue}\tikzmark{}{$=$}}\ \ \tikzmark{5}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+    {\color{red}\draw[<-]   ($(4.north)+(0,0.55)$)
+                node[above,align=left,black] {}  -- (5);}
+    {\color{green}\draw[->] (5.south) to[bend left] (2.south);}
+  % \draw[->]    
+  %             (2) edge node[above] {$r(t)=y(t)+ n(t)$}
+  %                       node[below] {$r[n]=y[n]+ z[n]$}
+  %             (3);
+  \end{tikzpicture}
+
+  \item (BVar -- App)
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{@_2}$
+
+  \[\tikzmark{}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ {\color{blue}\tikzmark{}{$=$}}\ \ \tikzmark{5}{$@_2$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.55)$)
+                node[above,align=left,black] {}  -- (5);}
+    {\color{green}\draw[->] (5.south) to[bend left] (2.south);}
+  \end{tikzpicture}
+
+  \item (BVar -- BVar)
+  \[\tikzmark{}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{y}$, где $\exists\ \lambda y$ в истроии, доступная по цепочке зеленых указателей из $@_1$\\
+
+  \[\tikzmark{1}{$\lambda y$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ {\color{blue}\tikzmark{}{$=$}}\ \ \tikzmark{5}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{green}\draw[densely dotted, ->] (2.south) to[bend left] (1.south);}
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.55)$)
+                node[above,align=left,black] {}  -- (5);}
+    {\color{green}\draw[->] (5.south) to[bend left] (1.south);}
+  \end{tikzpicture}
+
+  \item (BVar -- FVar)
+  \[\tikzmark{}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{y}$, где $\not\exists\ \lambda y$ в истроии, доступная по цепочке зеленых указателей из $@_1$\\
+
+  \[\tikzmark{}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ {\color{blue}\tikzmark{}{$=$}}\ \ \tikzmark{5}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+                node[above,align=left,black] {$i$}  -- (4);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.55)$)
+                node[above,align=left,black] {}  -- (5);}
+    {\color{green}\draw[<-]   ($(5.north)+(0,0.5)$)
+                node[above,align=left,black] {}  -- (5);}
+  \end{tikzpicture}
+  \end{itemize}
+
+\item (FVars)
+  \begin{itemize}
+  \item (FVar -- Not-FVar)
+  \[\tikzmark{0}{$@_0$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (1.north) to[bend right] (0.north);}
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{n}$, where $n$ is a right child of $@_1$ and $n \ne$ (FVar)\\
+
+  \[\tikzmark{0}{$@_0$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$y$}\ \ \tikzmark{}{\color{blue}$||$}\ \ \tikzmark{3}{$n$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (1.north) to[bend right] (0.north);}
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (0.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (1.south);}
+  \end{tikzpicture}
+
+  \item (FVar -- FVar)
+  \[\tikzmark{0}{$@_0$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (1.north) to[bend right] (0.north);}
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{x}$, where $n$ is a right child of $@_1$ and $n =$ (FVar)\\
+
+  \[\tikzmark{0}{$@_0$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$y$}\ \ \tikzmark{}{\color{blue}$||$}\ \ \tikzmark{3}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (1.north) to[bend right] (0.north);}
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (0.north);}
+    {\color{green}\draw[<-]   ($(3.north)+(0,0.5)$)
+                node[above,align=left,black] {}  -- (3);}
+  \end{tikzpicture}
+  \end{itemize}
+
+\item (Apps)
+  \begin{itemize}
+  \item (App -- BVar)
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{0}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{green}\draw[densely dotted, ->] (1.south) to[bend left] (0.south);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{x}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{0}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{2}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{green}\draw[densely dotted, ->] (1.south) to[bend left] (0.south);}
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (0.south);}
+  \end{tikzpicture}
+
+  \item (App -- FVar)
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\]
+
+  $\longrightarrow^{y}$, such that $\not\exists \lambda y$ in tarversal$:\ @_1 {\color{green}-->} \lambda y$ \\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{2}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[<-]   ($(2.north)+(0,0.5)$)
+                node[above,align=left,black] {}  -- (2);}
+  \end{tikzpicture}
+
+  \item (App -- Lam)
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\]
+
+  $\longrightarrow^{\lambda x}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{2}{$\lambda x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+  \end{tikzpicture}
+
+  \item (App -- App)
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\]
+
+  $\longrightarrow^{@_2}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{2}{$@_2$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+  \end{tikzpicture}
+  \end{itemize}
+
+\item (Lam-Reds)
+  \begin{itemize}
+  \item (Lam-Red -- BVar)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[densely dotted, <-]   ($(2.north)+(0,0.5)$)
+                node[above,align=left,black] {$\lambda x$}  -- (2);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{x}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[densely dotted, <-]   ($(2.north)+(0,0.5)$)
+                node[above,align=left,black] {$\lambda x$}  -- (2);}
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.6)$)
+                node[above,align=left,black] {}  -- (3);}
+    {\color{green}\draw[<-]   ($(2.north)+(0,0.6)$)
+                node[above,align=left,black] {}  -- (3);}
+  \end{tikzpicture}
+
+  \item (Lam-Red -- FVar)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{x}$, где $\not\exists\ \lambda x$ в истории, доступная по цепочке зеленых указателей из $\lambda y$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.6)$)
+                node[above,align=left,black] {}  -- (3);}
+    {\color{green}\draw[<-]   ($(3.north)+(0,0.5)$)
+                node[above,align=left,black] {}  -- (3);}
+  \end{tikzpicture}
+
+  \item (Lam-Red -- Lam)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{\lambda x}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$\lambda x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{red}\draw[<-]   ($(1.north)+(0,0.6)$)
+                node[above,align=left,black] {}  -- (3);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+  \end{tikzpicture}
+
+  \item (Lam-Red -- App)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{@_2}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$@_2$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.5)$)
+                node[above,align=left,black] {$@_0$}  -- (1);}
+    {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{brown}\draw[<-]   ($(1.north)+(0,0.6)$)
+                node[above,align=left,black] {}  -- (3);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+  \end{tikzpicture}
+
+  \end{itemize}
+
+\item (Lam-Browns)
+  \begin{itemize}
+  \item (Lam-Brown -- BVar)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[densely dotted, <-]   ($(2.north)+(0,0.5)$)
+                node[above,align=left,black] {$\lambda x$}  -- (2);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{x}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[densely dotted, <-]   ($(2.north)+(0,0.5)$)
+                node[above,align=left,black] {$\lambda x$}  -- (2);}
+    {\color{green}\draw[<-]   ($(2.north)+(0,0.6)$)
+                node[above,align=left,black] {}  -- (3);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  \item (Lam-Brown -- FVar)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{x}$, где $\not\exists\ \lambda x$ в истории, доступная по цепочке зеленых указателей из $\lambda y$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[<-]   ($(3.north)+(0,0.5)$)
+                node[above,align=left,black] {}  -- (3);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  \item (Lam-Brown -- Lam)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{\lambda x}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$\lambda x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+  \end{tikzpicture}
+
+  \item (Lam-Brown -- App)
+  \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+  \end{tikzpicture}
+
+  $\longrightarrow^{@_2}$\\
+
+  \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$@_2$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+  \end{tikzpicture}
+
+  \end{itemize}
+
+
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
