@@ -1,9 +1,8 @@
-module Parsing where
+module Parsing (parseExpr) where
 import Text.ParserCombinators.Parsec
 
 import DataTypes
 
--- parsing
 identifier  = do
   c  <- letter
   cs <- many (alphaNum <|> char '_')

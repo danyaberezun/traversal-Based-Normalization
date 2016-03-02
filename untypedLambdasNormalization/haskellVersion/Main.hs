@@ -17,17 +17,6 @@ computeBoundVariables t = computeBoundVariables' t [] where
   computeBoundVariables' (ULApp _ e1 e2) xs = computeBoundVariables' e1 (computeBoundVariables' e2 xs)
   computeBoundVariables' _ xs = xs
 
-findDynamicBinder :: String -> Traversal -> Int -> BinderPointer
-findDynamicBinder z tr len = findDynamicBinder' z tr len tr where
-  findDynamicBinder' z (Tr []) _ trr = error $ "findDynamicBinder : error: empty traversal"
-    ++ show z ++ " tr = "++ show trr
-  findDynamicBinder' z (Tr ((ULAbs _ x t, _):tr)) len _ | x == z = BIP len
-  findDynamicBinder' z (Tr tr@((_, (_, (_, bi_z))):_)) len trr
-    | (bp2int bi_z) == len = error $ "findDynamicBinder' " ++ show bi_z ++ " " ++ show len
-      ++ "\n" ++ show (Tr tr)
-    | otherwise   = findDynamicBinder' z (Tr (drop (len - (bp2int bi_z)) tr)) (bp2int bi_z) trr
-
--- TODO: clean up code
 travers :: Traversal -> [String] -> Int -> Bool -> Traversal
 travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len hn = case x of
   --trace (show (Tr tr) ++ "\n") $ case x of
@@ -72,12 +61,12 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len hn = case x of
   -- (Lam) rule
   (ULAbs _ v e, (_, (CAP up_x, _))) -> case e of
     ULAbs _ _ _ -> case drop (len - up_x) tr of
-      (_, (_, (LUP up_x', _))):_ -> travers (Tr $ (e, (True, (if up_x' == 0 then LUP 0 else CAP up_x', DCP len))):tr)
+      (_, (_, (LUP   up_x', _))):_ -> travers (Tr $ (e, (True, (if up_x' == 0 then LUP 0 else CAP up_x', DCP len))):tr)
                                             bv (len + 1) False
       (_, (_, (PAUSE up_x', _))):_ -> travers (Tr $ (e, (True, (PAUSE up_x', DCP len))):tr) bv (len + 1) False
       p                            -> error $ "travers: (Lam): application has a CAP pointer i)" ++ show p
     _           -> case drop (len - up_x) tr of
-      (_, (_, (LUP up_x'  , _))):_ -> travers (Tr $ (e, (True, (LUP   up_x', computeBP e len))):tr) bv (len + 1) False
+      (_, (_, (LUP   up_x', _))):_ -> travers (Tr $ (e, (True, (LUP   up_x', computeBP e len))):tr) bv (len + 1) False
       (_, (_, (PAUSE up_x', _))):_ -> travers (Tr $ (e, (True, (PAUSE up_x', computeBP e len))):tr) bv (len + 1) False
       _                            -> error "travers: (Lam): application has a CAP pointer ii)"
   (ULAbs _ v e, (_, (up_x, _)))     ->
@@ -93,6 +82,15 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len hn = case x of
     toPause (LUP   p) = PAUSE p
     toPause (CAP   p) = PAUSE p
     toPause (PAUSE p) = PAUSE p
+    findDynamicBinder :: String -> Traversal -> Int -> BinderPointer
+    findDynamicBinder z tr len = findDynamicBinder' z tr len tr where
+      findDynamicBinder' z (Tr []) _ trr = error $ "findDynamicBinder : error: empty traversal"
+        ++ show z ++ " tr = "++ show trr
+      findDynamicBinder' z (Tr ((ULAbs _ x t, _):tr)) len _ | x == z = BIP len
+      findDynamicBinder' z (Tr tr@((_, (_, (_, bi_z))):_)) len trr
+        | (bp2int bi_z) == len = error $ "findDynamicBinder' " ++ show bi_z ++ " " ++ show len
+          ++ "\n" ++ show (Tr tr)
+        | otherwise   = findDynamicBinder' z (Tr (drop (len - (bp2int bi_z)) tr)) (bp2int bi_z) trr
 
 hideNodes :: Traversal -> Int -> Traversal
 hideNodes (Tr tr) len =

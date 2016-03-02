@@ -23,7 +23,15 @@ showPdf trs ns exameples_names =
       	++ "\\\\[2in] Normal form: $" ++ (display . reverse $ xs) ++ "$\n"
       	, names), (x, n))) (document_begin, exameples_names) (zip trs ns)) ++ document_end
   where
-    document_begin = "\\documentclass[10pt]{article}\n\\usepackage{pgfplots}\n\\usepackage[paperheight=50in,paperwidth=20in]{geometry}\n\\usepackage{lscape}\n\\usetikzlibrary{arrows}\n\\newcommand{\\tikzmark}[3][]{\\tikz[remember picture,baseline] \\node [inner xsep=0pt,anchor=base,#1](#2) {#3};}\n\\begin{document}\n\\begin{landscape}\nNotation: \\\\ {\\color{red}\\tikzmark{}{$||$}} denotes puase; \\\\ {\\color{brown}\\tikzmark{}{=}} denotes substitution; \\\\ {\\color{red}$\\rightarrow$} bounds lambdas with corresponding arguments; \\\\ {\\color{brown} $\\rightarrow$} are pointers to last unfinished application within one run (between two neighbor '||'); \\\\  {\\color{violet} $\\rightarrow$} are pointers to last unfinished application from one run to another one (pointer across some '||'); \\\\ {\\color{green}$\\rightarrow$} are binder pointers (invariant: for (BVar) it points to the corresponding (Lam) that bounds it; otherwise it point to the parent with respect to tree structure); \\\\ elements of traversal that will appear in normalized term are \\underline{underlined}. \\\\ \\newpage \n"
+    document_begin = "\\documentclass[10pt]{article}\n\\usepackage{pgfplots}\n\\usepackage[paperheight=50in,paperwidth=20in]{geometry}\n\
+      \ \\usepackage{lscape}\n\\usetikzlibrary{arrows}\n\\newcommand{\\tikzmark}[3][]{\\tikz[remember picture,baseline]\
+      \ \\node [inner xsep=0pt,anchor=base,#1](#2) {#3};}\n\\begin{document}\n\\begin{landscape}\nNotation: \\\\ {\\color{red}\\tikzmark{}{$||$}}\
+      \ denotes puase; \\\\ {\\color{brown}\\tikzmark{}{=}} denotes substitution; \\\\ {\\color{red}$\\rightarrow$} bounds lambdas with corresponding arguments;\
+      \ \\\\ {\\color{brown} $\\rightarrow$} are pointers to last unfinished application within one run (between two neighbor '||');\
+      \ \\\\  {\\color{violet} $\\rightarrow$} are pointers to last unfinished application from one run to another one (pointer across some '||');\
+      \ \\\\ {\\color{green}$\\rightarrow$} are binder pointers (invariant: for (BVar) it points to the corresponding (Lam) that bounds it;\
+      \ otherwise it point to the parent with respect to tree structure);\
+      \ \\\\ elements of traversal that will appear in normalized term are \\underline{underlined}. \\\\ \\newpage \n"
     document_end   = "\\end{landscape}\\end{document}\n"
     showPdf_traversal :: [(UntypedLambda, (Bool, (UnfinishedPointer, BinderPointer)))] -> [Char]
     showPdf_traversal tr' = show_tikz where
