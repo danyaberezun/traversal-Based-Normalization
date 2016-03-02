@@ -1,8 +1,12 @@
-all: transition_system main main2
+all: transition_system main main2 headLinearReduction
 
 transition_system:
 	xelatex --shell-escape labelledTransitionSystem.tex
 	xelatex --shell-escape labelledTransitionSystem.tex
+	make clean
+
+headLinearReduction:
+	xelatex --shell-escape headLinearReductionLTS.tex
 	make clean
 
 main:

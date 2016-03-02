@@ -1,0 +1,149 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage[margin=0.5in]{geometry}
+% \usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[utf8]{inputenc}%кодировка
+\usepackage[russian]{babel}%используем русский и английский языки с переносами
+% \graphicspath{{/}}%путь к рисункам
+\usepackage{cite}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{ amssymb }
+\usepackage{ amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\graphicspath{{pictures/}}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dred}{rgb}{0.545,0,0}
+\definecolor{dblue}{rgb}{0,0,0.545}
+\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+
+\usepackage{pythontex}
+\usepackage{minted}
+
+% for printing trees
+\usepackage{verbatim}
+
+\usepackage[labelformat=empty]{caption}
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\defaultfontfeatures{Ligatures=TeX}
+\setmainfont{CMU Serif}
+\setsansfont{CMU Sans Serif}
+\setmonofont{CMU Typewriter Text}
+
+\usepackage{stmaryrd}
+\usepackage{amsfonts}
+\newcommand\abs[1]{\left|#1\right|}
+
+\usepackage{tikz}
+\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
+\usepackage{lscape}
+\usepackage{pdflscape}
+
+\lstset{
+  frame=none,
+  xleftmargin=2pt,
+  stepnumber=1,
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\ttfamily\tiny\color[gray]{0.3},
+  belowcaptionskip=\bigskipamount,
+  captionpos=b,
+  escapeinside={*'}{'*},
+  language=haskell,
+  tabsize=2,
+  emphstyle={\bf},
+  commentstyle=\it,
+  stringstyle=\mdseries\rmfamily,
+  showspaces=false,
+  keywordstyle=\bfseries\rmfamily,
+  columns=flexible,
+  basicstyle=\small\sffamily,
+  showstringspaces=false,
+  morecomment=[l]\%,
+}
+
+\usetikzlibrary{calc}
+
+\begin{document}
+
+\section{Labelled Transition System for repeated Head Linear Reduction}
+
+\subsection{Notes}
+State is a tuple $\langle$ $\lambda$-term with underlined node, context, list of arguments $\rangle$, where
+\begin{itemize}
+\item $\lambda$-term with underlined node is a usual lambda term with one underlined position;
+\item context $\Gamma$ is an unordered list of pair ($variable : term$);
+\item list of arguments $\Delta$ is an ordere list of $\lambda$-terms.
+\end{itemize}
+
+
+\subsection{Rules}
+
+\begin{enumerate}
+\item (App)
+
+$\dots (e_1 \underline{@} e_2) \dots;\ \Gamma;\ \Delta$
+$\longrightarrow$
+$\dots (\underline{e_1} @ e_2) \dots;\ \Gamma;\ e_2:\Delta$
+
+\item (Lam--elim)
+
+$\dots (\underline{\lambda x} . e_1) \dots;\ x:B,\ \Gamma;\ B,\ \Delta$
+$\longrightarrow$
+$\dots (\lambda x . \underline{e_1}) \dots;\ x:B,\ \Gamma;\ \Delta$
+
+\item (Lam--non-elim)
+
+$\dots (\underline{\lambda x} . e_1) \dots;\ x:B,\ \Gamma;\ \$,\ \Delta$
+$\longrightarrow$
+$\dots (\lambda x . \underline{e_1}) \dots;\ \Gamma;\ \$,\ \Delta$
+
+\item (BVar)
+
+$\dots \underline{x} \dots;\ x:B,\ \Gamma;\ \Delta$
+$\longrightarrow$
+$\dots \underline{B} \dots;\ x:B,\ \Gamma;\ \Delta$
+
+\item (FVar--pause-0)
+
+$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ B,\ \Delta$
+$\longrightarrow$
+$\dots \underline{B} \dots;\ \Gamma;\ \$,\ \Delta$
+
+\item (FVar--pause-1)
+
+$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \$,\ B,\ \Delta$
+$\longrightarrow$
+$\dots \underline{B} \dots;\ \Gamma;\ \$,\ \Delta$
+
+\item (FVar--pause-2)
+
+$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \$,\ \$,\ \Delta$
+$\longrightarrow$
+$\dots \underline{x} \dots;\ \Gamma;\ \$,\ \Delta$
+
+\item (FVar--stuck)
+
+$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \emptyset$
+$\longrightarrow$
+THE END
+
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
