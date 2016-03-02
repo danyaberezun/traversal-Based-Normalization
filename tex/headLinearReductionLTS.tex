@@ -77,9 +77,9 @@
 \subsection{Notes}
 State is a tuple $\langle$ $\lambda$-term with underlined node, context, list of arguments $\rangle$, where
 \begin{itemize}
-\item $\lambda$-term with underlined node is a usual lambda term with one underlined position;
+\item $\lambda$-term (a tree; by considering $\lambda$-term as a tree it becomes possible to cross arguments out of tree ($\dots without\ term$)) with underlined node is a usual lambda term with one underlined position;
 \item context $\Gamma$ is an unordered list of pair ($variable : term$);
-\item list of arguments $\Delta$ is an ordere list of $\lambda$-terms.
+\item list of arguments $\Delta$ is an ordere list of $\lambda$-terms. (one can also think about $\Delta$ as unordered list of pointers to the corresponding subtree)
 \end{itemize}
 
 
@@ -88,49 +88,56 @@ State is a tuple $\langle$ $\lambda$-term with underlined node, context, list of
 \begin{enumerate}
 \item (App)
 
-$\dots (e_1 \underline{@} e_2) \dots;\ \Gamma;\ \Delta$
+$\dots_1 (e_1 \underline{@} e_2) \dots_2;\ \Gamma;\ \Delta$
 $\longrightarrow$
-$\dots (\underline{e_1} @ e_2) \dots;\ \Gamma;\ e_2:\Delta$
+$\dots_1 (\underline{e_1} @ e_2) \dots_2;\ \Gamma;\ e_2:\Delta$
 
 \item (Lam--elim)
 
-$\dots (\underline{\lambda x} . e_1) \dots;\ x:B,\ \Gamma;\ B,\ \Delta$
+$\dots_1 (\underline{\lambda x} . e_1) \dots_2;\ x:B,\ \Gamma;\ B,\ \Delta$
 $\longrightarrow$
-$\dots (\lambda x . \underline{e_1}) \dots;\ x:B,\ \Gamma;\ \Delta$
+$\dots_1 (\underline{e_1}) (\dots_2\ without\ B);\ x:B,\ \Gamma;\ \Delta$
 
 \item (Lam--non-elim)
 
-$\dots (\underline{\lambda x} . e_1) \dots;\ x:B,\ \Gamma;\ \$,\ \Delta$
+$\dots_1 (\underline{\lambda x} . e_1) \dots_2;\ x:B,\ \Gamma;\ \$,\ \Delta$
 $\longrightarrow$
-$\dots (\lambda x . \underline{e_1}) \dots;\ \Gamma;\ \$,\ \Delta$
+$\dots_1 (\lambda x . \underline{e_1}) \dots_2;\ \Gamma;\ \$,\ \Delta$
 
 \item (BVar)
 
-$\dots \underline{x} \dots;\ x:B,\ \Gamma;\ \Delta$
+$\dots_1 \underline{x} \dots_2;\ x:B,\ \Gamma;\ \Delta$
 $\longrightarrow$
-$\dots \underline{B} \dots;\ x:B,\ \Gamma;\ \Delta$
+$\dots_1 \underline{B} \dots_2;\ x:B,\ \Gamma;\ \Delta$
 
 \item (FVar--pause-0)
 
-$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ B,\ \Delta$
+$\dots_1 (\dots_2 \underline{x} )\dots) @ B \dots_3;\ (x:\_) \not\in \Gamma;\ B,\ \Delta$
 $\longrightarrow$
-$\dots \underline{B} \dots;\ \Gamma;\ \$,\ \Delta$
+$\dots_1 (\dots_2 x )\dots) @ \underline{B} \dots_3;\ \Gamma;\ \$,\ \Delta$
+% $\dots \underline{B} \dots;\ \Gamma;\ \$,\ \Delta$
 
 \item (FVar--pause-1)
 
-$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \$,\ B,\ \Delta$
+$\dots_1 (\dots_2 \underline{x} )\dots) @ B \dots_3;\ (x:\_) \not\in \Gamma;\ \$,\ B,\ \Delta$
 $\longrightarrow$
-$\dots \underline{B} \dots;\ \Gamma;\ \$,\ \Delta$
+$\dots_1 (\dots_2 x )\dots) @ \underline{B} \dots_3;\ \Gamma;\ \$,\ \Delta$
 
 \item (FVar--pause-2)
 
-$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \$,\ \$,\ \Delta$
+$\dots_1 \underline{x} \dots_2;\ (x:\_) \not\in \Gamma;\ \$,\ \$,\ \Delta$
 $\longrightarrow$
-$\dots \underline{x} \dots;\ \Gamma;\ \$,\ \Delta$
+$\dots_1 \underline{x} \dots_2;\ \Gamma;\ \$,\ \Delta$
 
-\item (FVar--stuck)
+\item (FVar--stuck-0)
 
 $\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \emptyset$
+$\longrightarrow$
+THE END
+
+\item (FVar--stuck-1)
+
+$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \$,\ \dots,\ \$,\ \emptyset$
 $\longrightarrow$
 THE END
 
