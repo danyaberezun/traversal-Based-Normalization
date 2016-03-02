@@ -355,7 +355,7 @@ Some notes about traversals:
     {\color{red}\draw[->] (2.north) to[bend right] (1.north);}
   \end{tikzpicture}
 
-  $\longrightarrow^{x}$, где $\not\exists\ \lambda x$ в истории, доступная по цепочке зеленых указателей из $\lambda y$\\
+  $\longrightarrow^{x}$, where $\not\exists\ \lambda x$ in history such that there is no chain of binder (dreen) pointers from $\lambda y$ to $\lambda x$\\
 
   \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$x$}\]
   \begin{tikzpicture}[remember picture,overlay]
@@ -412,7 +412,7 @@ Some notes about traversals:
 
 \item (Lam-Browns) and (Lam-Violet)
   \begin{itemize}
-  \item (Lam-Brown -- BVar)
+  \item (Lam-Blue -- BVar)
   \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{blue}\draw[->] (2.north) to[bend right] (1.north);}
@@ -432,13 +432,13 @@ Some notes about traversals:
     {\color{blue}\draw[->] (3.north) to[bend right] (1.north);}
   \end{tikzpicture}
 
-  \item (Lam-Brown -- FVar)
+  \item (Lam-Blue -- FVar)
   \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (2.north) to[bend right] (1.north);}
+    {\color{blue}\draw[->] (2.north) to[bend right] (1.north);}
   \end{tikzpicture}
 
-  $\longrightarrow^{x}$, где $\not\exists\ \lambda x$ в истории, доступная по цепочке зеленых указателей из $\lambda y$\\
+  $\longrightarrow^{x}$, where $\not\exists\ \lambda x$ in history such that there is no chain of binder (green) pointers from $\lambda y$ to $\lambda x$\\
 
   \[\tikzmark{}{$\dots$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\ \ \tikzmark{3}{$x$}\]
   \begin{tikzpicture}[remember picture,overlay]
@@ -448,7 +448,7 @@ Some notes about traversals:
     {\color{blue}\draw[->] (3.north) to[bend right] (1.north);}
   \end{tikzpicture}
 
-  \item (Lam-Brown -- Lam)
+  \item (Lam-Blue -- Lam)
   \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{blue}\draw[->] (2.north) to[bend right] (1.north);}
@@ -463,7 +463,7 @@ Some notes about traversals:
     {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
   \end{tikzpicture}
 
-  \item (Lam-Brown -- App)
+  \item (Lam-Blue -- App)
   \[\tikzmark{}{$\dots$} \ \tikzmark{}{$\dots$}\ \ \tikzmark{1}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\lambda y$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{blue}\draw[->] (2.north) to[bend right] (1.north);}
