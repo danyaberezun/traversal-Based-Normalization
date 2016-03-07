@@ -102,8 +102,8 @@ $$
 $$
 
 $$
-\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;\$\bullet\Delta}}
-     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;\Delta}}
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;\epsilon}}
+     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;\epsilon}}
 \RuleNo{Lam-Non-Elim}
 $$
 
@@ -115,20 +115,20 @@ $$
 
 $$
 \Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;B\bullet\Delta}}
-     {\State{\InContext{A}{M@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
-\RuleNo{FVar-Pause-0}
+     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma;\;\Delta}},\;x\notin dom\,\Gamma
+\RuleNo{FVar}
 $$
 
-$$
-\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet B\bullet\Delta}}
-     {\State{\InContext{A}{M@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
-\RuleNo{FVar-Pause-1}
-$$
+%$$
+%\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet B\bullet\Delta}}
+%     {\State{\InContext{A}{M@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
+%\RuleNo{FVar-Pause-1}
+%$$
 
-$$
-\Rule{\State{\InContext{A}{\underline{x}};\;\Gamma;\;\$\bullet\$\bullet\Delta}}
-     {\State{\InContext{A}{\underline{x}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
-\RuleNo{FVar-Pause-2}
-$$
+%$$
+%\Rule{\State{\InContext{A}{\underline{x}};\;\Gamma;\;\$\bullet\$\bullet\Delta}}
+%     {\State{\InContext{A}{\underline{x}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
+%\RuleNo{FVar-Pause-2}
+%$$
 
 \end{document}
