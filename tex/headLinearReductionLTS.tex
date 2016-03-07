@@ -1,49 +1,48 @@
 \documentclass[a4paper, 10pt]{article}
 \usepackage[margin=0.5in]{geometry}
-% \usepackage[a4paper, total={6in, 8in}]{geometry}
 \usepackage[utf8]{inputenc}%кодировка
 \usepackage[russian]{babel}%используем русский и английский языки с переносами
-% \graphicspath{{/}}%путь к рисункам
 \usepackage{cite}
 \usepackage{multirow}
 \usepackage{float}
-\usepackage{tikz}
-\usetikzlibrary{arrows}
-\usepackage{ amssymb }
-\usepackage{ amsmath}
+%\usepackage{tikz}
+%\usetikzlibrary{arrows}
+\usepackage{amssymb }
+\usepackage{amsmath}
 \usepackage{listings}
-\usepackage{xcolor}
-\graphicspath{{pictures/}}
-\definecolor{dkgreen}{rgb}{0,0.6,0}
-\definecolor{dred}{rgb}{0.545,0,0}
-\definecolor{dblue}{rgb}{0,0,0.545}
-\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
-\definecolor{gray}{rgb}{0.4,0.4,0.4}
-\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\usepackage{cancel}
+%\usepackage{xcolor}
+%\graphicspath{{pictures/}}
+%\definecolor{dkgreen}{rgb}{0,0.6,0}
+%\definecolor{dred}{rgb}{0.545,0,0}
+%\definecolor{dblue}{rgb}{0,0,0.545}
+%\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+%\definecolor{gray}{rgb}{0.4,0.4,0.4}
+%\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
 
-\usepackage{pythontex}
-\usepackage{minted}
+%\usepackage{pythontex}
+%\usepackage{minted}
 
 % for printing trees
 \usepackage{verbatim}
 
-\usepackage[labelformat=empty]{caption}
-\usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{english}
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{CMU Serif}
-\setsansfont{CMU Sans Serif}
-\setmonofont{CMU Typewriter Text}
+%\usepackage[labelformat=empty]{caption}
+%\usepackage{fontspec}
+%\usepackage{polyglossia}
+%\setdefaultlanguage{english}
+%\defaultfontfeatures{Ligatures=TeX}
+%\setmainfont{CMU Serif}
+%\setsansfont{CMU Sans Serif}
+%\setmonofont{CMU Typewriter Text}
 
-\usepackage{stmaryrd}
+%\usepackage{stmaryrd}
 \usepackage{amsfonts}
 \newcommand\abs[1]{\left|#1\right|}
 
-\usepackage{tikz}
+%\usepackage{tikz}
 \newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
-\usepackage{lscape}
-\usepackage{pdflscape}
+%\usepackage{lscape}
+%\usepackage{pdflscape}
 
 \lstset{
   frame=none,
@@ -68,7 +67,12 @@
   morecomment=[l]\%,
 }
 
-\usetikzlibrary{calc}
+\newcommand{\State}[1]{\left<{#1}\right>}
+\newcommand{\InContext}[2]{{#1}\left[{#2}\right]}
+\newcommand{\RuleNo}[1]{\eqno[\textsc{#1}]}
+\newcommand{\Rule}[2]{{#1}\longrightarrow{#2}}
+
+%\usetikzlibrary{calc}
 
 \begin{document}
 
@@ -85,72 +89,46 @@ State is a tuple $\langle$ $\lambda$-term with underlined node, context, list of
 
 \subsection{Rules}
 
-\begin{enumerate}
-\item (App)
+$$
+\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;e_2\bullet\Delta}}
+\RuleNo{App}
+$$
 
-$\dots_1 (e_1 \underline{@} e_2) \dots_2;\ \Gamma;\ \Delta$
-$\longrightarrow$
-$\dots_1 (\underline{e_1} @ e_2) \dots_2;\ \Gamma;\ e_2:\Delta$
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;B\bullet\Delta}}
+     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x:B,\,\Gamma;\;\Delta}}
+\RuleNo{Lam-Elim}
+$$
 
-\item (Lam--elim)
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;\$\bullet\Delta}}
+     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;\Delta}}
+\RuleNo{Lam-Non-Elim}
+$$
 
-$\dots_1 (\underline{\lambda x} . e_1) \dots_2;\ x:B,\ \Gamma;\ B,\ \Delta$
-$\longrightarrow$
-$\dots_1 (\underline{e_1}) (\dots_2\ without\ B);\ x:B,\ \Gamma;\ \Delta$
+$$
+\Rule{\State{\InContext{A}{\underline{x}};\;x:B,\,\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{B}};\;x:B,\,\Gamma;\;\Delta}}
+\RuleNo{BVar}
+$$
 
-\item (Lam--non-elim)
+$$
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;B\bullet\Delta}}
+     {\State{\InContext{A}{M@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
+\RuleNo{FVar-Pause-0}
+$$
 
-$\dots_1 (\underline{\lambda x} . e_1) \dots_2;\ x:B,\ \Gamma;\ \$,\ \Delta$
-$\longrightarrow$
-$\dots_1 (\lambda x . \underline{e_1}) \dots_2;\ \Gamma;\ \$,\ \Delta$
+$$
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet B\bullet\Delta}}
+     {\State{\InContext{A}{M@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
+\RuleNo{FVar-Pause-1}
+$$
 
-\item (BVar)
-
-$\dots_1 \underline{x} \dots_2;\ x:B,\ \Gamma;\ \Delta$
-$\longrightarrow$
-$\dots_1 \underline{B} \dots_2;\ x:B,\ \Gamma;\ \Delta$
-
-\item (FVar--pause-0)
-
-$\dots_1 (\dots_2 \underline{x} )\dots) @ B \dots_3;\ (x:\_) \not\in \Gamma;\ B,\ \Delta$
-$\longrightarrow$
-$\dots_1 (\dots_2 x )\dots) @ \underline{B} \dots_3;\ \Gamma;\ \$,\ \Delta$
-% $\dots \underline{B} \dots;\ \Gamma;\ \$,\ \Delta$
-
-\item (FVar--pause-1)
-
-$\dots_1 (\dots_2 \underline{x} )\dots) @ B \dots_3;\ (x:\_) \not\in \Gamma;\ \$,\ B,\ \Delta$
-$\longrightarrow$
-$\dots_1 (\dots_2 x )\dots) @ \underline{B} \dots_3;\ \Gamma;\ \$,\ \Delta$
-
-\item (FVar--pause-2)
-
-$\dots_1 \underline{x} \dots_2;\ (x:\_) \not\in \Gamma;\ \$,\ \$,\ \Delta$
-$\longrightarrow$
-$\dots_1 \underline{x} \dots_2;\ \Gamma;\ \$,\ \Delta$
-
-\item (FVar--stuck-0)
-
-$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \emptyset$
-$\longrightarrow$
-THE END
-
-\item (FVar--stuck-1)
-
-$\dots \underline{x} \dots;\ (x:\_) \not\in \Gamma;\ \$,\ \dots,\ \$,\ \emptyset$
-$\longrightarrow$
-THE END
-
-\end{enumerate}
-
-
-
-
-
-
-
-
-
-
+$$
+\Rule{\State{\InContext{A}{\underline{x}};\;\Gamma;\;\$\bullet\$\bullet\Delta}}
+     {\State{\InContext{A}{\underline{x}};\;\Gamma;\;\$\bullet\Delta}},\;x\notin dom\,\Gamma
+\RuleNo{FVar-Pause-2}
+$$
 
 \end{document}
