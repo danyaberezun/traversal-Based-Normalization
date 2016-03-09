@@ -13,6 +13,7 @@ instance Show UntypedLambda where
   show (ULApp _ e (ULVar _ v))       = show e ++ v
   show (ULApp _ e1 e2)               = show e1 ++ "(" ++ show e2 ++ ")"
   show (ULAbs _ v e)                 = "$\\lambda$" ++ v ++ " . " ++ show e
+  --show (ULAbs _ v e)                 = "\\ " ++ v ++ " . " ++ show e
 
 data ULambda = UVar String
   | UApp ULambda ULambda
@@ -33,7 +34,7 @@ instance Show Traversal where
     show' [] _ = ""
     show' (x:xs) i =
       -- change 350 for something greater if program goes to infinite loop
-      -- up2 i ++ ". " ++ show1 x 350 ++ "\n" ++ show' xs ((+) i 1)
+       --up2 i ++ ". " ++ show1 x 350 ++ "\n" ++ show' xs ((+) i 1)
       up2 i ++ ". " ++ show1 x 70 ++ "\n\\\\" ++ show' xs ((+) i 1)
       where
         up2h (CAP   i) = " CAP " ++ up2 i
