@@ -23,7 +23,7 @@ Inductive TermT (P : Path) (l : nat) :=
 | FVar : nat -> TermT P l.
 
 (* A term is a tree with the root indexed by empty
-   path
+   path and zero number of enclosed lambdas
 *)
 Definition Term := TermT [] 0.
 
@@ -34,43 +34,54 @@ Definition IdT  : Term.
 Defined.
 
 Definition AppT : Term. 
-  refine (Lam [] 0 (Lam [U] 1 (App [U; U] 2 (BVar [U;U;L] 2 1 _) (BVar [U;U;R] 2 0 _)))).
+  refine (
+    Lam [] 0 (
+      Lam [U] 1 (
+        App [U; U] 2 
+          (BVar [U;U;L] 2 1 _) 
+          (BVar [U;U;R] 2 0 _)
+      )
+    )
+  ).
   omega. omega.
 Defined.
 
+(* Auxilliary lemma *)
 Lemma cons_to_app : forall (A : Set) (a : A) (l : list A), a::l = [a] ++ l.
 Proof.
   intros A a l. reflexivity.
 Qed.
 
-Definition subterm : forall (P P' : Path) (l : nat), TermT P l -> option (TermT (P ++ P') l').
+(* Subterm: subterm t p returns a subterm of t, indexed by 
+   (relative) path p; if the term does not exists, returns None
+*)
+Definition subterm : 
+  forall {P : Path} {l : nat} (P' : Path), 
+  TermT P l -> option { l' : nat & TermT (P ++ P') l'}.
   refine (
-    fix subterm' (P P' : Path) 
-                 (l : nat ) {struct P'} : TermT P l -> exists l', option (TermT (P ++ P') l') := fun T =>
-      match P' return exists l', option (TermT (P ++ P') l') with
+    fix subterm' {P : Path} {l : nat} (P' : Path) {struct P'} : TermT P l -> option { l' : nat & TermT (P ++ P') l'} := fun T =>
+      match P' return option { l' : nat & TermT (P ++ P') l'} with
       | []   => Some _
       | x::p =>           
-          match x return exists l', option (TermT (P ++ x::p) l') with
-          | U => match T return exists l', option (TermT (P ++ U::p) l') with
+          match x return option { l' : nat & TermT (P ++ x::p) l'} with
+          | U => match T return option { l' : nat & TermT (P ++ U::p) l'} with
                  | Lam t => _
                  | _     => None
                  end 
-          | L => match T return exists l', option (TermT (P ++ L::p) l') with
+          | L => match T return option { l' : nat & TermT (P ++ L::p) l'} with
                  | App t _ => _
                  | _       => None
                  end 
-          | R => match T return exists l', option (TermT (P ++ R::p) l') with
+          | R => match T return option { l' : nat & TermT (P ++ R::p) l'} with
                  | App _ t => _
                  | _       => None
                  end 
         end  
       end). 
-  rewrite app_nil_r. exact T.
-  intros.
-    apply (subterm' (P++[U]) p) in t. rewrite cons_to_app. rewrite app_assoc. assumption.
-    apply (subterm' (P++[R]) p) in t. rewrite cons_to_app. rewrite app_assoc. assumption.  
-    apply (subterm' (P++[L]) p) in t. rewrite cons_to_app. rewrite app_assoc. assumption.
+  rewrite app_nil_r. exists l. exact T.  
+  apply (subterm' (P++[U]) (S l) p) in t. rewrite cons_to_app. rewrite app_assoc. assumption.
+  apply (subterm' (P++[R])  l    p) in t. rewrite cons_to_app. rewrite app_assoc. assumption.  
+  apply (subterm' (P++[L])  l    p) in t. rewrite cons_to_app. rewrite app_assoc. assumption.
 Defined.
 
-Definition subpath (A B : Path) : Prop := 
-  exists (A' : Path), A' ++ A = B /\ length A' > 0.
+Notation "A [ p ]" := (subterm p A) (at level 0).
