@@ -152,6 +152,8 @@ run_examples xs =
     Right term -> normalize $ annotate term) xs
 
 main = do
+  writeFile "show_traversal.tex" $ showTraversalPdf (run_examples examples_normalize_only)
+    examples_normalize_only examples_normalize_only_names
   writeFile "examples.tex" $ showPdf (run_examples examples_picture) examples_picture examples_picture_names
   writeFile "examplesNormalForms.tex" $ showNormalFormPDF (run_examples examples_normalize_only)
     examples_normalize_only examples_normalize_only_names

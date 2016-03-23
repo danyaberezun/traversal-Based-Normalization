@@ -1,8 +1,7 @@
-all: cleanExceptPdf
-	make program
-	make normalize
-	make generate_traversals
-	make cleanExceptPdf
+all: cleanExceptPdf program show normalize generate_traversals cleanExceptPdf
+
+show: cleanExceptPdf
+	xelatex --shell-escape show_traversal.tex
 
 program: cleanExceptPdf
 	ghc Main.hs
@@ -17,7 +16,7 @@ generate_traversals:
 	xelatex --shell-escape examples.tex
 
 cleanExceptPdf:
-	rm -rf *.log *.aux *.toc *.pyg *.pytxcode examples.tex examplesNormalForms.tex Main *.o *.hi
+	rm -rf *.log *.aux *.toc *.pyg *.pytxcode show_traversal.tex examples.tex examplesNormalForms.tex Main *.o *.hi
 
 clean: cleanExceptPdf
 	rm -f examples.pdf examplesNormalForms.pdf
