@@ -84,79 +84,95 @@
 
 \begin{document}
 
-Good afternoon, my name is Daniil and I'm going to present our joint with professor Neil Deaton Jones work in progress called ``Partial Evaluation and Normalization by traversals''. \\
+Good afternoon, my name is Daniil and I'm going to present our joint work with 
+professor Neil Deaton Jones, called ``Partial Evaluation and Normalization by 
+Traversals''. 
 
 
 ====================================================\\
-=== slide ??: introduction ===========================\\
-======================================================
-
-The game semantics for PCF can be thought of as a PCF interpreter.
-In a set of game semantics papers the denotation of an expression is a game strategy. When played, the game results in a traversal.
-
-Ong’s recent paper [14] shows that a \blue{\textit{simply-typed lambda-expression \lam{M}}} can be \red{evaluated} (i.e. normalised) by the algorithm that constructs a \green{traversal} of \lam{M}.
-
-A \green{\textit{traversal}} in this case is justified sequence of subexpressions of \lam{M}.\\
-For brivety, we will call them \green{\textit{tokens}}.
-  One can think that M is a \blue{program} and token is a \blue{program point}.
-Any token may have a \green{\textit{back pointer}}, aki justifier, to some other token in history. This pointers are used to lookup some information about \lexp in history and to find a binamic binder for variables.
-
-Suprisely, this approach to normalization can be implemented with \textit{\blue{none of} the traditional implementation technics}
-like $\beta$-reductions, environments that binds variables to values, closures and thunks for function calls and parameters.
-\\\\
+=== slide ??: introduction =========================\\
+====================================================
 
 
+#TODO:
+Reformulate: game semantics for various versions of lambdas.
 
-====================================================\\
-=== slide ??: start point ============================\\
-======================================================
+#The game semantics for PCF can be thought of as a PCF interpreter.
+#In a set of game semantics papers the denotation of an expression is a game strategy. 
+#When played, the game results in a traversal.
 
-Now then, it looks very promising to study an \textit{operational} consequences of game semantics. And a start point for our research is an Oxford normalization procedure. We will use an abbriviation \lam{ONP} for name it.
+For example, Luke Ong’s recent paper ``Normalization by Traversals'' shows that a \blue{\textit{simply-typed 
+lambda-expression \lam{M}}} can be \red{evaluated} (i.e. normalised) by the algorithm that 
+constructs a \green{traversal} of \lam{M}.
 
-\lam{ONP} can be thought as a \green{an interpreter for {\lexp}s}.
-It constracts a set of traversals \lam{$\mathfrak{Trav}(M)$} for a given \lexp \lam{$M$} each of that is a \underline{path} in a tree that represents a normal form of $\lambda$-expression \lam{M}.
+A \green{\textit{traversal}} in this case is a justified sequence of subexpressions of \lam{M}.
+For brivety, we will call them \green{\textit{tokens}}.  One can think, that M is 
+a \blue{program} and token is a \blue{program point}. Any token may have a \green{\textit{back pointer}}, 
+or justifier, to some other previously encountered token. These pointers are used to lookup some 
+information about \lexp in the history of computation and to find dynamic binders for variables.
 
-\textbf{But what and how?}
-
-Consider a traversal \lam{$tr$} from \lam{$\mathfrak{Trav}(M)$} such that is a sequence from \lam{$t_0$} to \lam{$t_n$} where each \lam{$t_i$} is a \blue{token}.
-
-On each step \lam{ONP} for all such traversals from \lam{$\mathfrak{Trav}(M)$} adds one or more externsions in \lam{$\mathfrak{Trav}(M)$} or maybe zero. If zero then it means that traversal $tr$ is already a path in a tree representing an $\beta$-normal $\eta$-long form of the term.
-
-Each extension is a traversal obtained by contatination traversal \lam{$tr$} with \underline{one new token} \lam{$t'$} that could have a backpointer somewhere \blue{in a current view}.
-
-Moreover, \lam{ONP} uses a inverence rules that are entirely based on a sintax of the end-token \lam{$t_n$}. In other words, \lam{ONP} is based on \blue{syntax-directed inference rules}.
-
-Thus, we have two main \underline{data types}: traversal and items.
-\underline{Traversal} is just a list of \underline{items} where an item is a pair: a token and a backpointer.\\\\
-
+Hereafter we will call this approach to normalization of simply typed lambda terms Oxford Normalization Procedure, 
+or ONP. For a given \lexp \lam{$M$} \lam{ONP} constructs a set of traversals \lam{$\mathfrak{Trav}(M)$}, each 
+of which corresponds to some \underline{path} in normalized term tree.
 
 
 ====================================================\\
-=== slide ??: SOME ONP CHARACTERISTICS ===============\\
-======================================================
+=== slide ??: starting point =======================\\
+====================================================
 
-Now then, let's summarize some importants properties of \green{Oxford normaliztion procedure}.
+# Confirm the understanding of operational view and its motivation.
+In the context of our research, we are interested in \emph{operational}, algorithmic 
+view of game semantics-based normalization without direct reference to game semantic
+foundations (?).
 
-Fisrt, \lam{ONP} can be abblied only to \blue{simply-tiped} $\lambda$-terms that are in a \blue{$\eta$-long form}.
-The long form is obtained by $\eta$-expanding term fully and replacing the implicit binary application operator of each redex by the \textit{long application operator} $@$.
+Consider a traversal \lam{$tr$} from \lam{$\mathfrak{Trav}(M)$}, which is a sequence of tokens \lam{$t_0$} \lam{$t_n$}.
 
-Second, \lam{ONP} realises the \green{\underline{complete} head linear reduction}. Complete head linear reduction is a repeated applying of \textit{head linear reduction} to all arguments while head linear reduction itself on each step substitutes only one occurence of variable that is a \textit{hoc-position}.
+For all such traversals from \lam{$\mathfrak{Trav}(M)$} \lam{ONP} adds on each step zero or more extensions to \lam{$\mathfrak{Trav}(M)$}. 
+If none is added, then the traversal $tr$ already represents some path in the tree of $\beta$-normal $\eta$-long form of the term.
 
-The correctness of normalization by traversals is done by game semantics and categories, and fulle based on \lam{$M$}'s types.
+Each extension is a traversal, obtained by concatenation of traversal \lam{$tr$} and \underline{one new token} \lam{$t'$}, which 
+may be equipped with a pointer to some previous token in \lam{$tr$}.
 
-Then, by contract to standart approaches to term normalization, method of normalization by traversals uses \red{\underline{no $\beta$-reduction}} and leavs the original term inpact.
+Moreover, \lam{ONP} uses inference rules, discriminated solely by sintax of end-tokens \lam{$t_n$}. 
+In other words, \lam{ONP} is \blue{syntax-directed}.
 
-Finally, an important property of \lam{ONP} is that while running \lam{ONP} does not use the types od \lam{$M$} at all.
-As was mention before, \lam{ONP} constracts straversal using only \blue{syntax-derected rules}. \\
+In terms of implementation, we have two main \underline{data types}: traversals and items. \underline{Traversal} is just a list 
+of \underline{items}, where an item is a pair: a token and its (optional) backpointer.
 
-And now now we are able to formulate \textbf{goals} of this research:
+====================================================\\
+=== slide ??: SOME ONP CHARACTERISTICS =============\\
+====================================================
+
+Now then, let's summarize some importants for us properties of \green{ONP}.
+
+Fisrt, \lam{ONP} can be applied only to \blue{simply-tiped} $\lambda$-terms in \blue{$\eta$-long form}.
+The $\eta$-long form is obtained by $\eta$-expanding term fully and replacing implicit binary 
+application operator of each redex by the \textit{long application operator} $@$. The crucial
+point is that in order to perform this expansion one needs to know the exact types of all
+subterms.
+
+Second, \lam{ONP} implements \green{\underline{complete} head linear reduction}. Complete head linear 
+reduction can be seen as regular \textit{head linear reduction} followed by regular \textit{head linear 
+reductions} of all arguments.
+
+The correctness of normalization by traversals is proven in terms of game semantics and categories, and 
+fully based on \lam{$M$}'s types.
+
+Then, in contrast to standart evaluation approaches, normalization by traversals uses 
+\red{\underline{no $\beta$-reductions}}, leaves the original term intact, and 
+can be implemented without resorting to \textit{traditional techniques} like environments, 
+closures etc.
+
+Finally, an important property of \lam{ONP} is that while running, \lam{ONP} does not use type information at all.
+As it was mentioned before, \lam{ONP} constructs traversals using only \blue{syntax-derected rules}. 
+
+And now we are able to formulate the \textbf{goals} of our research:
+
 \bi
-\ii First goal is to extend \green{ONP} to \green{UNP} that is a normalizer for the \textit{untyped} lambda calculus and
-\ii Second, \green{Partially evaluate} a normaliser with respect to "static" input $\lambda$-term \lam{$M$}.\\
-  By partial evaluating normalizer it becoms possible to \red{compile} \lc $\ $ into a \lam{low-level language}(\lam{LLL} for brivety) that futher can be used to express \green{semantics}.
+\ii The first goal is to extend \green{ONP} to the untyped case (hereafter \green{UNP});
+\ii The second is to reexamine the outcomes of partial evaluation in the light of 
+alternative evaluation technique.
 \ei
-\ \\
-
 
 
 ====================================================\\
