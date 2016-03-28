@@ -40,7 +40,8 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len hn = case x of
             case n of
               ULAbs _ _ _ -> travers (Tr $ (n, (True, (if up_x' == 0 then LUP 0 else CAP up_x', computeBP n i))):tr)
                                      bv (len + 1) False
-              _           -> travers (Tr $ (n, (True, (LUP up_x', computeBP n i))):tr) bv (len + 1) False
+              --_           -> travers (Tr $ (n, (True, (LUP up_x', computeBP n i))):tr) bv (len + 1) False
+              _           -> travers (Tr $ (n, (True, (LUP up_x', computeBP n i ))):tr) bv (len + 1) False
           PAUSE _ -> travers (Tr $ (n, (True, (PAUSE up_x', computeBP n i))):tr) bv (len + 1) False
         Nothing     -> --trace ("False\n") $
           if hn == False then travers (hideNodes (Tr tr) len) bv len True
@@ -74,7 +75,8 @@ travers (Tr tr@(x@(x_e, (b_x, (up_x, bi_x))):trs)) bv len hn = case x of
   where
     computeBP :: UntypedLambda -> Int -> BinderPointer
     computeBP e i = case e of
-      ULVar _ z | elem z bv -> findDynamicBinder z (Tr (drop (len - i) tr)) i
+      ULVar _ z | elem z bv -> -- trace ("call findDynamicBinder " ++ show i ++ "\n" ++ show (Tr tr) ++ "\n") $
+        findDynamicBinder z (Tr (drop (len - i) tr)) i
       _ -> LCP i
     computeBP' e i = case computeBP e i of
       LCP j -> DCP j
@@ -150,6 +152,8 @@ run_examples xs =
     Right term -> normalize $ annotate term) xs
 
 main = do
+  writeFile "show_traversal.tex" $ showTraversalPdf (run_examples examples_normalize_only)
+    examples_normalize_only examples_normalize_only_names
   writeFile "examples.tex" $ showPdf (run_examples examples_picture) examples_picture examples_picture_names
   writeFile "examplesNormalForms.tex" $ showNormalFormPDF (run_examples examples_normalize_only)
     examples_normalize_only examples_normalize_only_names

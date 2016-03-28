@@ -1,0 +1,461 @@
+% Document Type: LaTeX 2e
+\documentclass[12pt,fleqn,landscape]{article}
+% \documentclass[handout]{beamer}
+
+
+
+\usepackage{upgreek,latexsym, amssymb, amsmath, amsfonts, mathrsfs} 
+\usepackage{eucal,upref,yfonts,eufrak,stmaryrd,graphics,color} 
+\usepackage[pdftex]{graphicx}
+\usepackage{times}
+\usepackage[all]{xy} 
+\usepackage{xcolor}
+
+
+\newcounter{chapter}
+
+\setcounter{chapter}{2}
+
+\usepackage{slide_style_new} 
+
+\usepackage{ndj} 
+
+% MACROS USED IN THE SLIDES
+
+\newcommand{\tP}{\tt p}
+\newcommand{\Data}{\mathbb{D}}
+
+\newcommand{\where}{?}
+
+
+
+
+
+\begin{document}\sffamily\bfseries\boldmath
+
+
+
+\newcommand{\arity}[2]{\stackrel{\tt#1}{#2}}
+
+
+\newcommand{\lexp}{$\lambda$-expression}
+\newcommand{\lc}{$\lambda$-calculus}
+\newcommand{\lopen}{\Lambda^o}
+\newcommand{\lclosed}{\Lambda^\bullet}
+\newcommand{\lnf}{\Lambda^{nf}}
+
+
+
+\newcommand{\mv}[2]{R_{#2}:=R_{#1}}
+
+\newcommand{\out}{\mbox{\bf out}}
+\newcommand{\ifc}{\mbox{\bf if}}
+\newcommand{\thenc}{\mbox{\bf then}}
+\newcommand{\elsec}{\mbox{\bf else}}
+\newcommand{\nil}{\mbox{\bf skip}}
+\newcommand{\false}{\mbox{\sl false}}
+\newcommand{\true}{\mbox{\sl true}}
+\newcommand{\while}{\mbox{\bf while}}
+\newcommand{\decl}{\mbox{\sl declassify}}
+\newcommand{\dow}{\mbox{\bf do}}
+\newcommand{\ew}{\mbox{\bf endw}}
+\newcommand{\eif}{\mbox{\bf fi}}
+\newcommand{\casec}{\mbox{\bf case}}
+\newcommand{\ofc}{\mbox{\bf of}}
+\newcommand{\letc}{\mbox{\bf let}}
+\newcommand{\inc}{\mbox{\bf in}}
+
+
+\newcommand{\dobf}[1]{dob(#1)}
+
+\newcommand{\pp}[1]{ ^{#1.}}
+\newcommand{\outp}{\mbox{\bf output}}
+\newcommand{\inpp}{\mbox{\bf input}}
+
+%\newcommand{\skipc}{\mbox{\bf skip}}
+\newcommand{\skipc}{\nil}
+
+
+\color{Black}\LARGE
+
+
+\newcommand{\ii}{\item}
+
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\green}[1]{{\color{blue!20!black!30!green}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\brown}[1]{{\color{brown}#1}}
+\newcommand{\browm}[1]{{\color{browm}#1}}
+\newcommand{\violet}[1]{{\color{violet}#1}}
+
+\newcommand{\lam}[1]{{\color{brown}\textit{\boldmath{#1}}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Title
+
+\thispagestyle{empty}
+{\ }\vspace{2ex}
+\begin{center} \Huge 
+   \rule{18cm}{5pt} \\[1ex]
+   \rouge{Partial Evaluation and Normalisation by Traversals} \\
+   
+   \rule{18cm}{5pt}
+\end{center}
+
+
+\begin{center}\LARGE
+
+Work in progress by:
+\vair
+
+\bi
+\item 
+ \bleu{Daniil Berezun}\\\hair
+\vertt{Saint Petersburg State University}\\
+\vair\vair
+
+\item 
+ \bleu{Neil D. Jones}\\\hair
+\vertt{ DIKU, University of Copenhagen (prof.\ emeritus)}\\
+\ei
+\end{center}
+
+
+\begin{slide}{Introduction}
+
+The much-studied game semantics for PCF can be thought of
+
+\green{as a PCF interpreter}.
+
+\bc
+Ong \cite{ong2015} shows that
+\ec
+
+\blue{\textit{a $\lambda$-expression \lam{M}}} can be \red{evaluated} (i.e. normalised) by the algorithm that constructs a \green{traversal} of \lam{M}.
+\vair\vair
+
+A \green{\textit{traversal}} is a sequence of
+\bi
+\ii  \green{subexpressions} of \lam{M}.
+  This is a finite set, whose elements we will call \red{tokens}
+  \hfill \bleu{(think: \noir{$M$} = program, \noir{tokens} = \underline{program points})}
+\vair
+\ii Any token may have a \green{back pointers}.
+\ei
+
+\vair\vair
+
+With this approach to normalisation: there is \red{\em no need for $\beta$-reduction,
+environments, ``thunks'' or ``closures''} to do the evaluation
+\vair\vair
+
+\end{slide}
+
+
+
+\begin{slide}{start point}
+\bi
+\ii A view of the Oxford normalisation procedure (ONP for short): It is
+\vair
+
+\bc\green{an interpreter for {\lexp}s}
+\ec
+
+\ii ONP builds a set of traversal \lam{$\mathfrak{Trav}(M)$}
+\bi
+\ii Let \lam{$tr \;=\; t_0 \bullet t_1 \bullet \dots \bullet t_n \in \mathfrak{Trav}(M)$} \hfill where \lam{$t_i$} is a \blue{token}
+\vair
+\ii \blue{Syntax-directed inference rules}:
+
+  \hfill based on syntax of the end-token \lam{$t_n$}
+\vair
+\ii Action: add 0, 1 or more extensions of \lam{$tr$} to \lam{$\mathfrak{Trav}(M)$}. For each,
+\vair
+    \bi
+    \ii Add a new token \lam{$t'$}, yielding \lam{$tr \bullet t'$}
+    \ii Add a back pointer from \lam{$t'$}
+    \ei
+\ei
+\vair
+
+\red{Data types}:
+\bi
+\ii $tr \in \lam{Tr} = Item^{*}$
+\ii $\lam{Item} = subexpression(M) \times Tr$
+\ei
+\ei
+
+\end{slide}
+
+
+\begin{slide}{SOME ONP CHARACTERISTICS}
+
+\green{Oxford normaliztion procedure}
+
+\bi
+\ii Applies to \blue{simply-typed} {\lexp}s
+\ii Begins by translating \lam{$M$} into \blue{$\eta$-long} form
+\ii Realises the \green{\underline{compete head linear reduction}} of \lam{$M$}
+\ii \red{Correctness:} by game semantics and categories, using \lam{$M$}'s types
+\ii ONP uses \red{\underline{no $\beta$-reduction}}: all is based on subexpressions of \lam{$M$}
+\ii While running, ONP \red{\underline{does not use the types}} of \lam{$M$} at all
+\ei
+
+\vair
+
+\vertt{\underline{\textbf{Goals} of this research}}:
+\bi
+\ii Extend \green{ONP} to \green{UNP}, for the \textit{\red{untyped}} lambda calculus
+\ii \green{Partially evaluate} a normaliser with respect to "static" input \lam{$M$}.
+
+  Use this to \red{compile} \lc $\ $ into a \textit{low-level language}.
+\ei
+
+\end{slide}
+
+
+
+\begin{slide}{PARTIAL EVALUATION, BRIEFLY}
+
+A partial evaluator is a \blue{program specialiser}. Defining property of $spec$:
+
+$$
+\forall p\in \mathit{Programs}\ .\ \forall s, d \in \mathit{Data}\ . \ 
+\lsem \lsem spec\rsem (p, s)\rsem (d) = \lsem p\rsem (s, d)
+$$
+
+
+\bi
+\ii Given program $p$ and \red{static} data $s$, $spec$ builds a \blue{residual program}
+  $$p_s\;\stackrel{def}{=}\;\lsem spec \rsem \ p\ s$$
+
+\ii \blue{Staging transformation}:
+\vair
+
+  \bi
+  \ii $\lsem p \rsem (s, d)\;\;\;\;\;\;\;\;\;\;\;\;\;$ is a \red{1 stage} computation
+  \ii $\lsem \lsem spec \rsem (p, s) \rsem (d)\ $ is a \red{2 stage} computation
+  \ei
+
+\vair\vair
+
+\ii Program speedup by \green{precomputation}. Applications: \blue{compiling}, and
+  \blue{compiler generation} (from an interpreter, and by self-applying $spec$).
+\ei
+
+\end{slide}
+
+
+
+\begin{slide}{why partially evaluate $\mbox{NP}$}
+
+\be
+
+\ii The $spec$ equation for a normaliser program \fbox{$\mbox{NP}:\;\Lambda \rightarrow Traversals$}
+\vair
+
+\bc
+\fbox{$
+\forall \lam{$M \in \Lambda$}\ . \ 
+\lsem\  \lsem spec\rsem (\mbox{NP}, \lam{$M$})\rsem ()  = \lsem \mbox{NP}\rsem (\lam{$M$})
+$}
+\ec
+
+\vair
+
+\ii $\lambda$-calculus tradition: \lam{$M$} is self-contained.
+\vair
+
+So \vertt{why break normalisation into 2 stages}?
+\vair
+
+\be
+\ii The specialised output $\mbox{NP}_{\lam{$M$}} = \lsem spec \rsem (\mbox{NP}, \lam{$M$})$
+  can be in a \blue{much simplier language} than $\lambda$-calculus.
+
+  Our candidate is some \textbf{\brown{low-level language, LLL}}.
+\vair
+
+\ii 2 stages will be natural for \blue{\em semantics-directed compiler generation}.
+
+  LLL can be an intermediate language to express semantics:
+
+  \bi
+  \ii $\mbox{NP}_1\;=\; \lsem spec \rsem\; \mbox{NP}\; \lam{M}\;\;\;:\; \Lambda \rightarrow LLL$
+  \ii $\mbox{NP}_2\;=\; \lsem \_ \rsem\;\;\; :\; LLL \rightarrow Traversals$ \hfill a \red{semantic} function
+  \ei
+\ee
+\ee
+
+\end{slide}
+
+
+
+\begin{slide}{how to partially evaluate ONP}
+
+\be
+\vair
+
+\ii \blue{Annotate} parts of normalization procedure as either \green{static} or \red{dynamic}. Variables ranging over
+  \be
+  \ii\label{onpsyntax} \green{tokens} are \green{static}, \hfill (subexpressions of \lam{$M$}; \blue{finitely many});
+\vair
+
+  \ii\label{onpbps} \red{back pointers} are \red{dynamic}; \hfill (\blue{unboundedly} many)
+  \ii\label{onptraversals} so the \red{traversal} is \red{dynamic} too.
+  \ee
+\vair
+
+\ii Computations in normalization proicedure \textbf{NP} are either 
+  \green{unfolded} or \red{residualised} (runtime code is generated to \red{do them later})
+\vair
+
+  \bi
+  \ii Perform \green{fully static} computations  \green{at partial evauation time}.
+\vair
+
+  \ii Operations to build or test a traversal: generate \red{residual code}.
+  \ei
+\ee
+
+\end{slide}
+
+
+
+
+\begin{slide}{The residual program \textbf{ONP}$_M = \lsem \lowercase{spec}\rsem \, \mbox{ONP}\ M$}
+
+ONP is not quite structually inductive but it is \blue{semi-compositional}:\\
+
+\hfill\green{Any recursive \textbf{ONP} call has \underline{\underline{a substructure of \lam{$M$}}} as argument.}
+
+\blue{Consequences}:
+\bi
+\vair
+
+\ii The partial evaluator can do, at specialisation time,
+
+  \hfill \blue{all of the \textbf{ONP} operations that depend only on \lam{$M$}}
+\ii ONP$_{\lam{$M$}}$ performs \green{\underline{no operations at all}} on  lambda expressions
+\vair
+
+\ii A specialised program ONP$_{\lam{$M$}}$ contains ``residual code'':
+  \bi
+  \ii operations to extend the traversal
+  \ii operations to follow back pointers
+  \ei
+\vair
+
+\ii Subexpressions of \lam{$M$} will appear, but are only used as \red{tokens}:
+
+  Tokens are \green{indivisible}: used as labels and for equality comparisons
+\ei
+
+\end{slide}
+
+
+
+\begin{slide}{Status: our work on simply-typed \lc }
+
+\be
+\item We have one version of ONP  in  \blue{\sc Haskell} and another in \blue{\sc Scheme}
+\item {\sc Haskell} version includes: \green{ typing; conversion to eta-long form;
+  the traversal algorithm itself; and construction of the normalised term}.
+\item {\sc Scheme} version: nearly ready to apply automatic partial evaluation.
+
+  Plan: use the \blue{\sc unmix} partial evaluator (Sergei Romanenko).
+
+\item The LLL output size is only \red{linearly larger}
+  than \lam{$M$}, $|p_{\lam{$M$}}| = O(|\lam{$M$}|)$
+\item We have also have a handwritten a \red{\em generating extension} of ONP.
+  $$
+  \mbox{If\ }p_M = \lsem \mbox{ONP-gen} \rsem^{\sc scheme} (M)
+  \mbox{\ then\ }
+  \forall M \ .\ \lsem M\rsem^\Lambda =  \lsem p_M \rsem^{LLL} 
+  $$
+
+  {\Large \blue{Now: LLL = is a tiny subset of {\tt scheme}, so the output $p_M$ is  a {\sc scheme}  program.}}
+\ee
+\end{slide}
+
+\begin{slide}{more work for simply-typed \lc }
+
+\vair\vair
+
+Next steps:
+\vair
+
+  \bi
+  \ii Produce a generating extension, \green{automatically,} by \blue{specialising
+    the specialiser to a $\Lambda$-traverser}, using {\sc unmix}
+\vair
+
+  \ii Redefine LLL formally as a clean stand-alone subset of {\sc haskell}
+\vair
+
+  \ii Use haskell supersompiler
+\vair
+
+  \ii Extend existing approach to \green{programs with input \red{dynamic} data}
+  \ei
+\end{slide}
+
+
+
+
+\begin{slide}{Status:  our work on the \blue{untyped} \lc }
+
+\be
+\ii $UNP$ is a normaliser for \brown{$\Lambda^{untyped}$}.
+\vair
+
+\ii $UNP$ has been done in {\sc Haskell} and works on a variety of examples.
+\vair
+
+\ii Some of traversal items may have \blue{two back pointers}, in comparison: $ONP$ uses only one.
+\vair
+
+\ii As $ONP$, $UNP$ is also defined \green{semi-compositionally} by recursion on syntax of $\lambda$-expression \lam{$M$}.
+\vair
+
+\ii By specialising $UNP$, an \blue{arbitrary untyped $\lambda$-expression} can be translated to \lam{LLL}.
+\vair
+
+\ii Correctness proof: pending.
+\ee
+
+\end{slide}
+
+
+
+\begin{slide}{Towards separating programs from data in $\Lambda$}
+
+Also we have a one more direction for research:
+\be
+\ii An idea is to regard a \green{computation of $\lambda$-expression $M$ on input $d$} as a
+  \red{ \blue{two-player game} between the {\sc lll}-codes for $M$ and $d$}.
+\ii An intresting examples in this case a is usual $\lambda$-calculus definition of function $mult$
+  on Church numerals.
+\ii Amaizing fact is that \textbf{Loops from out of nowhere}:
+  \bi
+  \ii \green{Neither {\tt mul} nor the data contain loops};
+  \ii But {\tt mul} function is compiled into \blue{an {\sc lll}-program with two nested loops};
+  \ii We also expect that we can do the computation \green{entirely without back pointers}.
+  \ei
+\ii Right now we are trying to express such program-data games in a \red{\em communicating}
+  version of \lam{LLL}. 
+\ee
+
+\end{slide}
+
+\begin{slide}{Refenerces}
+
+\end{slide}
+
+
+\end{document}
