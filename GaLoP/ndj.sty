@@ -1,0 +1,715 @@
+\catcode `Æ=\active
+\let Æ = \AE
+\catcode `Ø=\active
+\let Ø = \O
+\catcode `Å=\active
+\let Å = \AA
+\catcode `æ=\active
+\let æ = \ae
+\catcode `ø=\active
+\let ø = \o
+\catcode `å=\active
+\let å = \aa
+
+\newcommand{\com}{\newcommand}
+\com{\pgt}[1]{{\tt #1}}
+
+%\com{\etc}{\textit{etc}}
+%\com{\ie}{\textit{i.e.,}}
+%\com{\eg}{\textit{e.g.,}}
+
+
+\newcommand{\fl}{\noindent}
+\newcommand{\hair}{\hspace{3mm}}
+\newcommand{\vair}{\vspace{3mm}}
+
+\newcommand{\bq}{\begin{quote}}
+\newcommand{\eq}{\end{quote}}
+
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ee}{\end{enumerate}}
+
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+
+\newcommand{\bd}{\begin{description}}
+\newcommand{\ed}{\end{description}}
+
+\newcommand{\bp}{\begin{program}}
+\newcommand{\ep}{\end{program}}
+
+\newcommand{\bt}{\begin{tabular}}
+\newcommand{\et}{\end{tabular}}
+\newcommand{\bdfn}{\begin{definition}}
+\newcommand{\edfn}{\end{definition}}
+
+\newcommand{\Nat}{{\cal N}}
+
+\newcommand{\store}{\mbox{\textit{store}}}
+
+\newcommand{\bind}[2]{#1\mapsto$2}
+
+
+\newtheorem{example-thm}{Example}[section]
+% \newenvironment{example}{\begin{example-thm}\rm}%
+% 	{\end{example-thm}}
+
+\newtheorem{definition-thm}[example-thm]{Definition}
+% \newenvironment{definition}{\begin{definition-thm}\rm}%
+% 	{\end{definition-thm}}
+
+
+%\com{\irule}[2]{$\frac{\mbox{\raisebox{.2ex}{#1}}}{\mbox{\raisebox{-.4ex}[1.5ex][1.5ex]{#2}}}$}
+
+
+
+
+\newcommand{\lsem}{\mbox{$\lbrack\hspace{-0.3ex}\lbrack$}}
+\newcommand{\rsem}{\mbox{$\rbrack\hspace{-0.3ex}\rbrack$}}
+
+%\newcommand{\sempar}[1]{\mbox{\lsem\pgt{#1}\rsem}}  
+%\newcommand{\semparlang}[2]{\mbox{\lsem\pgt{#1}\rsem}$^\pgt{#2}$}  
+
+
+%
+
+\newcommand{\codetype}[2]{\mbox{\mbox{\underline{$#1$}}\,\raisebox{-1.7mm}{{\bf
+#2}}}}
+\newcommand{\codecodetype}[2]{\mbox{\mbox{\underline{$#1$}}\,\raisebox{-3mm}{{\bf
+#2}}}}
+
+
+\newcommand{\sempar}[1]{\mbox{\lsem{\tt #1}\rsem}}
+\newcommand{\semparlang}[2]{\mbox{\lsem{\tt #1}\rsem}$^\pgt{#2}$} 
+
+
+\newcommand{\runpgm}[2]{\mbox{\lsem\pgt{#1}\rsem}(\pgt{#2})}
+\newcommand{\runpgmlang}[3]{\mbox{\lsem\pgt{#1}\rsem$^\pgt{#3}(\pgt{#2})$}} 
+\newcommand{\runpgmlangnest}[3]{\mbox{\lsem#1\rsem$^\pgt{#3}(\pgt{#2})$}} 
+
+\newcommand{\timepgm}[2]{\mbox{${\mathit time}_\pgt{#1}(\pgt{#2})$}} 
+\newcommand{\timepgmlang}[3]{\mbox{${\mathit time}^\pgt{#3}_\pgt{#1}(\pgt{#2})$}}
+
+\newcommand{\spacepgm}[2]{\mbox{${\mathit space}_\pgt{#1}(\pgt{#2})$}} 
+\newcommand{\spacepgmlang}[3]{\mbox{${\mathit space}^\pgt{#3}_\pgt{#1}(\pgt{#2})$}}
+
+
+      
+\newcommand{\lang}[3]{\mbox{\semparlang{#2}{#1}{\tt #3}}}
+\newcommand{\langone}[2]{\mbox{\sempar{#1}{\tt #2}}}
+%
+
+\com{\slidetop}[1]{\fl\underline{\bf#1}\vair}
+
+\com{\slideskip}{\vair\fl}
+
+
+% \newtheorem{exercise-thm}{\protect\@gobble}[chapter]
+\newenvironment{exercise}{\begin{exercise-thm}\rm}%
+        {\end{exercise-thm}}
+
+
+% \newcommand{\solution}[1]{\vspace{.5cm}
+% \noindent {\bf Vejledende l\o sning.} {#1}}
+
+\newcommand{\Int}{\mbox{\textit{Int}}}
+\newcommand{\Variables}{\mbox{\textit{Variables}}}
+\newcommand{\Expressions}{\mbox{\textit{Expressions}}}
+\newcommand{\Commands}{\mbox{\textit{Commands}}}
+\newcommand{\Stores}{\mbox{\textit{Stores}}}
+\newcommand{\Env}{\mbox{\textit{Env}}}
+\newcommand{\ProgramState}{\mbox{\textit{ProgramState}}}
+\newcommand{\ControlState}{\mbox{\textit{ControlState}}}
+\newcommand{\DataState}{\mbox{\textit{DataState}}}
+\newcommand{\Program}{\mbox{\textit{Prog}}}
+\newcommand{\Programs}{\mbox{\textit{Programs}}}
+\newcommand{\ProgramPoint}{\mbox{\textit{ProgramPoint}}}
+\newcommand{\Stmt}{\mbox{\textit{Stmt}}}
+\newcommand{\Exp}{\mbox{\textit{Exp}}}
+\newcommand{\X}{\mbox{\textit{X}}}
+\newcommand{\littlex}{\mbox{\pgt{x}}}
+\newcommand{\Store}{\mbox{\textit{Store}}}
+\newcommand{\n}{\mbox{\textit{n}}}
+\newcommand{\Seq}[1]{[ #1 ]}
+
+
+% Macros for syntax of While language (konkret syntax: C)
+
+\newcommand{\Num}[1]{\mbox{\texttt{#1}}}
+\newcommand{\Var}[1]{\mbox{\texttt{#1}}}
+\newcommand{\Array}[2]{#1[#2]}
+\newcommand{\Plus}[2]{#1 \mbox{ \texttt{+} } #2}
+\newcommand{\Minus}[2]{#1 \mbox{ \texttt{-} } #2}
+\newcommand{\Times}[2]{#1 \mbox{ \texttt{*} } #2}
+\newcommand{\Div}[2]{#1 \mbox{ \texttt{/} } #2}
+\newcommand{\Cond}[3]{#1 \mbox{\texttt{?}} #2 \mbox{\texttt{:}} #3}
+\newcommand{\Equals}[2]{#1 \mbox{ \texttt{==} } #2}
+\newcommand{\NotEquals}[2]{#1 \mbox{ \texttt{!=} } #2}
+\newcommand{\LessEqual}[2]{#1 \mbox{ \texttt{<=} } #2}
+\newcommand{\Not}[1]{\mbox{\texttt{!}} #1}
+\newcommand{\Or}[2]{#1 \mbox{ \texttt{||} } #2}
+% \newcommand{\And}[2]{{#1} \mbox{ \texttt{\&\&} } {#2}}
+
+\newcommand{\Assign}[2]{{#1} \mbox{ \texttt{=} } #2 \mbox{\texttt{;}}}
+\newcommand{\AssignArray}[3]{#1[#2] \mbox{ \texttt{=} } #3 \mbox{\texttt{;}}}
+\newcommand{\Skip}{\texttt{skip}}
+\newcommand{\Block}[1]{\{ #1 \}}
+\newcommand{\Comp}[2]{\{ #1 \; #2 \}}
+\newcommand{\If}[3]{\mbox{\texttt{if(}} #1 \mbox{\texttt{)} } #2 
+  \mbox{ \texttt{else} } #3}
+\newcommand{\While}[2]{\mbox{\texttt{while(}} #1 \mbox{\texttt{)} } #2}
+\newcommand{\Label}[1]{\mbox{\texttt{#1}}}
+
+
+% Relevant to the FUN language
+
+\newcommand{\Prog}{\mbox{\it Programs}}
+\newcommand{\Fn}{\mbox{\it FNames}}
+\newcommand{\Fdef}{\mbox{\it FcnDef}}
+\newcommand{\Fexp}{\mbox{\it Fexp}}
+\newcommand{\Fenv}{\mbox{\it Fenv}}
+\newcommand{\Penv}{\mbox{\it Penv}}
+\newcommand{\Stack}{\mbox{\it Stack}}
+\newcommand{\Frame}{\mbox{\it Frame}}
+\newcommand{\Symtab}{\mbox{\it Symtab}}
+\newcommand{\Vars}{\mbox{\it Var}}
+
+\newcommand{\prog}{\mbox{\it Program}}
+\newcommand{\fn}{\mbox{\it Fn}}
+\newcommand{\fdef}{\mbox{\it Fdef}}
+\newcommand{\expr}{\mbox{\it Exp}}
+\newcommand{\var}{\mbox{\it X}}
+\newcommand{\fram}{\mbox{\it frame}}
+
+\com{\fenv}{\mbox{{\it fenv}}}
+\com{\penv}{\mbox{{\it penv}}}
+\com{\stack}{\mbox{{\it stk}}}
+\newcommand{\symtab}{\mbox{\it sym}}
+
+
+\newcommand{\valu}{\mbox{\it v}}
+\newcommand{\Valu}{\mbox{${\cal Z}$}}
+\newcommand{\Z}{\mbox{${\cal Z}$}}
+
+\newcommand{\cbnvalu}{\mbox{\it w}}
+\newcommand{\CBNValu}{\mbox{\it CBNValue}}
+\newcommand{\Thunk}{\mbox{\it Thunk}}
+\newcommand{\thunk}{\mbox{\it thunk}}
+
+
+\com{\jfprog}[3]{\mbox{$#1\,:\,#2\Rightarrow#3$}}
+\com{\jfnaexp}[4]{\mbox{$#1,#3\vdash#2\Rightarrow#4$}} 
+\com{\jfncexp}[5]{\mbox{$#1,#2,#3:#4\Rightarrow#5$}} % Concrete call by value
+
+
+\com{\jfnvexp}[4]{\mbox{$#1,#2:#3\stackrel{\mbox{\tiny cbv}}{\Longrightarrow}#4$}} % Call by value
+
+\com{\jfnnexp}[4]{\mbox{$#1,#2:#3\stackrel{\mbox{\tiny cbn}}{\Longrightarrow}#4$}} % Call by name
+
+\com{\jfnconcexp}[5]{\mbox{$#1,#2,#3:#4\stackrel{\mbox{\tiny conc}}{\Longrightarrow}#5$}} % Concrete call by value
+
+
+\com{\force}[3]{#1\,:\,#2\mbox{\shortstack[c]{\ \ force\ \ \\$\longrightarrow$}}#3}
+
+% Relevant to Mini-C language
+
+
+\newcommand{\dvs}{{\sf dvs.}}
+\newcommand{\AVar}{\mbox{\it AVar}}
+
+\newcommand{\Fdefs}{\mbox{\it FcnDefs}}
+\newcommand{\Dec}{\mbox{\it Declarations}}
+\newcommand{\BlockC}{\mbox{\it Blocks}}
+\newcommand{\Com}{\mbox{\it Commands}}
+\newcommand{\ExpC}{\mbox{\it Expressions}}
+\newcommand{\VarC}{\mbox{\it Vars}}
+
+\newcommand{\fdefs}{\mbox{\it Fdefs}}
+\newcommand{\dec}{\mbox{\it Dec}}
+% \newcommand{\block}{\mbox{\it Block}}
+\newcommand{\cmd}{\mbox{\it Stmt}}
+
+\newcommand{\Value}{\mbox{\it Value}}
+% \newcommand{\Level}{\mbox{\it Level}}
+\newcommand{\Display}{\mbox{\it Display}}
+\newcommand{\Base}{\mbox{\it Base}}
+\newcommand{\Offset}{\mbox{\it Offset}}
+
+
+\newcommand{\env}{\mbox{\it env}}
+
+\newcommand{\rec}{\mbox{\it rec}}
+\newcommand{\stor}{\mbox{\it s}}
+\newcommand{\level}{\mbox{$\ell$}}
+\newcommand{\display}{\mbox{\it d}}
+\newcommand{\base}{\mbox{\it b}}
+\newcommand{\offset}{\mbox{\it ofs}}
+
+\newcommand{\jexp}[5]{#1\vdash#2:#3,#4\Rightarrow#5}
+\newcommand{\jcmd}[7]{#1\vdash#2:#3,#4,#5,#6\Rightarrow#7}
+
+
+\newcommand{\jblock}[7]{#1\vdash#2:#3,#4,#5,#6\Rightarrow#7}
+\newcommand{\jdec}[8]{#1\vdash#2:#3,#4,#5\Rightarrow#6,#7,#8}
+\newcommand{\jprogram}[3]{\vdash#1:#2\Rightarrow#3}
+
+\newcommand{\adr}{\mbox{\it adr}}
+\newcommand{\unfold}{\mbox{\it unfold}}
+
+
+% Relevant to implemntation of operational semantics 
+
+
+
+\com{\jprog}[3]{\mbox{$#1:#2\Rightarrow#3$}}
+
+\com{\jpartiallycorrect}[3]{\mbox{$\{#1\}\ #2\ \{#3\}$}}
+
+\com{\jexpios}[4]{\mbox{$#1,#2\vdash#3\Rightarrow#4$}}
+
+\com{\jexpfun}[3]{\mbox{$#1\,\vdash\,#2\Rightarrow#3$}}
+\com{\jexpimp}[4]{\mbox{$#1\,\vdash\,#2:#3\Rightarrow#4$}}
+
+\com{\jexpnew}[6]{\mbox{$#1,#2\,\vdash\,#3,#4,#5\Rightarrow#6$}}
+
+\com{\jprolog}[3]{\mbox{$#1\,\vdash#2\rightarrow#3$}}
+
+% Macros for type constructions
+
+\newcommand{\Function}[2]{#1 \rightarrow #2}
+\newcommand{\corresponds}{\cong}
+\newcommand{\FinMap}[2]{#1 \rightarrow_{\mathit{fin}} #2}
+
+
+
+\newtheorem{theorem-thm}[example-thm]{Theorem}
+% \newenvironment{theorem}{\begin{theorem-thm}\rm}%
+% 	{\end{theorem-thm}}
+
+\newtheorem{lemma-thm}[example-thm]{Lemma}
+\newenvironment{lemma}{\begin{lemma-thm}\rm}%
+	{ \end{lemma-thm}}
+
+\newcommand{\blem}{\begin{lemma}}
+\newcommand{\elem}{\end{lemma}}
+
+\newcommand{\bcor}{\begin{corollary}}
+\newcommand{\ecor}{\end{corollary}}
+
+\newcommand{\bprf}{\begin{proof}}
+\newcommand{\eprf}{\end{proof}}
+
+\newcommand{\bthm}{\begin{theorem}}
+\newcommand{\ethm}{\end{theorem}}
+
+
+\newcommand{\ldata}[1]{\mbox{{\tt #1-}\it data}} 
+\newcommand{\lprograms}[1]{\mbox{{\tt #1-}\it programs}} 
+
+\newcommand{\judge}[3]
+{\pgt{p},\,\mbox{$#1$}\mbox{$\,\vdash\,${\tt#2}}\mbox{$\rightarrow#3$}}
+
+\newcommand{\judgenull}[2]
+{\mbox{$\,\vdash^{null}\,#1\rightarrow#2$}}
+
+
+\newcommand{\judgeif}[5]
+{\pgt{p},$\,#1\,\vdash^{if}\,${\tt#3},{\tt#4},$\,#2\rightarrow#5$}
+
+
+\newcommand{\judgecall}[3]
+{\pgt{p}$\,\vdash^{call}\,#1,#2\rightarrow#3$}
+
+
+
+% Macros for inference systems
+
+\newcommand{\evals}{\Longrightarrow}
+\newcommand{\computes}{\longrightarrow}
+
+\newcommand{\Evals}[3]{\mbox{${#2}\vdash{#1} \Rightarrow {#3}$}}
+\newcommand{\Evalsmin}[4]{\mbox{${#2}\vdash^{#4}{#1} \Rightarrow {#3}$}}
+
+\newcommand{\Computes}[4]{\mbox{$(#1, #2) \computes (#3, #4)$}}
+\newcommand{\Axiom}[1]{\Rule{}{#1}}
+\newcommand{\AxiomS}[2]{\Axiom{#1} \quad ({#2})}
+
+\newcommand{\Rule}[2]{{\setlength{\arraycolsep}{0in}%
+   \begin{array}{c} {#1} \\ \hline {#2} \end{array}}}
+
+\newcommand{\RuleS}[3]{{\setlength{\arraycolsep}{0in}%
+   \begin{array}{cr} \begin{array}{c} {#1} \\ \hline {#2} \end{array}
+   & \quad \left({#3}\right) \end{array}}}
+
+
+% Program texts -----------------------------------------
+
+
+
+
+\newcommand{\programenvironment}{\programmode%
+	\def\par{\leavevmode\endgraf}\obeylines\nobreak%
+	\programmode}
+\newcommand{\programinfig}{%
+	 \parindent 0em
+	 \nobreak\programenvironment}
+\newcommand{\programmode}{\large\tt%   Is: \small\tt, PS 1992-09-23
+	\catcode`\_=12 \catcode`\?=12 \catcode`\.=12 \catcode`\,=12
+	\catcode`\;=12 \catcode`\:=12 \catcode`\@=12 \catcode`\~=12
+        \catcode`\#=12 \catcode`\&=12      % Added by PS 1991-06-17
+	\obeyspaces\frenchspacing}%
+
+
+\newenvironment{programintext}{\programenvironment}{}
+
+\newenvironment{program}{\setlength{\partopsep}{0mm}\setlength{\topsep}{0mm}
+	\begin{trivlist}\item[]
+\begin{minipage}{0.90\textwidth}
+	\vspace{1mm}
+	\begin{programintext}
+	}{\end{programintext}
+	\vspace{1mm}
+	\end{minipage}
+	\end{trivlist}
+	\noindent}
+
+
+
+
+
+% The following code makes Tex respect spaces and tabs in the source text, 
+% which is useful for program layout.
+
+{\catcode`\^^I=\active \obeyspaces\global\def^^I{ }}
+{\obeyspaces\global\let =\ } % let active space = control space
+{\catcode`\`=\active \gdef`{\relax\lq}}
+
+
+
+
+  %% doframeit draws a box around it argument by manipulating boxes.  It
+  %% is used in the frame environments.
+  %% 
+  %%  Rene' Seindal (seindal@diku.denet) Fri Feb 12 16:03:07 1988
+  %%  added \fboxrule and \fboxsep to \doframeit
+
+\def\doframeit#1{\vbox{%
+  \hrule height\fboxrule
+    \hbox{%
+      \vrule width\fboxrule \kern\fboxsep
+      \vbox{\kern\fboxsep #1\kern\fboxsep }%
+      \kern\fboxsep \vrule width\fboxrule }%
+    \hrule height\fboxrule }}
+
+  %% The frameit and Frameit environments formats text within a single 
+  %% Anything can be framed, including verbatim text.
+
+\def\frameit{\smallskip \advance \linewidth by -2\fboxsep
+  \advance \linewidth by -2\fboxrule \hsize=\linewidth
+  \setbox0=\vbox \bgroup \strut \ignorespaces }
+
+\def\endframeit{\ifhmode \par \nointerlineskip \fi \egroup
+\doframeit{\box0}}
+
+
+%
+%-----------------------------------------------------------------------------
+%     figure environment
+%
+%  #1 = caption, #2 = location, #3 = label
+%
+
+\newcounter{figur}[chapter]
+\def\thefigur{\thechapter.\arabic{figur}}
+\newsavebox{\fighack}
+
+\newenvironment{fig}[3]
+{%
+\refstepcounter{figur}%
+\label{#3}%
+\sbox{\fighack}{{\it Figure \ref{#3}: #1}}%
+\begin{figure}[#2]
+\begin{frameit}
+\hspace*{3mm}\begin{minipage}{0.95\textwidth}}{\end{minipage}\end{frameit}\usebox{\fighack}\end{figure}}
+
+
+
+
+\newenvironment{fig0}[3]
+{
+\refstepcounter{figur}
+\label{#3}
+\sbox{\fighack}{{\it Figure \ref{#3}: #1}}
+\begin{figure}[#2]
+%\begin{frameit}
+%\hspace*{3mm} % commented out, AJG <panic@diku.dk> 28.08.96
+\begin{minipage}{\textwidth}}{\end{minipage}
+%\end{frameit}
+\vskip2mm plus2mm minus1mm\usebox{\fighack}\end{figure}}
+
+
+
+%%      Contents: Macros for drawing T and I diagrams.
+
+\newcommand{\drawT}[4]{\put#1{\Tdiam{#2}{#3}{#4}}}
+\newcommand{\Tdiam}[3]{%
+ \begin{picture}(80,40)(-40,0)
+  \put(-40,40){\line(1,0){80}}
+  \put(-40,40){\line(0,-1){20}}
+  \put(-40,20){\line(1,0){30}}
+  \put(-10,20){\line(0,-1){20}}
+  \put(-10,0){\line(1,0){20}}
+  \put(10,0){\line(0,1){20}}
+  \put(10,20){\line(1,0){30}}
+  \put(40,20){\line(0,1){20}}
+  \put(-29,27){{\tt #1}}
+  \put(21,27){{\tt #2}}
+  \put(-3,7){{\tt #3}}
+  \put(-6, 30){\vector(1,0){12}}
+ \end{picture}
+}
+
+\newcommand{\drawI}[3]{\put#1{\Idiam{#2}{#3}}}
+\newcommand{\Idiam}[2]{%
+ \begin{picture}(20,40)(-10,0)
+   \put(-10,0){\framebox(20,40){}}
+   \put(0,10){\makebox(0,0){\tt #2}}
+   \put(0,30){\makebox(0,0){\tt #1}}
+ \end{picture}
+}
+
+\newcommand{\drawDI}[3]{\put#1{\DIdiam{#2}{#3}}}
+\newcommand{\DIdiam}[2]{%
+ \begin{picture}(20,40)(-10,0)
+   \put(-10,0){\dashbox(20,40){}}
+   \put(0,10){\makebox(0,0){\tt #2}}
+   \put(0,30){\makebox(0,0){\tt #1}}
+ \end{picture}
+}
+
+
+\newcommand{\drawD}[2]{\put#1{\Ddiam{}{#2}}}
+\newcommand{\Ddiam}[2]{%
+ \begin{picture}(20,40)(-10,0)
+   \put(-10,0){\line(0,1){20}{}}
+   \put(10,0){\line(0,1){20}{}}
+   \put(-10,0){\line(1,0){20}{}}
+   \put(0,0){\qbezier[25](-10,20)(0,50)(10,20)}
+   \put(0,10){\makebox(0,0){\tt #2}}
+   \put(0,30){\makebox(0,0){\tt #1}}
+ \end{picture}
+}
+
+\newenvironment{TIdiagram}{%
+  \begin{picture}}{\end{picture}}
+
+\newcommand{\ignore}[1]{}
+
+
+\long\def\comment#1{}
+
+\newcommand{\tin}{\pgt{in}}
+\newcommand{\tout}{\pgt{out}}
+\newcommand{\tsource}{\pgt{source}}
+\newcommand{\ttarget}{\pgt{target}}
+\newcommand{\tint}{\pgt{int}}
+\newcommand{\tspec}{\pgt{spec}}
+\newcommand{\tcompiler}{\pgt{compiler}}
+\newcommand{\tcogen}{\pgt{cogen}}
+
+
+
+\newcommand{\eller}{\mbox{$\mid$ }}
+\newcommand{\pil}{\mbox{$\rightarrow$}}
+\newcommand{\mi}{\mbox{$\mid$}}
+
+
+
+
+\newcommand{\ass}[3]{\mbox{#1 $\vdash$ {\it #2} : {\it #3}}}
+
+\newcommand{\asstwo}[2]{\mbox{{\it #1} : {\it #2}}}
+
+\newcommand{\irule}[2]{$\frac{\mbox{#1}}{\mbox{\raisebox{-.4ex}[1.5ex][1.5ex]{#2}}}$}
+
+
+
+\newcommand{\etd}{\mbox{$_1$}}
+\newcommand{\nul}{\mbox{$_0$}}
+\newcommand{\tre}{\mbox{$_3$}}
+
+\newcommand{\un}[1]{\underline{#1}}
+
+\newcommand{\unl}[1]{\underline{#1}\,\raisebox{-3mm}{}}
+
+
+
+\newcommand{\nats} {{\cal N}}
+%\newcommand{\ints} {{\cal Z}}
+\newcommand{\bools}{{\cal B}}
+\newcommand{\ids}{{\cal ID}}
+
+% \derive c
+% Equation1 \\
+% Eq2 \\[2ex]
+% LongEquation3 \\
+% ----
+% Conclusion \\
+% /derive
+
+% c'et efter "\derive" betyder, at ligninger skal centreres. Andre muligheder er
+% "l" og "r" for hhv. venstre og hoejre-justering. 
+
+% PS. Bemaerk at ligningerne bliver formateret i "math-mode". Du kan 
+% aendre dette ved at erstatte '$##$' med f.eks. '##' i 4. og 5. linie af
+% definitionen af derive-makroen. 
+
+% ---------------- cut here ---------------- 
+
+% ** The following macro expands to parameter #2 or parameter #3 according to 
+% ** whether the next non-blank character following the macro is or is not #1. 
+% ** Blanks following the macro are gobbled. 
+\catcode`!=11 \def\!ifnextchar#1#2#3{%
+\let\!testchar=#1%
+\def\!first{#2}%
+\def\!second{#3}%
+\futurelet\!nextchar\!testnext}
+\def\!testnext{%
+\ifx \!nextchar \!spacetoken
+\let\!next=\!skipspacetestagain
+\else
+\ifx \!nextchar \!testchar
+\let\!next=\!first
+\else
+\let\!next=\!second
+\fi
+\fi
+\!next}
+\def\\{\!skipspacetestagain}
+\expandafter\def\\ {\futurelet\!nextchar\!testnext} \def\\{\let\!spacetoken= } \\ % ** set \spacetoken to a space token 
+
+%
+%------------------------------------------------------------------------------ 
+%		Derivation rules
+%
+% \derive#1#2----#3/derive
+%	#1 = position l r c (left/right/center premises and conclusion)
+%	#2 = premises (each ended by \\)
+%	#3 = conclusion (each line ended by \\)
+%	#2 and #3 are set in math mode.
+
+\def\derive#1#2----#3/derive{
+{\let\rfil=\hfil \let\lfil=\hfil
+\ifx#1l\let\lfil=\relax\else\ifx#1r\let\rfil=\relax\else\fi\fi 
+\setbox0=\vbox{\let\\=\mycr\halign{\lfil$##$\rfil\cr#2}} 
+\setbox1=\vtop{\let\\=\mycr\halign{\lfil$##$\rfil\cr#3}} \ifnum\wd0<\wd1\relax
+\dimen0=\wd1
+\else \dimen0=\wd0\fi
+\setbox0=\vbox{\hbox to\dimen0{\lfil\box0\rfil} 
+\vskip2.0ex
+\hrule
+\vskip1.0ex
+\hbox to\dimen0{\lfil\box1\rfil}}
+\dimen0=\dp0\advance\dimen0by1.5ex\dp0=\dimen0 \dimen0=\ht0\advance\dimen0by-1.5ex\ht0=\dimen0 \box0
+}}
+%
+%\let\mycr=\cr
+\def\mycr{\!ifnextchar [{\mycrend}{\mycrend[0pt]}} \def\mycrend[#1]{\cr\noalign{\vskip #1\relax}} 
+%
+%------------------------------------------------------------------------------ % (BINARY) PROOFTREES
+%
+% \proof
+%	PROOFCMDS
+% \endproof
+% PROOFCMDS ::= \step#1{#2}{#3}	#1 line character, eg. - or =
+%	#2 reference to applied rules
+%	#3 conclusion of this step
+%
+%	| \premise#1	#1 premise for following steps
+%
+%	| \split{#1}{#2}	#1,#2 PROOFCMDS (used for two
+%	branches of premises).
+% All arguments are set in math mode.
+% Example:
+%
+% \proof
+% \split{\step-{Id} {A\Infer A}}
+%	{\step-{Id} {B\Infer B}}
+% \step={\And} {A,B\Infer A\And B}
+% \endproof
+% will produce (of course typeset) something like %
+%	------ Id ------ Id
+%	A :- A	B :- B
+%	================== and
+%	A,B :- A and B
+%
+\newdimen\proofleft
+\newdimen\proofright
+\newdimen\proofjud
+\newdimen\prooflabel
+\newdimen\splitindent
+%
+\def\proof{%
+\bgroup
+\proofleft=-31pt \proofright=-32pt \proofjud=-33pt \def\premise##1{\step{}{}{##1}}
+\def\step##1##2##3{% #1 line #2 label #3 judgement 
+\setbox3=\hbox{##1}
+\setbox3=\hbox to .3\wd3{\hss\box3\hss}
+\setbox0=\hbox{$##3$\strut}
+\setbox2=\hbox{\strut$~##2$}
+\dimen0=\wd0\relax\prooflabel=\wd2
+\ifdim\proofjud<\dimen0\relax\proofjud=\dimen0\fi \advance\proofjud by4pt
+\hbox to 0pt{
+\hss
+\vtop{\hbox{\kern-2pt\vbox to0pt{\vss
+\hbox to\proofjud{
+\leaders\box3
+\hfil\rlap{\box2}}
+\vss}
+\vrule height.3ex depth.5ex width0pt}
+\hbox{\vbox{\vss\hbox to\proofjud{\hfil\box0\hfil}\vss}}} \hss}
+\proofjud=\dimen0\relax \dimen0=.5\dimen0 \ifdim\proofleft<\dimen0\relax \proofleft=\dimen0\fi \advance\dimen0by\prooflabel
+\ifdim\proofright<\dimen0\relax \proofright=\dimen0\fi }
+\def\split##1##2{%
+\setbox1=\vbox{\proof##1\endproof\saveproofvals} \dimen1=.5\proofjud \dimen2=\proofleft \dimen3=\proofright \setbox2=\vbox{\proof##2\endproof\saveproofvals} \dimen4=.5\proofjud \dimen5=\proofleft \dimen6=\proofright % new jud:
+\proofjud=\dimen1 \advance\proofjud by\dimen4 \advance\proofjud by\dimen3 \advance\proofjud by\dimen5 \advance\proofjud by15pt
+% new left:
+\proofleft=.5\proofjud \advance\proofleft by-\dimen1 \advance\proofleft by\dimen2
+% new right:
+\proofright=.5\proofjud \advance\proofright by-\dimen4 \advance\proofright by\dimen6
+%
+\llap{\hbox to\proofleft{\box1\kern15pt\box2\hss}} }
+\setbox0=\vbox\bgroup\offinterlineskip
+}
+%
+\def\endproof{
+\saveproofvals
+\egroup
+\vbox{\hbox{\kern\proofleft\box0\kern\proofright}} \saveproofvals
+\egroup
+}
+%
+\def\saveproofvals{
+\edef\values{\the\proofjud,\the\proofleft,\the\proofright} \expandafter\saveafterend\values]
+}
+\def\saveafterend#1,#2,#3]{
+\global\def\saveaftervalue{
+\proofjud=#1\relax \proofleft=#2\relax \proofright=#3} \aftergroup\saveaftervalue
+}
+%
+\def\savetwoafter#1#2{
+\edef\saveaftervalue{\the#1,\the#2}
+\expandafter\savetwoafterend\saveaftervalue,#1,#2] }
+\def\savetwoafterend#1,#2,#3,#4]{
+\global\def\saveaftervalue{#3=#1\relax#4=#2\relax} \aftergroup\saveaftervalue
+}
+%
+\catcode`!=12
+
+
