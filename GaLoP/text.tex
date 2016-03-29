@@ -70,7 +70,7 @@
 \newcommand{\browm}[1]{{\color{browm}#1}}
 \newcommand{\violet}[1]{{\color{violet}#1}}
 
-\newcommand{\lam}[1]{{\color{brown}\textit{\boldmath{#1}}}}
+\newcommand{\lam}[1]{{\color{brown}\emph{\boldmath{#1}}}}
 \newcommand{\lexp}{$\lambda$-expression}
 \newcommand{\lc}{$\lambda$-calculus}
 \newcommand{\ba}{\begin{array}}
@@ -98,22 +98,28 @@ Traversals''.
 Reformulate: game semantics for various versions of lambdas.
 
 \#The game semantics for PCF can be thought of as a PCF interpreter.
-\#In a set of game semantics papers the denotation of an expression is a game strategy. 
-\#When played, the game results in a traversal.
+\#In a set of game semantics papers the denotation of an expression
+\#is a game strategy. When played, the game results in a traversal.
 
-For example, Luke Ong’s recent paper ``Normalization by Traversals'' shows that a \blue{\textit{simply-typed 
-lambda-expression \lam{M}}} can be \red{evaluated} (i.e. normalised) by the algorithm that 
+For example, Luke Ong’s recent paper ``Normalization by Traversals''
+shows that a \blue{\emph{simply-typed lambda-expression \lam{M}}}
+can be \red{evaluated} (i.e. normalised) by the algorithm that
 constructs a \green{traversal} of \lam{M}.
 
-A \green{\textit{traversal}} in this case is a justified sequence of subexpressions of \lam{M}.
-For brivety, we will call them \green{\textit{tokens}}.  One can think, that M is 
-a \blue{program} and token is a \blue{program point}. Any token may have a \green{\textit{back pointer}}, 
-or justifier, to some other previously encountered token. These pointers are used to lookup some 
-information about \lexp in the history of computation and to find dynamic binders for variables.
+A \green{\emph{traversal}} in this case is a justified sequence
+of subexpressions of \lam{M}. For brivety, we will call them
+\green{\emph{tokens}}.  One can think, that M is 
+a \blue{program} and token is a \blue{program point}. Any token
+may have a \green{\emph{back pointer}}, or justifier, to some other 
+previously encountered token. These pointers are used to lookup some 
+information about \lexp in the history of computation and to find
+dynamic binders for variables.
 
-Hereafter we will call this approach to normalization of simply typed lambda terms Oxford Normalization Procedure, 
-or ONP. For a given \lexp \lam{$M$} \lam{ONP} constructs a set of traversals \lam{$\mathfrak{Trav}(M)$}, each 
-of which corresponds to some \underline{path} in normalized term tree.
+Hereafter we will call this approach to normalization of simply typed
+lambda terms Oxford Normalization Procedure, or ONP. For a given \lexp
+\lam{$M$} \lam{ONP} constructs a set of traversals
+\lam{$\mathfrak{Trav}(M)$}, each of which corresponds to some
+\underline{path} in normalized term tree.
 
 
 ====================================================\\
@@ -121,23 +127,29 @@ of which corresponds to some \underline{path} in normalized term tree.
 ====================================================
 
 \# Confirm the understanding of operational view and its motivation.
-In the context of our research, we are interested in \emph{operational}, algorithmic 
-view of game semantics-based normalization without direct reference to game semantic
-foundations (?).
+In the context of our research, we are interested in \emph{operational}, 
+algorithmic view of game semantics-based normalization without direct
+reference to game semantic foundations (?).
 
-Consider a traversal \lam{$tr$} from \lam{$\mathfrak{Trav}(M)$}, which is a sequence of tokens \lam{$t_0$} \lam{$t_n$}.
+Consider a traversal \lam{$tr$} from \lam{$\mathfrak{Trav}(M)$}, which is
+a sequence of tokens \lam{$t_0$} \lam{$t_n$}.
 
-For all such traversals from \lam{$\mathfrak{Trav}(M)$} \lam{ONP} adds on each step zero or more extensions to \lam{$\mathfrak{Trav}(M)$}. 
-If none is added, then the traversal $tr$ already represents some path in the tree of $\beta$-normal $\eta$-long form of the term.
+For all such traversals from \lam{$\mathfrak{Trav}(M)$} \lam{ONP} adds on
+each step zero or more extensions to \lam{$\mathfrak{Trav}(M)$}. 
+If none is added, then the traversal $tr$ already represents some path in
+the tree of $\beta$-normal $\eta$-long form of the term.
 
-Each extension is a traversal, obtained by concatenation of traversal \lam{$tr$} and \underline{one new token} \lam{$t'$}, which 
-may be equipped with a pointer to some previous token in \lam{$tr$}.
+Each extension is a traversal, obtained by concatenation of traversal
+\lam{$tr$} and \underline{one new token} \lam{$t'$}, which may be
+equipped with a pointer to some previous token in \lam{$tr$}.
 
-Moreover, \lam{ONP} uses inference rules, discriminated solely by sintax of end-tokens \lam{$t_n$}. 
-In other words, \lam{ONP} is \blue{syntax-directed}.
+Moreover, \lam{ONP} uses inference rules, discriminated solely by sintax
+of end-tokens \lam{$t_n$}. In other words, \lam{ONP} is \blue{syntax-directed}.
 
-In terms of implementation, we have two main \underline{data types}: traversals and items. \underline{Traversal} is just a list 
-of \underline{items}, where an item is a pair: a token and its (optional) backpointer.
+In terms of implementation, we have two main \underline{data types}:
+traversals and items. \underline{Traversal} is just a list of
+\underline{items}, where an item is a pair: a token and its (optional) 
+backpointer.
 
 ====================================================\\
 === slide ??: SOME ONP CHARACTERISTICS =============\\
@@ -145,33 +157,36 @@ of \underline{items}, where an item is a pair: a token and its (optional) backpo
 
 Now then, let's summarize some importants for us properties of \green{ONP}.
 
-Fisrt, \lam{ONP} can be applied only to \blue{simply-tiped} $\lambda$-terms in \blue{$\eta$-long form}.
-The $\eta$-long form is obtained by $\eta$-expanding term fully and replacing implicit binary 
-application operator of each redex by the \textit{long application operator} $@$. The crucial
-point is that in order to perform this expansion one needs to know the exact types of all
-subterms.
+Fisrt, \lam{ONP} can be applied only to \blue{simply-tiped} $\lambda$-terms
+in \blue{$\eta$-long form}. The $\eta$-long form is obtained by $\eta$-
+expanding term fully and replacing implicit binary application operator of
+each redex by the \emph{long application operator} $@$. The crucial
+point is that in order to perform this expansion one needs to know the exact 
+types of all subterms.
 
-Second, \lam{ONP} implements \green{\underline{complete} head linear reduction}. Complete head linear 
-reduction can be seen as regular \textit{head linear reduction} followed by regular \textit{head linear 
+Second, \lam{ONP} implements \green{\underline{complete} head linear
+reduction}. Complete head linear reduction can be seen as regular
+\emph{head linear reduction} followed by regular \emph{head linear 
 reductions} of all arguments.
 
-The correctness of normalization by traversals is proven in terms of game semantics and categories, and 
-fully based on \lam{$M$}'s types.
+The correctness of normalization by traversals is proven in terms of game 
+semantics and categories, and fully based on \lam{$M$}'s types.
 
-Then, in contrast to standart evaluation approaches, normalization by traversals uses 
-\red{\underline{no $\beta$-reductions}}, leaves the original term intact, and 
-can be implemented without resorting to \textit{traditional techniques} like environments, 
-closures etc.
+Then, in contrast to standart evaluation approaches, normalization by 
+traversals uses \red{\underline{no $\beta$-reductions}}, leaves the original 
+term intact, and can be implemented without resorting to \emph{traditional 
+techniques} like environments, closures etc.
 
-Finally, an important property of \lam{ONP} is that while running, \lam{ONP} does not use type information at all.
-As it was mentioned before, \lam{ONP} constructs traversals using only \blue{syntax-derected rules}. 
+Finally, an important property of \lam{ONP} is that while running, \lam{ONP}
+does not use type information at all. As it was mentioned before, \lam{ONP} 
+constructs traversals using only \blue{syntax-derected rules}.
 
 And now we are able to formulate the \textbf{goals} of our research:
-
 \bi
-\ii The first goal is to extend \green{ONP} to the untyped case (hereafter \green{UNP});
-\ii The second is to reexamine the outcomes of partial evaluation in the light of 
-alternative evaluation technique.
+\ii The first goal is to extend \green{ONP} to the untyped case (hereafter
+\green{UNP});
+\ii The second is to reexamine the outcomes of partial evaluation in the
+light of alternative evaluation technique.
 \ei
 
 
@@ -179,24 +194,58 @@ alternative evaluation technique.
 === slide ??: PARTIAL EVALUATION, BRIEFLY =========\\
 ======================================================
 
-Now I whant breafly remined what is partial evaluation and how it can be applied to normalizer.
+Now let breafly remined what is partial evaluation and disscuss
+an effect of its application to normalizer.
 
-A partial evaluator is a \blue{program specialiser} that can be defined as follows: $spec$:\\
-$\forall p \in Programs\ .\ \forall s,\ d \in Data\ .\ \lsem \lsem spec\rsem (p, s)\rsem (d)\;=\; \lsem p \rsem (s, d)$\\
-Specializer is a program $spec$ that being applied to initial program $p$ and data $s$ and then to the remaining data $d$ is absolutely the same that apply initial program $p$ to both data $s$ and $d$.
+Partial evaluation is a program optimization technique also known
+as \blue{program specialization}.
+A one-argument function can be obtained from one with two arguments by
+specialization, i.e. by ``freezing'' one input to a fixed value.
+A partial evaluator by given subject program together with part of its input
+data $s$ constructs a new program $p_{s}$ which, when given $p$'s remaining 
+input $d$, will yield the same result that $p$ would have produced
+given both inputs.
 
 \bi
-\ii In other words, this means that for a given program $p$ and some static data $s$, partial evaluator builds a \blue{residual program $p_s$}$\;\stackrel{def}{=}\;\lsem spec \rsem \ p\ s$ that being applied to the remaing data $d$ produces the same result as an initial program $p$ being applied to both of them.
 
-\ii A net effect of partial evaluation is a \blue{staging program transformation}. I.e. partial evaluation devides computation in two stages:
-  optimized residual program generation and running this program on some dunamic data.
-  While running an initial program $p$ on data $s$ and $d$ is a one stage computation.
+\ii Partial evaluation yeilds program speed up by \green{precomputing} all 
+  static input at compile time.
 
-\ii Partial ervaluation produce some speed up by \green{precomputing} all static input at compile time.
-  It can be applied in \blue{compilation}, moreover PE permits an \blue{automatic compiler generation} from an interpreter by self-applying a specializer.
+\ii Thus, while talking about partial evaluation data $s$ is called
+  \red{static}, data $d$ --- dynamic, and program $p_s$ that is build by
+  specializer is called \blue{residual}.
+
+\ii A net effect of partial evaluation is a \blue{staging program
+  transformation}. Partial evaluation devides one-stage program computation
+  in two stages:
+  \be
+  \ii optimized residual program generation and
+  \ii running the generated program on some dynamic data.
+  \ee
+
+\ii Most successful applications of PE are \blue{compilation} and 
+  \blue{compiler generator}.
+  For example, partial evaluation of an interpreter with respect to a source 
+  program yields a target program.
+  Moreover, a well-known fact about partial evaluation is that
+  if provided the partial evaluator is self-applicable,
+  then \blue{compiler generation} is possible by specializing the partial 
+  evaluator itself with respect to a fixed interpreter yields a compiler.
+  Finally, specializing the partial evaluator with respect to itself yields 
+  a \blue{compiler generator}.
+
+\ii An old idea: use partial evaluation to provide \blue{Semantics-directed 
+  compiler generation}.
+  By this we mean more than just a tool to help humans write compilers. Given
+  a specfication of a programming language, like a formal semantics or 
+  an interpreter, the goal is automatically and correctly transform it into a 
+  compiler.
+  The motivation for automatic compiler generation is evident:
+  the three jobs of writing the language specfication, writing the compiler,
+  and showing the compiler to be correct are reduced to one: writing the 
+  language specfication in a form suitable as input to the compiler generator.
+
 \ei
-\ \\
-
 
 
 ====================================================\\
@@ -224,7 +273,7 @@ Well, ... , there are several reasons for it:
   First stage that called $\mbox{NP}_1$ is a result of partially evaluating 
   normalization procedure to input term \lam{$M$}\\
   $\mbox{NP}_1\;=\; \lsem spec \rsem\; \mbox{NP}\; M\;:\; \Lambda \rightarrow LLL$\\
-  and the second stage, $\mbox{NP}_2$ is the \textit{semantic function} of LLL-programs\\
+  and the second stage, $\mbox{NP}_2$ is the \emph{semantic function} of LLL-programs\\
   $\mbox{NP}_2\;=\; \lsem \cdot \rsem\; :\; LLL \rightarrow Traversals$.
 \ee
 \ \\
@@ -322,7 +371,7 @@ Status of our work for symply-tiped \lc \ is as follows:
 \item There are more thing to do for simply-typed \lc:
   \bi
   \ii First, produce a generating extension \green{automatically} by \blue{specialising the specialiser to a $\Lambda$-traverser} using {\sc unmix}.
-  \ii Second, redefine \lam{LLL} formally as a \textit{clean stand-alone tiny \underline{first-order} subset} of {\sc haskell}
+  \ii Second, redefine \lam{LLL} formally as a \emph{clean stand-alone tiny \underline{first-order} subset} of {\sc haskell}
     and use haskell supersompiler to achive a partial evaluation effect.
   \ii Also we whant to extend existing approach to \green{programs with input \red{dynamic} data} in run-time.
   \ei

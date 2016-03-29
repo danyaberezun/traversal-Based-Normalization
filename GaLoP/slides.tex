@@ -195,7 +195,7 @@ environments, ``thunks'' or ``closures''} to do the evaluation
 
 \begin{slide}{SOME ONP CHARACTERISTICS}
 
-\green{Oxford normaliztion procedure}
+\green{Oxford normalization procedure}
 
 \bi
 \ii Applies to \blue{simply-typed} {\lexp}s
@@ -231,6 +231,9 @@ $$
 
 
 \bi
+\ii Program speedup by \green{precomputation}.
+\vair
+
 \ii Given program $p$ and \red{static} data $s$, $spec$ builds a \blue{residual program}
   $$p_s\;\stackrel{def}{=}\;\lsem spec \rsem \ p\ s$$
 
@@ -242,10 +245,12 @@ $$
   \ii $\lsem \lsem spec \rsem (p, s) \rsem (d)\ $ is a \red{2 stage} computation
   \ei
 
-\vair\vair
+\vair
 
-\ii Program speedup by \green{precomputation}. Applications: \blue{compiling}, and
-  \blue{compiler generation} (from an interpreter, and by self-applying $spec$).
+\ii Applications: \blue{compiling}, and \blue{compiler generation}
+
+  An old idea: \vertt{Semantics directed compiler generation}
+
 \ei
 
 \end{slide}
@@ -330,7 +335,7 @@ So \vertt{why break normalisation into 2 stages}?
 
 \begin{slide}{The residual program \textbf{ONP}$_M = \lsem \lowercase{spec}\rsem \, \mbox{ONP}\ M$}
 
-ONP is not quite structually inductive but it is \blue{semi-compositional}:\\
+ONP is not quite structurally inductive but it is \blue{semi-compositional}:\\
 
 \hfill\green{Any recursive \textbf{ONP} call has \underline{\underline{a substructure of \lam{$M$}}} as argument.}
 
@@ -398,7 +403,7 @@ Next steps:
   \ii Redefine LLL formally as a clean stand-alone subset of {\sc haskell}
 \vair
 
-  \ii Use haskell supersompiler
+  \ii Use {\sc haskell} supercompiler
 \vair
 
   \ii Extend existing approach to \green{programs with input \red{dynamic} data}
@@ -417,7 +422,7 @@ Next steps:
 \ii $UNP$ has been done in {\sc Haskell} and works on a variety of examples.
 \vair
 
-\ii Some of traversal items may have \blue{two back pointers}, in comparison: $ONP$ uses only one.
+\ii Some traversal items may have \blue{two back pointers}, in comparison: $ONP$ uses only one.
 \vair
 
 \ii As $ONP$, $UNP$ is also defined \green{semi-compositionally} by recursion on syntax of $\lambda$-expression \lam{$M$}.
@@ -439,9 +444,9 @@ Also we have a one more direction for research:
 \be
 \ii An idea is to regard a \green{computation of $\lambda$-expression $M$ on input $d$} as a
   \red{ \blue{two-player game} between the {\sc lll}-codes for $M$ and $d$}.
-\ii An intresting examples in this case a is usual $\lambda$-calculus definition of function $mult$
+\ii An interesting example in this case a is usual $\lambda$-calculus definition of function $mult$
   on Church numerals.
-\ii Amaizing fact is that \textbf{Loops from out of nowhere}:
+\ii Amaizing fact is that \textbf{Loops come from out of nowhere}:
   \bi
   \ii \green{Neither {\tt mul} nor the data contain loops};
   \ii But {\tt mul} function is compiled into \blue{an {\sc lll}-program with two nested loops};
@@ -453,7 +458,7 @@ Also we have a one more direction for research:
 
 \end{slide}
 
-\begin{slide}{Refenerces}
+\begin{slide}{References}
 
 \end{slide}
 
