@@ -108,7 +108,7 @@ constructs a \green{traversal} of \lam{M}.
 
 A \green{\emph{traversal}} in this case is a justified sequence
 of subexpressions of \lam{M}. For brivety, we will call them
-\green{\emph{tokens}}.  One can think, that M is 
+\green{\emph{tokens}}.  One can think, that \lam{$M$} is 
 a \blue{program} and token is a \blue{program point}. Any token
 may have a \green{\emph{back pointer}}, or justifier, to some other 
 previously encountered token. These pointers are used to lookup some 
@@ -195,7 +195,7 @@ light of alternative evaluation technique.
 ======================================================
 
 Now let breafly remined what is partial evaluation and disscuss
-an effect of its application to normalizer.
+an effect of its application to normalization procedure.
 
 Partial evaluation is a program optimization technique also known
 as \blue{program specialization}.
@@ -249,35 +249,39 @@ given both inputs.
 
 
 ====================================================\\
-=== slide ??: why partially evaluate ONP =============\\
+=== slide ??: why partially evaluate NP =============\\
 ======================================================
 
-The $spec$ equation for a normaliser program \textbf{NP} that is just a function from lambda-calculus to Traversals can be seen on the slide.
+The $spec$ equation for a normalizer program \textbf{NP} that is just a 
+function from \lc\ to Traversals can be seen on the slide.
 
-You can see that there is no external dynamic
-data and that is a tradition for $\lambda$-calculus that $\lambda$-term \lam{M} is self-contained.
+You can see that there is no external dynamic data and
+that is a tradition for \lc\ that $\lambda$-term \lam{M} is self-contained.
 
 So a question is \textbf{why break normalization into two stages?}
 
-Well, ... , there are several reasons for it:
+Well, $\dots$ , there are several reasons to perform it:
 \be
-\ii First, a specialiser output $\mbox{NP}_M = \lsem spec \rsem (\mbox{NP}, M)$
-  can be in a \blue{much simplier language} than $\lambda$-calculus.
-  And our candidate for it is some \textbf{\brown{low-level language}} called \lam{LLL}.
+\ii First, a specializer output $\mbox{NP}_M = \lsem spec \rsem (\mbox{NP},
+  M)$ can be in a \blue{much simplier language} than $\lambda$-calculus. 
+  And our candidate for it is some \textbf{\brown{low-level language}}, 
+  \lam{LLL}.
 
-\ii Second, two stages will be natural for \blue{\em semantics-directed compiler generation}.\\
-  Our \green{aim is to use \lam{LLL} as an intermediate language to express \red{semantics}}.\\
-  Programs on this low-level language can be thought as a \red{semantics}
-  for programs from $\lambda$-calculus.\\
-  In other words, we \red{factor} the initial normalization procedure $\mbox{NP}$ into two stages:\\
+\ii Second, two stages will be natural for \blue{\em semantics-directed 
+  compiler generation}.\\
+  Our \green{aim is to use \lam{LLL} as an intermediate language to express 
+  \red{semantics}}. This means that programs on this low-level language can 
+  be thought as a \red{semantics} for programs from $\lambda$-calculus. 
+  In other words, we \red{factor} the initial normalization procedure 
+  $\mbox{NP}$ into two stages:\\
   First stage that called $\mbox{NP}_1$ is a result of partially evaluating 
   normalization procedure to input term \lam{$M$}\\
-  $\mbox{NP}_1\;=\; \lsem spec \rsem\; \mbox{NP}\; M\;:\; \Lambda \rightarrow LLL$\\
-  and the second stage, $\mbox{NP}_2$ is the \emph{semantic function} of LLL-programs\\
+  $\mbox{NP}_1\;=\; \lsem spec \rsem\; \mbox{NP}\; M\;:\; \Lambda \rightarrow 
+  LLL$\\
+  and the second stage, $\mbox{NP}_2$ is the \emph{semantic function} of 
+  LLL-programs\\
   $\mbox{NP}_2\;=\; \lsem \cdot \rsem\; :\; LLL \rightarrow Traversals$.
 \ee
-\ \\
-
 
 
 ====================================================\\
@@ -287,26 +291,34 @@ Well, ... , there are several reasons for it:
 A next question is "how to partially evaluate oxford nomalization procedure
 with respect to the \red{static} input term \lam{$M$}"?
 
+A well-known fact is that partial evaluation will achive a best result if 
+the input program is \emph{annotated}. Thus,
+
 \be
-\ii First, we have to \blue{annotate} parts of normalization procedure as either \green{static} or \red{dynamic}. And here variables ranging over
+\ii First, we have to \blue{annotate} parts of normalization procedure as 
+  either \green{static} or \red{dynamic}. And here variables ranging over
   \be
-  \ii\label{onpsyntax} \green{tokens} that are \green{static}, \\
-    Because there are only \blue{finitely many} subexpressions of \lam{$M$}.\\\\
+  \ii \green{tokens} that are \green{static},
+    Because there are only \blue{finitely many} subexpressions of \lam{$M$}.
+    \\\\
     And all other data is actually dynamic
-  \ii\label{onpbps} i.e. \red{back pointers} are \red{dynamic};
-  \ii\label{onptraversals} and so the \red{traversal} being built from both of them is \red{dynamic} too.
+  \ii i.e. \red{back pointers} are \red{dynamic};
+  \ii and so the \red{traversal} being built from both of them is
+    \red{dynamic} too.
   \ee
-\ii Computations in normalization proicedure \textbf{NP} are either 
+\ii Then, run partial evaluator on annotated program. Computations in 
+  normalization procedure \textbf{ONP} are either 
   \green{unfolded} by partial evaluator in compile time or \red{residualised}
-  that means that partial evaluator will generate a runtime code to \red{do them later} in run-time.\\
-  And then
+  that means that partial evaluator will generate a runtime code to \red{do 
+  them later} in run-time.\\
+  Finaly,
   \bi
-  \ii Perform all \green{fully static} computations  \green{at partial evauation time}.
-  \ii and for operations to build or test a traversal: generate \red{residual code}.
+  \ii Perform all \green{fully static} computations  \green{at partial 
+    evauation time}.
+  \ii and for operations to build or test a traversal: generate \red{residual 
+    code}.
   \ei
 \ee
-\ \\
-
 
 
 ====================================================\\
