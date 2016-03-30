@@ -98,13 +98,14 @@ Reformulate: game semantics for various versions of lambdas.
 \#In a set of game semantics papers the denotation of an expression\\
 \#is a game strategy. When played, the game results in a traversal.\\
 
-For example, Luke Ong’s recent paper ``Normalization by Traversals''
-shows, that a \blue{\emph{simply-typed lambda-expression \lam{M}}}
-can be \red{evaluated} (i.e. normalized) by the algorithm that
+The game semantics for programming languages can be thought of as a theirs 
+interpreter. For example, Luke Ong’s recent paper ``Normalization by 
+Traversals'' shows, that a \blue{\emph{simply-typed lambda-expression 
+\lam{M}}} can be \red{evaluated} (i.e. normalized) by the algorithm that
 constructs a \green{traversal} of \lam{M}.
 
 A \green{\emph{traversal}} in this case is a justified sequence
-of subexpressions of \lam{M}. For the sake of brevity, we will call them
+of subexpressions of \lam{$M$}. For the sake of brevity, we will call them
 \green{\emph{tokens}}. One may think, that \lam{$M$} is 
 a \blue{program} and token is a \blue{program point}. Any token
 may have a \green{\emph{back pointer}}, or justifier, to some other 
@@ -113,8 +114,8 @@ information about \lexp in the history of computation and to find
 dynamic binders for variables.
 
 Hereafter we will call this approach to normalization of simply typed
-lambda terms Oxford Normalization Procedure, or ONP. For a given \lexp
-\lam{$M$} \lam{ONP} constructs a set of traversals
+lambda terms \green{Oxford Normalization Procedure}, or \lam{ONP}.
+For a given \lexp \lam{$M$} \lam{ONP} constructs a set of traversals
 \lam{$\mathfrak{Trav}(M)$}, each of which corresponds to some
 \underline{path} in normalized term tree.
 
@@ -143,7 +144,7 @@ of end-tokens \lam{$t_n$}. In other words, \lam{ONP} is \blue{syntax-directed}.
 
 In terms of implementation, we have two main \underline{data types}:
 traversals and items. \underline{Traversal} is just a list of
-\underline{items}, where an item is a pair: a token and its (optional) 
+\underline{items}, where an item is a pair: a token and its optional 
 backpointer.
 
 
@@ -160,27 +161,30 @@ types of all subterms.
 
 Second, \lam{ONP} implements \green{\underline{complete} head linear
 reduction}. Complete head linear reduction can be seen as regular
-\emph{head linear reduction} followed by regular \emph{head linear 
-reductions} in all arguments.
+\emph{head linear reduction}, which on each step substitutes only a \emph{head
+variable occurence}, followed by regular \emph{head linear reductions} in all 
+arguments.
 
 The correctness of normalization by traversals is proven in terms of game 
 semantics and categories, and fully based on \lam{$M$}'s types.
 
 Then, in contrast to standart evaluation approaches, normalization by 
-traversals uses \red{\underline{no $\beta$-reductions}}, leaves the original 
-term intact, and can be implemented without \emph{traditional 
-techniques} like environments, closures etc.
+traversals uses \red{\underline{no $\beta$-reductions}} at all. It leaves 
+the original term intact, and can be implemented without \emph{traditional 
+techniques} like environments, closures and so on.
 
 Finally, an important property of \lam{ONP} is that, while running, \lam{ONP}
 does not use type information at all. As it was mentioned before, \lam{ONP} 
-constructs traversals using only \blue{syntax-derected rules}.
+constructs traversals using only \blue{syntax-derected rules}. While types are 
+only used to contruct a correct \emph{long form} and to prove \lam{ONP} 
+correctness.
 
 And now we are able to formulate the \textbf{goals} of our research:
 \bi
-\ii The first goal is to extend \green{ONP} to the untyped case (hereafter
-\green{UNP});
-\ii The second is to reexamine the outcomes of partial evaluation in the
-light of alternative evaluation technique.
+\ii The first goal is to extend \lam{ONP} to the untyped case (hereafter
+  \lam{UNP});
+\ii The second is to reexamine the outcomes of partial evaluation in the 
+  light of alternative evaluation technique.
 \ei
 
 
@@ -214,8 +218,8 @@ $p$ would produce for both inputs.
   \ii execution of residual program for some dynamic input.
   \ee
 
-\ii Most successful applications of PE are \blue{compilation} and 
-  \blue{compiler generation}.
+\ii Most successful applications of parial evaluation are \blue{compilation} 
+  and \blue{compiler generation}.
 
   For example, specialization of an interpreter with respect to a source 
   program yields a target program. Moreover, a well-known fact about partial 
@@ -239,7 +243,7 @@ $p$ would produce for both inputs.
 \section{Why partially evaluate NP?}
 
 An instance of $spec$ equation for a normalizer program \textbf{NP}, which is 
-just a function from \lc\ to Traversals is shown on the slide.
+just a function from \lc\ to Traversals, is shown on the slide.
 
 You can see that there are no external dynamic data and, conventionally, 
 $\lambda$-term \lam{M} is self-contained.
@@ -262,8 +266,8 @@ Well, $\dots$, there are several reasons:
   In other words, we \red{factor} the initial normalization procedure 
   $\mbox{NP}$ into two stages:
 
-  The first stage, denoted $\mbox{NP}_1$, is a result of specialization of 
-  normalization procedure on the input term \lam{$M$}
+  The first stage, denoted $\mbox{NP}_1$, is specialization of normalization 
+  procedure on the input term \lam{$M$}
 
   $$\mbox{NP}_1\;=\; \lsem spec \rsem\; \mbox{NP}\; M\;:\; \Lambda \rightarrow 
   \lam{LLL}$$
@@ -288,7 +292,7 @@ the input program is \emph{annotated}. Thus,
   either \green{static} or \red{dynamic}. The variables ranging over
   \be
   \ii \green{tokens} are \green{static}, since there are only \blue{finitely 
-  many} subexpressions of \lam{$M$}.
+  many} subexpressions of a given term \lam{$M$}.
   \ii \red{back pointers} are \red{dynamic};
   \ii \red{traversals} being built from both of them are \red{dynamic} too.
   \ee
@@ -319,26 +323,25 @@ compositional} in the sense, that \green{any recursive \lam{ONP}-call has
 This property has several \blue{consequences}:
 
 \bi
-\item First, the partial evaluator can do, at specialization time, \blue{all 
-of the \lam{ONP} operations, 
-which depend only on input term \lam{$M$}} 
-\item \blue{wherein} this also means, that \lam{ONP$_M$} performs \green{
+\ii First, the partial evaluator can do, at specialization time, \blue{all 
+  of the \lam{ONP} operations, which depend only on input term \lam{$M$}} 
+\ii \blue{wherein} this also means, that \lam{ONP$_M$} performs \green{
   \underline{no operations at all}} on lambda expressions
 \ei
 
 For all other operations
 \bi
-\ii a specialised program \lam{ONP$_M$} will be generated. This program will 
+\ii a specialized program \lam{ONP$_M$} will be generated. This program will 
   contain ``residual code'', containing only operations to build the 
   traversal. There are two kind of operations:
   \bi
   \ii operations to extend the traversal; and sometimes;
   \ii operations to follow back pointers when needed to do this.
   \ei
-\item An important fact is that subexpressions of \lam{$M$} will appear, but 
-  will be only used as \red{tokens}:\\
-  This means that tokens are \green{indivisible}: they are only used as labels 
-  (i.e. program points) and for equality comparison with other tokens. 
+\ii An important fact is that subexpressions of \lam{$M$} will appear in 
+  specialized progrma \lam{ONP$_M$}, but will be only used as \red{tokens}:\\
+  This means that tokens are \green{indivisible}: they are only used as 
+  labels, program points, and for equality comparison with other tokens. 
   Actually we use names instead of real subexpressions. And real 
   subexpressions are only needed for the normalized term reconstruction from 
   traversals.
@@ -360,9 +363,9 @@ Status of our work for symply-typed \lc \ is as follows:
   evaluation. We are planning to use  the \blue{\sc unmix} partial evaluator, 
   which was written by Sergei Romanenko and others. 
   {\sc unmix} is a general partial evaluator for {\sc Scheme}. We expect that 
-  we will achieve the described above effect of specialising \lam{ONP}.
+  we will achieve the described above effect of specializing \lam{ONP}.
 \ii An important fact is that the size of output \lam{LLL} program is only 
-  \red{linearly larger},than \lam{$M$}, while traversal itself can be 
+  \red{linearly larger}, than \lam{$M$}, while traversal itself can be 
   arbitrarily larger, than the size of the input term.
 \ii We also have a handwritten \red{\em generating extension} for \lam{ONP}
   $ONP-gen$. It means, that for given $\lambda$-term \lam{$M$} $OMP-gen$ 
@@ -374,7 +377,7 @@ Status of our work for symply-typed \lc \ is as follows:
 \ii There are more thing to do for simply-typed \lc:
   \bi
   \ii First, produce a generating extension \green{automatically} by 
-    \blue{specialising the specialiser to a $\Lambda$-traverser} using 
+    \blue{specializing the specializer to a $\Lambda$-traverser} using 
     {\sc unmix}.
   \ii Second, redefine \lam{LLL} formally as a \emph{clean stand-alone tiny 
     \underline{first-order} subset} of {\sc haskell}
@@ -385,7 +388,7 @@ Status of our work for symply-typed \lc \ is as follows:
 \ee
 
 
-\section{Status:  our work on the \blue{untyped} \lc}
+\section{Status: our work on the \blue{untyped} \lc}
 
 For \blue{untyped} \lc
 
@@ -393,8 +396,8 @@ For \blue{untyped} \lc
 \ii We have a normaliser \lam{UNP}, which works for arbitrary (normalizing) 
   untyped lambda terms.
 \ii \lam{UNP} is implemented in {\sc Haskell} and works for a variety of 
-  examples. Right now we are working on a more justified definition of 
-  \lam{UNP}.
+  examples. Right now we are working on a more \textbf{justified} definition 
+  of \lam{UNP}.
 \ii Some of traversal items may have \blue{two back pointers}; for comparison: 
   \lam{ONP} uses only one.
 \ii As \lam{ONP}, \lam{UNP} is also defined \green{semi-compositionally} via 
@@ -402,7 +405,8 @@ For \blue{untyped} \lc
   This actually means that it also can be specialized similarly to \lam{ONP}.
 \ii Moreover, by specializing \lam{UNP}, an \blue{arbitrary untyped $\lambda$-
   expression} can be translated to our low-level language.
-  So the specialised version of \lam{UNP} could be a semantic function for \lc.
+  It actually means, that the specialized version of \lam{UNP} could be seen 
+  as a semantic function for \lc.
 \ii For now, we are working on a \red{correctness proof} for \lam{$UNP$}. 
   We expect that we will prove its correctness formally using some proof 
   assistants like \textbf{Coq}.
