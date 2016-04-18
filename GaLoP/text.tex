@@ -1,0 +1,438 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+% \graphicspath{{/}}%путь к рисункам
+\usepackage{cite}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usepackage{ amssymb }
+\usepackage{ amsmath}
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{dred}{rgb}{0.545,0,0}
+\definecolor{dblue}{rgb}{0,0,0.545}
+\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\lstdefinelanguage{cpp}{
+    backgroundcolor=\color{lgrey},  
+    basicstyle=\footnotesize \ttfamily \color{black} \bfseries,   
+    breakatwhitespace=false,       
+    breaklines=true,               
+    captionpos=b,
+    commentstyle=\color{dkgreen},   
+    deletekeywords={...},          
+    escapeinside={\%*}{*)},                  
+    frame=single,                  
+    language=C++,                
+    keywordstyle=\color{purple},  
+    morekeywords={size_t,string,void,int,gc_ptr,gc_new}, 
+    identifierstyle=\color{black},
+    stringstyle=\color{blue},
+    numbers=right,                 
+    numbersep=5pt,                  
+    numberstyle=\tiny\color{black}, 
+    rulecolor=\color{black},        
+    showspaces=false,               
+    showstringspaces=false,        
+    showtabs=false,                
+    stepnumber=1,                   
+    tabsize=5,                     
+    title=\lstname,                 
+}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{russian}
+\setmainfont[Ligatures=TeX]{DejaVu Serif}
+\setsansfont[Ligatures=TeX]{DejaVu Sans}
+\setmonofont{DejaVu Sans Mono}
+
+\usepackage{geometry} % Меняем поля страницы
+\geometry{left=3.5cm}% левое поле
+\geometry{right=2.5cm}% правое поле
+\geometry{top=4cm}% верхнее поле
+\geometry{bottom=4cm}% нижнее поле
+
+\newcommand{\bi}{\begin{itemize}}
+\newcommand{\ei}{\end{itemize}}
+\newcommand{\be}{\begin{enumerate}}
+\newcommand{\ee}{\end{enumerate}}
+\newcommand{\ii}{\item}
+
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\green}[1]{{\color{blue!20!black!30!green}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\brown}[1]{{\color{brown}#1}}
+\newcommand{\browm}[1]{{\color{browm}#1}}
+\newcommand{\violet}[1]{{\color{violet}#1}}
+
+\newcommand{\lam}[1]{{\color{brown}\emph{\boldmath{#1}}}}
+\newcommand{\lexp}{$\lambda$-expression}
+\newcommand{\lc}{$\lambda$-calculus}
+\newcommand{\ba}{\begin{array}}
+\newcommand{\ea}{\end{array}}
+
+\newcommand{\lsem}{\mbox{$\lbrack\hspace{-0.3ex}\lbrack$}}
+\newcommand{\rsem}{\mbox{$\rbrack\hspace{-0.3ex}\rbrack$}}
+
+\newcommand{\bc}{\begin{center}}
+\newcommand{\ec}{\end{center}}
+
+\begin{document}
+
+Good afternoon. My name is Daniil and I'm going to present our joint work with 
+professor Neil Deaton Jones, called ``Partial Evaluation and Normalization by 
+Traversals''. 
+
+
+\section{Introduction}
+
+\#TODO:
+Reformulate: game semantics for various versions of lambdas.
+
+\#The game semantics for PCF can be thought of as a PCF interpreter.\\
+\#In a set of game semantics papers the denotation of an expression\\
+\#is a game strategy. When played, the game results in a traversal.\\
+
+The game semantics for programming languages can be thought of as a theirs 
+interpreter. For example, Luke Ong’s recent paper ``Normalization by 
+Traversals'' shows, that a \blue{\emph{simply-typed lambda-expression 
+\lam{M}}} can be \red{evaluated} (i.e. normalized) by the algorithm that
+constructs a \green{traversal} of \lam{M}.
+
+A \green{\emph{traversal}} in this case is a justified sequence
+of subexpressions of \lam{$M$}. For the sake of brevity, we will call them
+\green{\emph{tokens}}. One may think, that \lam{$M$} is 
+a \blue{program} and token is a \blue{program point}. Any token
+may have a \green{\emph{back pointer}}, or justifier, to some other 
+previously encountered token. These pointers are used to lookup some 
+information about \lexp in the history of computation and to find
+dynamic binders for variables.
+
+Hereafter we will call this approach to normalization of simply typed
+lambda terms \green{Oxford Normalization Procedure}, or \lam{ONP}.
+For a given \lexp \lam{$M$} \lam{ONP} constructs a set of traversals
+\lam{$\mathfrak{Trav}(M)$}, each of which corresponds to some
+\underline{path} in normalized term tree.
+
+
+\section{Starting point}
+
+\# Confirm the understanding of operational view and its motivation.\\
+In the context of our research, we are interested in \emph{operational}, 
+algorithmic view of game semantics-based normalization without direct
+reference to game semantic foundations (?).
+
+Consider a traversal \lam{$tr$} from \lam{$\mathfrak{Trav}(M)$}, which is
+a sequence of tokens \lam{$t_0$} \lam{$t_n$}.
+
+For all such traversals from \lam{$\mathfrak{Trav}(M)$} \lam{ONP} on
+each step adds zero or more extensions to \lam{$\mathfrak{Trav}(M)$}. 
+If none is added, then the traversal $tr$ already represents some path in
+the tree of $\beta$-normal $\eta$-long form of the term.
+
+Each extension is a traversal, obtained by concatenation of traversal
+\lam{$tr$} and \underline{one new token} \lam{$t'$}, which may be
+equipped with a pointer to some previous token in \lam{$tr$}.
+
+Moreover, \lam{ONP} uses inference rules, discriminated solely by sintax
+of end-tokens \lam{$t_n$}. In other words, \lam{ONP} is \blue{syntax-directed}.
+
+In terms of implementation, we have two main \underline{data types}:
+traversals and items. \underline{Traversal} is just a list of
+\underline{items}, where an item is a pair: a token and its optional 
+backpointer.
+
+
+\section{SOME ONP CHARACTERISTICS}
+
+Now then, let's summarize some importants for us properties of \green{ONP}.
+
+Fisrt, \lam{ONP} can be applied only to \blue{simply-tiped} $\lambda$-terms
+in \blue{$\eta$-long form}. The $\eta$-long form is obtained by full $\eta$-
+expansion of the term and substitution of all implicit binary application 
+operators for each redex by \emph{long application operator} $@$. The crucial
+point is that in order to perform this expansion one needs to know the exact 
+types of all subterms.
+
+Second, \lam{ONP} implements \green{\underline{complete} head linear
+reduction}. Complete head linear reduction can be seen as regular
+\emph{head linear reduction}, which on each step substitutes only a \emph{head
+variable occurence}, followed by regular \emph{head linear reductions} in all 
+arguments.
+
+The correctness of normalization by traversals is proven in terms of game 
+semantics and categories, and fully based on \lam{$M$}'s types.
+
+Then, in contrast to standart evaluation approaches, normalization by 
+traversals uses \red{\underline{no $\beta$-reductions}} at all. It leaves 
+the original term intact, and can be implemented without \emph{traditional 
+techniques} like environments, closures and so on.
+
+Finally, an important property of \lam{ONP} is that, while running, \lam{ONP}
+does not use type information at all. As it was mentioned before, \lam{ONP} 
+constructs traversals using only \blue{syntax-derected rules}. While types are 
+only used to contruct a correct \emph{long form} and to prove \lam{ONP} 
+correctness.
+
+And now we are able to formulate the \textbf{goals} of our research:
+\bi
+\ii The first goal is to extend \lam{ONP} to the untyped case (hereafter
+  \lam{UNP});
+\ii The second is to reexamine the outcomes of partial evaluation in the 
+  light of alternative evaluation technique.
+\ei
+
+
+\section{PARTIAL EVALUATION, BRIEFLY}
+
+Now let us briefly recollect, what is partial evaluation.
+
+Partial evaluation is a program optimization technique, also known
+as \blue{program specialization}. A one-argument function can be obtained 
+from function of two arguments by specialization, i.e. by ``freezing'' one 
+of its inputs to a fixed value. A partial evaluator for a given subject 
+program together with a part of its input data $s$ constructs a new program 
+$p_{s}$, which, given $p$'s remaining input $d$, yields the same result as 
+$p$ would produce for both inputs.
+
+\bi
+
+\ii In the context of partial evaluation, data $s$ is called
+  \red{static}, data $d$~--- dynamic, and program $p_s$ is 
+  called \blue{residual}, or specialized.
+
+\ii Partial evaluation yeilds program speed up by \green{precomputing} all 
+  static input at compile time.
+
+\ii A net effect of partial evaluation is a \blue{staging program
+  transformation}. Partial evaluation divides one-stage program computation
+  in two stages:
+
+  \be
+  \ii optimized residual program generation and;
+  \ii execution of residual program for some dynamic input.
+  \ee
+
+\ii Most successful applications of parial evaluation are \blue{compilation} 
+  and \blue{compiler generation}.
+
+  For example, specialization of an interpreter with respect to a source 
+  program yields a target program. Moreover, a well-known fact about partial 
+  evaluation is that if partial evaluator is self-applicable, then 
+  \blue{compiler generation} is possible by specializing the partial evaluator 
+  itself on a fixed interpreter yields a compiler. Finally, specializing a 
+  partial evaluator on itself yields a \blue{compiler generator}.
+
+\ii An old idea: use partial evaluation to provide \blue{Semantics-directed 
+  compiler generation}. By this we mean more than just a tool to help humans 
+  write compilers. Given a specfication of a programming language, like a 
+  formal semantics or an interpreter, the goal is to automatically and 
+  correctly transform it into a compiler. The motivation for automatic 
+  compiler generation is evident:
+  the three jobs of writing the language specfication, writing the compiler,
+  and showing the compiler to be correct are reduced to one: writing the 
+  language specfication in a form suitable as input to the compiler generator.
+\ei
+
+
+\section{Why partially evaluate NP?}
+
+An instance of $spec$ equation for a normalizer program \textbf{NP}, which is 
+just a function from \lc\ to Traversals, is shown on the slide.
+
+You can see that there are no external dynamic data and, conventionally, 
+$\lambda$-term \lam{M} is self-contained.
+
+So the question is \textbf{why break normalization into two stages?}
+
+Well, $\dots$, there are several reasons:
+
+\be
+\ii First, a specializer output $\mbox{NP}_M = \lsem spec \rsem (\mbox{NP},
+  M)$ can be expressed in a \blue{much simplier language}, than \lc. 
+  Our candidate is called \textbf{\brown{low-level language}}, \lam{LLL}.
+
+\ii Second, two stages are natural for \blue{\em semantics-directed 
+  compiler generation}.
+
+  Our \green{aim is to use \lam{LLL} as an intermediate language to express 
+  \red{semantics}}. This means, that programs in this low-level language can 
+  be thought as a \red{semantics} for programs in $\lambda$-calculus. 
+  In other words, we \red{factor} the initial normalization procedure 
+  $\mbox{NP}$ into two stages:
+
+  The first stage, denoted $\mbox{NP}_1$, is specialization of normalization 
+  procedure on the input term \lam{$M$}
+
+  $$\mbox{NP}_1\;=\; \lsem spec \rsem\; \mbox{NP}\; M\;:\; \Lambda \rightarrow 
+  \lam{LLL}$$
+
+  and the second stage, $\mbox{NP}_2$, is \emph{semantic function} for
+  \lam{LLL}-programs:
+
+  $$\mbox{NP}_2\;=\; \lsem \cdot \rsem\; :\; \lam{LLL} \rightarrow Traversals$$
+\ee
+
+
+\section{How to partially evaluate \lam{ONP}?}
+
+The next question is "how to partially evaluate oxford nomalization procedure
+with respect to a \red{static} input term \lam{$M$}"?
+
+A well-known fact is that partial evaluation would achieve the best result if 
+the input program is \emph{annotated}. Thus,
+
+\be
+\ii First, we have to \blue{annotate} parts of normalization procedure as 
+  either \green{static} or \red{dynamic}. The variables ranging over
+  \be
+  \ii \green{tokens} are \green{static}, since there are only \blue{finitely 
+  many} subexpressions of a given term \lam{$M$}.
+  \ii \red{back pointers} are \red{dynamic};
+  \ii \red{traversals} being built from both of them are \red{dynamic} too.
+  \ee
+\ii Then, we can run partial evaluator on annotated program. Computations in 
+  normalization procedure \lam{ONP} are either  \green{unfolded} by partial 
+  evaluator at compile time or \red{residualised}, which means, that partial 
+  evaluator generates some runtime code to \red{execute them later} at run-
+  time.
+
+  Finaly,
+  \bi
+  \ii Perform all \green{fully static} computations \green{at partial 
+  evauation time}.
+  \ii Generate \red{residual code} for all other operations.
+  \ei
+\ee
+
+
+\section{The  residual program \lam{ONP}$_{\lam{$M$}} = \lsem \lowercase{spec}
+  \rsem \, \mbox{NP}\ \lam{$M$}$}
+
+Now let's discuss the structure of specialized program \lam{ONP}$_{\lam{$M$}}$.
+
+Note, that \lam{ONP} is not quite structually inductive, but \red{semi-
+compositional} in the sense, that \green{any recursive \lam{ONP}-call has 
+\underline{\underline{a substructure of $M$}} as argument.}
+
+This property has several \blue{consequences}:
+
+\bi
+\ii First, the partial evaluator can do, at specialization time, \blue{all 
+  of the \lam{ONP} operations, which depend only on input term \lam{$M$}} 
+\ii \blue{wherein} this also means, that \lam{ONP$_M$} performs \green{
+  \underline{no operations at all}} on lambda expressions
+\ei
+
+For all other operations
+\bi
+\ii a specialized program \lam{ONP$_M$} will be generated. This program will 
+  contain ``residual code'', containing only operations to build the 
+  traversal. There are two kind of operations:
+  \bi
+  \ii operations to extend the traversal; and sometimes;
+  \ii operations to follow back pointers when needed to do this.
+  \ei
+\ii An important fact is that subexpressions of \lam{$M$} will appear in 
+  specialized progrma \lam{ONP$_M$}, but will be only used as \red{tokens}:\\
+  This means that tokens are \green{indivisible}: they are only used as 
+  labels, program points, and for equality comparison with other tokens. 
+  Actually we use names instead of real subexpressions. And real 
+  subexpressions are only needed for the normalized term reconstruction from 
+  traversals.
+\ei
+
+
+\section{Status: our work on simply-typed \lc}
+
+Status of our work for symply-typed \lc \ is as follows:
+
+\be
+\ii We have one version of \lam{ONP}, written in \blue{\sc Haskell}, and 
+  another in \blue{\sc Scheme}
+\ii The {\sc Haskell} version includes: \green{typing} using algorithm $W$;
+  \green{conversion to eta-long form; 
+  the traversal generation algorithm itself; reconstruction of the normalized 
+  term from the set of traversals}.
+\ii The {\sc Scheme} version is nearly ready to apply automatic partial 
+  evaluation. We are planning to use  the \blue{\sc unmix} partial evaluator, 
+  which was written by Sergei Romanenko and others. 
+  {\sc unmix} is a general partial evaluator for {\sc Scheme}. We expect that 
+  we will achieve the described above effect of specializing \lam{ONP}.
+\ii An important fact is that the size of output \lam{LLL} program is only 
+  \red{linearly larger}, than \lam{$M$}, while traversal itself can be 
+  arbitrarily larger, than the size of the input term.
+\ii We also have a handwritten \red{\em generating extension} for \lam{ONP}
+  $ONP-gen$. It means, that for given $\lambda$-term \lam{$M$} $OMP-gen$ 
+  generates an \lam{LLL} program $p_{\lam{$M$}}$, which, being executed, 
+  generates a traversal for \lam{$M$}.
+
+  \green{For now: \lam{LLL} is a tiny subset of {\tt scheme}, so the output 
+  $p_M$ is a {\sc scheme} program}.
+\ii There are more thing to do for simply-typed \lc:
+  \bi
+  \ii First, produce a generating extension \green{automatically} by 
+    \blue{specializing the specializer to a $\Lambda$-traverser} using 
+    {\sc unmix}.
+  \ii Second, redefine \lam{LLL} formally as a \emph{clean stand-alone tiny 
+    \underline{first-order} subset} of {\sc haskell}
+    and use haskell supercompiler to achive the effect of partial evaluation.
+  \ii Also we want to extend existing approach to \green{programs with input 
+    \red{dynamic} data} at run-time.
+  \ei
+\ee
+
+
+\section{Status: our work on the \blue{untyped} \lc}
+
+For \blue{untyped} \lc
+
+\be
+\ii We have a normaliser \lam{UNP}, which works for arbitrary (normalizing) 
+  untyped lambda terms.
+\ii \lam{UNP} is implemented in {\sc Haskell} and works for a variety of 
+  examples. Right now we are working on a more \textbf{justified} definition 
+  of \lam{UNP}.
+\ii Some of traversal items may have \blue{two back pointers}; for comparison: 
+  \lam{ONP} uses only one.
+\ii As \lam{ONP}, \lam{UNP} is also defined \green{semi-compositionally} via 
+  recursion on syntax of $\lambda$-expression \lam{$M$}.
+  This actually means that it also can be specialized similarly to \lam{ONP}.
+\ii Moreover, by specializing \lam{UNP}, an \blue{arbitrary untyped $\lambda$-
+  expression} can be translated to our low-level language.
+  It actually means, that the specialized version of \lam{UNP} could be seen 
+  as a semantic function for \lc.
+\ii For now, we are working on a \red{correctness proof} for \lam{$UNP$}. 
+  We expect that we will prove its correctness formally using some proof 
+  assistants like \textbf{Coq}.
+\ee
+
+
+\section{Towards separating programs from data in $\Lambda$}
+
+Also we have a one more direction for research:
+\be
+\ii An idea is to consider a \green{computation of $\lambda$-expression 
+  \lam{$M$} on input $d$} as a \red{ \blue{two-player game} between 
+  \lam{LLL}-programs for \lam{$M$} and $d$}.
+\ii An intresting example here is the conventional $\lambda$-calculus 
+  definition of multiply function ($mult$) on Church numerals.
+\ii Amasing fact is that \textbf{Loops come from out of nowhere}:
+  \bi
+  \ii \green{Neither {\tt mult} nor the data contain loops};
+  \ii but {\tt mult} function is compiled into \blue{an {\lam{LLL}}-program 
+    with two nested loops}, one for each input numerals. This function, when 
+    applied to two Church numerals, computes their product.
+  \ii We expect, that in this perticular case we perform the computations 
+    \green{entirely without back pointers}.
+  \ei
+\ii Right now we are trying to express such program-data games in a 
+  \red{\em communicating} version of \lam{LLL}.
+\ee
+
+\end{document}

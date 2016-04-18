@@ -8,8 +8,12 @@ An algorithm that constracts traversals for and arbitrary term from untyped lamb
 * LaTex
 
 ## Run instruction
-* Run make in terminal
-* Open file 'examples.pdf'
+* Normalization only
+- Run 'make normalize' in terminal
+- Open file 'examplesNormalForms.pdf'
+* Write traversal in pdf
+- Run 'make generate_traversals' in terminal
+- Open file 'examples.pdf'
 
 ### Comments
 * Make file uses xelatex by default. If you prefer another one then open makefile and replace all occurence of xelatex by whatever you'd prefer

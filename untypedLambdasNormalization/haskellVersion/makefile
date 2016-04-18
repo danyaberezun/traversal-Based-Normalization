@@ -1,12 +1,22 @@
-all: cleanExceptPdf
-	ghc TwoBackPointersVersion.hs
-	./TwoBackPointersVersion
+all: cleanExceptPdf program show normalize generate_traversals cleanExceptPdf
+
+show: cleanExceptPdf
+	xelatex --shell-escape show_traversal.tex
+
+program: cleanExceptPdf
+	ghc Main.hs
+	./Main
+
+normalize:
+	xelatex --shell-escape examplesNormalForms.tex
+	xelatex --shell-escape examplesNormalForms.tex
+
+generate_traversals:
 	xelatex --shell-escape examples.tex
 	xelatex --shell-escape examples.tex
-	make cleanExceptPdf
 
 cleanExceptPdf:
-	rm -rf *.log *.aux *.toc *.pyg *.pytxcode examples.tex TwoBackPointersVersion *.o *.hi
+	rm -rf *.log *.aux *.toc *.pyg *.pytxcode show_traversal.tex examples.tex examplesNormalForms.tex Main *.o *.hi
 
 clean: cleanExceptPdf
-	rm -f examples.pdf
+	rm -f examples.pdf examplesNormalForms.pdf

@@ -1,0 +1,189 @@
+\documentclass[a4paper, 10pt]{article}
+\usepackage[margin=0.5in]{geometry}
+\usepackage[utf8]{inputenc}%кодировка
+\usepackage[russian]{babel}%используем русский и английский языки с переносами
+\usepackage{cite}
+\usepackage{multirow}
+\usepackage{float}
+%\usepackage{tikz}
+%\usetikzlibrary{arrows}
+\usepackage{amssymb }
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{cancel}
+%\usepackage{xcolor}
+%\graphicspath{{pictures/}}
+%\definecolor{dkgreen}{rgb}{0,0.6,0}
+%\definecolor{dred}{rgb}{0.545,0,0}
+%\definecolor{dblue}{rgb}{0,0,0.545}
+%\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+%\definecolor{gray}{rgb}{0.4,0.4,0.4}
+%\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+
+%\usepackage{pythontex}
+%\usepackage{minted}
+
+% for printing trees
+\usepackage{verbatim}
+
+%\usepackage[labelformat=empty]{caption}
+%\usepackage{fontspec}
+%\usepackage{polyglossia}
+%\setdefaultlanguage{english}
+%\defaultfontfeatures{Ligatures=TeX}
+%\setmainfont{CMU Serif}
+%\setsansfont{CMU Sans Serif}
+%\setmonofont{CMU Typewriter Text}
+
+%\usepackage{stmaryrd}
+\usepackage{amsfonts}
+\newcommand\abs[1]{\left|#1\right|}
+
+%\usepackage{tikz}
+\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
+%\usepackage{lscape}
+%\usepackage{pdflscape}
+
+\lstset{
+  frame=none,
+  xleftmargin=2pt,
+  stepnumber=1,
+  numbers=left,
+  numbersep=5pt,
+  numberstyle=\ttfamily\tiny\color[gray]{0.3},
+  belowcaptionskip=\bigskipamount,
+  captionpos=b,
+  escapeinside={*'}{'*},
+  language=haskell,
+  tabsize=2,
+  emphstyle={\bf},
+  commentstyle=\it,
+  stringstyle=\mdseries\rmfamily,
+  showspaces=false,
+  keywordstyle=\bfseries\rmfamily,
+  columns=flexible,
+  basicstyle=\small\sffamily,
+  showstringspaces=false,
+  morecomment=[l]\%,
+}
+
+\newcommand{\State}[1]{\left<{#1}\right>}
+\newcommand{\InContext}[2]{{#1}\left[{#2}\right]}
+\newcommand{\RuleNo}[1]{\eqno[\textsc{#1}]}
+\newcommand{\Rule}[2]{{#1}\longrightarrow{#2}}
+
+%\usetikzlibrary{calc}
+
+\begin{document}
+
+\section{Labelled Transition System for repeated Head Linear Reduction}
+
+\subsection{Notes}
+State is a tuple $\langle$ $\lambda$-term with underlined node, context, list of arguments $\rangle$, where
+\begin{itemize}
+\item $\lambda$-term (a tree; by considering $\lambda$-term as a tree it becomes possible to cross arguments out of tree with a parent application node (denotes as $A_{\xcancel{B}}$)); underlined node is a usual lambda term with one underlined position;
+\item Context $\Gamma$ is an unordered list of pairs ($variable : term$);
+\item List of arguments $\Delta$ is an ordered list of $\lambda$-terms (one can also think about $\Delta$ as an ordered list of pointers to the corresponding subtree);
+\item Term that is received by throwing out all elements that are crossed out is a \textit{residual term in the normal form};
+\item \textit{Initial} configuration is $\langle \lambda-term\ with\ underlined\ root,\ \emptyset,\ \$ \rangle$;
+\item \textit{Final} configuration is $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$.
+\end{itemize}
+
+
+\subsection{Rules}
+
+$$
+\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;e_2\bullet\Delta}}
+\RuleNo{App}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;\$\bullet\Delta}}
+     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;\$\bullet\Delta}}
+\RuleNo{Lam-Non-Elim}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;B\bullet\Delta}}
+     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x:B,\,\Gamma;\;\Delta}},\;B\ne\$
+\RuleNo{Lam-Elim}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{x}};\;x:B,\,\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{B}};\;x:B,\,\Gamma;\;\Delta}}
+\RuleNo{BVar}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;B\bullet\$\bullet\Delta}}
+     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;B\ne\$,\;x\notin dom\,\Gamma
+\RuleNo{FVar-0}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;B\bullet C\bullet\Delta}}
+     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma;\;\$\bullet C\bullet\Delta}},\;C\ne\$,\;B\ne\$,\;x\notin dom\,\Gamma
+\RuleNo{FVar-1}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet B\bullet\Delta}}
+     {\State{\InContext{A}{\InContext{M}{x}@\underline{B}};\;\Gamma;\;\Delta}},\;B\ne\$,\;x\notin dom\,\Gamma
+\RuleNo{FVar-2}
+$$
+
+
+\subsection{Correctness proof}
+
+\subsubsection{Residual term $\InContext{M}{\underline{x}}$ has no redexes}
+\paragraph{Proof}
+We will prove by induction (with step size equal to 2) on number of steps that there is no way for redexes to appear in a path from the root to the current underlined node:
+\begin{itemize}
+\item \textbf{Base} $\;$ Straightforward:
+  \begin{enumerate}
+  \item $n == 0$, empty term has no redexes;
+  \item $n == 1$, path from root to itself contains no redexes.
+  \end{enumerate}
+\item \textbf{Induction Hypothesis} There is no redexes for all paths with a length less than $n$ ($2 \leq n$).
+\item \textbf{Induction Step ()}\\
+  Redex is an \textit{application node with $\lambda$-expression as a left child}. We will show that there is no way to construct such subtree without crossing application node out by case analisys on a current (the underlined one) node form:
+  \begin{itemize}
+  \item For $[Lam-*],\ [BVar],\ [FVar-*]$ rules this is obvious: they do not add $\lambda$ as a left or down child of some node.
+  \item The only interesting case is $[App]$ rule. I.e. the rule that was applied on previous step is an $[App]$-rule.
+    Here we have two possibilities:
+    \begin{itemize}
+    \item $e_1 \ne \lambda\ x$; in this case no redexes appear.
+    \item $e_1 == \lambda\ x$, for some $x$. In this case a redex appears but by $[App]$-rule we have:\\
+      $\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
+       {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;e_2\bullet\Delta}}$.\\
+      Note, that there \textit{exists} a rule that can be applied next --- $[Lam-Elim]$, and no other rule can be applied. This rule will cross application node with its right subterm out.\\
+    \end{itemize}
+  \end{itemize}
+  Thus, no new redexes can appear.
+\end{itemize}
+
+\subsubsection{Only $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$ can be a final state}
+\paragraph{Proof}
+\begin{itemize}
+\item It is easy to see that the state $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$ is a final state: there is no rules that can be applied.
+\item Let's prove that there is no other final states (with respect to the form of the state). Consider another state which either :
+  \begin{itemize}
+  \item If current term is not equal to $\InContext{M}{\underline{x}}$ then either $[App]$ or $[Lam-*]$ can be applied.
+  (together they have no restrictions on $\Gamma$ and $\Delta$)
+  \item If $\Delta \ne \$$. Note that $\Delta$ can not be empty because there is no rule that can move $\$$ that is on the bottom of it. Thus, $\Delta = A \dots \$$ where either $A == \$$ or $A \ne \$$. In this case one of $[FVar-*]$ rules can be applied.
+  \end{itemize}
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
