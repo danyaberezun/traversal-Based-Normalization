@@ -1,10 +1,10 @@
 module Examples (examples, examples_names) where
 
 examples = [ex_1, ex_2, ex_3, ex_4, ex_4', ex_5, ex_succ2, ex_9, ex_11,
-	ex_f0, ex_f1, ex_f2, ex_LO1, ex_LO2, ex_LO3, ex_LO4, ex_1, ex_6, ex_7]
+	ex_f0, ex_f1, ex_f2, ex_LO1, ex_LO2, ex_LO3, ex_LO4, ex_1, ex_6, ex_7, ex_corr]
 examples_names = ["ex\\_1", "ex\\_2", "ex\\_3", "ex\\_4", "ex\\_4'", "ex\\_5", "succ two",
 	"ex\\_9", "ex\\_11", "ex\\_f0", "ex\\_f1", "ex\\_f2", "ex\\_LO1", "ex\\_LO2", "ex\\_LO3",
-	"ex\\_LO4", "ex\\_1", "NPR", "mut three two"]
+	"ex\\_LO4", "ex\\_1", "NPR", "mut three two", "ex\\_corr"]
 
 ex = "(\\a . (\\w . w @ (w @ a)) @ s) @ (s @ z)"
 ex_1 = "(g @ (\\ n . n))"
@@ -36,3 +36,5 @@ ex_LO2 = "(\\ x . (x @ x) @ x) @ (\\ a . \\ b . a)"
 ex_LO3 = "(\\ x . x @ (\\ y . y)) @ (\\ a . \\ b . b)"
 ex_LO4 = "(\\ x . x @ (\\ y . y)) @ (\\ a . \\ b . a)"
 ex_LO5 = "(\\ f . \\ x . f @ (x @ ((f @ x) @ x))) @ (\\ a . \\ b . a @ b)"
+
+ex_corr = "(\\ f . \\ x . f @ (x @ ((f @ x) @ x))) @ (\\ a . \\ b . a @ b)"
