@@ -22,19 +22,20 @@
 \definecolor{darkblue}{rgb}{0.0,0.0,0.6}
 
 \usepackage{pythontex}
-\usepackage{minted}
+%\usepackage{minted}
 
 % for printing trees
 \usepackage{verbatim}
 
 \usepackage[labelformat=empty]{caption}
-\usepackage{fontspec}
-\usepackage{polyglossia}
-\setdefaultlanguage{english}
-\defaultfontfeatures{Ligatures=TeX}
-\setmainfont{CMU Serif}
-\setsansfont{CMU Sans Serif}
-\setmonofont{CMU Typewriter Text}
+%\usepackage{fontspec}
+% \usepackage{polyglossia}
+% \setdefaultlanguage{english}
+% \defaultfontfeatures{Ligatures=TeX}
+% \setmainfont{CMU Serif}
+% \setsansfont{CMU Sans Serif}
+% \setmonofont{CMU Typewriter Text}
+
 
 \usepackage{stmaryrd}
 \usepackage{amsfonts}
@@ -85,26 +86,33 @@ Some notes about traversals:
   \begin{itemize}
   \item First kind is either:
     \begin{itemize}
-    \item A pointer to the \textit{last unfinished application}. I.e. a pointer to the last apllication within one run of \textit{head linear reduction} (in other
-      words, this pointer can not to get over {\color{blue}$||$} sing) whose left had side is being under consideration or
-      has been consedered yet while right hand side (argument of application) has not consedered and has not bound by some (Lam)--node.
+    \item A pointer to the \textit{last unfinished application}. I.e. a pointer to the last aplication within one run of \textit{head linear reduction} 
+      % (in other
+      % words, this pointer can not to get over {\color{blue}$||$} sing) whose left had side is being under consideration or
+      % has been consedered yet while right hand side (argument of application) has not consedered and has not bound by some (Lam)--node.
+      {\color{red} (in other words, this pointer cannot cross any {\color{blue}$||$} sign) whose LHS is being traversed, or has been considered yet while its RHS (argument of application) has not been touched and has not been bound by some (Lam)--node.}
+
       On traversal diagrams this kind of pointer is denoted as {\color{brown}$\rightarrow$}.
     \item A pointer to the \textit{last unfinished application} that is between nodes in different \textit{head linear reduction} runs (in other
-      words, this pointer has to get over at least one {\color{blue}$||$} sing).
+      words, this pointer has to cross at least one {\color{blue}$||$} sign).
       On traversal diagrams this kind of pointer is denoted as {\color{red}$\rightarrow$}.
-    \item A pointer that binds (Lam)--node with its argument. (for example, for $\lambda x$ node this pointer point to the application whose argument
-      has to be substituted instead of $x$ variable occurence in the future).
+    \item A pointer that binds (Lam)--node with its argument. 
+    %(For example, for $\lambda x$ node, this pointer points to the application whose argument has to be substituted instead of $x$ variable occurence in the future).
+{\color{red} (For example, for $\lambda x$-node, this pointer points to the application whose argument has to be substituted instead of $x$ variable occurence in the future).} %\lo{I don't understand the preceding.}
+
       On traversal diagrams this kind of pointer is denoted as {\color{violet}$\rightarrow$}.
     \end{itemize}
-  \item Note that pointers described above can points only to some application in current history.
-  \item The second pointer is a \textit{binder pointer} that for:
+  \item Note that pointers described above can point only to some application in current history.
+
+  \item The second pointer is a \textit{binder pointer} which, for:
     \begin{itemize}
-    \item Bound variables points to the corresponding binder;
-    \item Free variables points to nowhere;
-    \item Application nodes and lambda nodes it points to the parent in scence of tree structure of input term.
+    \item Bound variables, points to the corresponding binder;
+    \item Free variables, points to nowhere;
+    \item %Application nodes and lambda nodes it points to the parent in scence of tree structure of input term.
+    {\color{red} Application nodes and lambda nodes, points to the parent in the tree structure of input term.}
     \end{itemize}
   \item On traversal diagrams binder pointer is denoted as {\color{green}$\rightarrow$}.
-  \item A pointer {\color{green} - ->} (dotted binder pointer) denotes "there exists a path between this to nodes by the chain of binder pointers".
+  \item A pointer {\color{green} - ->} (dotted binder pointer) denotes ``there exists a path between this to nodes by the chain of binder pointers''.
   \item {\color{blue}$\rightarrow$} denotes either {\color{brown}$\rightarrow$} or {\color{violet}$\rightarrow$}.
   \end{itemize}
 \end{itemize}
