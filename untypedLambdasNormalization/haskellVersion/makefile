@@ -19,4 +19,4 @@ cleanExceptPdf:
 	rm -rf *.log *.aux *.toc *.pyg *.pytxcode show_traversal.tex examples.tex examplesNormalForms.tex Main *.o *.hi
 
 clean: cleanExceptPdf
-	rm -f examples.pdf examplesNormalForms.pdf
+	rm -f show_traversal.pdf examples.pdf examplesNormalForms.pdf

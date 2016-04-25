@@ -1,7 +1,7 @@
-module Parsing (parseExpr) where
-import Text.ParserCombinators.Parsec
+module Parsing (parseExpr,identifier) where
+import           Text.ParserCombinators.Parsec
 
-import DataTypes
+import           DataTypes
 
 identifier  = do
   c  <- letter
