@@ -5,12 +5,19 @@
 \usepackage{cite}
 \usepackage{multirow}
 \usepackage{float}
-%\usepackage{tikz}
-%\usetikzlibrary{arrows}
+\usepackage{tikz-cd}
+\usetikzlibrary{babel}
 \usepackage{amssymb }
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{cancel}
+
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
+
 %\usepackage{xcolor}
 %\graphicspath{{pictures/}}
 %\definecolor{dkgreen}{rgb}{0,0.6,0}
@@ -38,11 +45,6 @@
 %\usepackage{stmaryrd}
 \usepackage{amsfonts}
 \newcommand\abs[1]{\left|#1\right|}
-
-%\usepackage{tikz}
-\newcommand{\tikzmark}[3][]{\tikz[remember picture,baseline] \node [inner xsep=0pt,anchor=base,#1](#2) {#3};}
-%\usepackage{lscape}
-%\usepackage{pdflscape}
 
 \lstset{
   frame=none,
@@ -76,25 +78,26 @@
 
 \begin{document}
 
-\section{Labelled Transition System for repeated Head Linear Reduction}
+\section{Labelled Transition System for Complete Head Linear Reduction}
 
 \subsection{Notes}
-State is a tuple $\langle$ $\lambda$-term with underlined node, context, list of arguments $\rangle$, where
+State is a tuple $\langle$ $\lambda$-term with underlined node; context; list of pairs (argument, context) $\rangle$, where
 \begin{itemize}
-\item $\lambda$-term (a tree; by considering $\lambda$-term as a tree it becomes possible to cross arguments out of tree with a parent application node (denotes as $A_{\xcancel{B}}$)); underlined node is a usual lambda term with one underlined position;
-\item Context $\Gamma$ is an unordered list of pairs ($variable : term$);
-\item List of arguments $\Delta$ is an ordered list of $\lambda$-terms (one can also think about $\Delta$ as an ordered list of pointers to the corresponding subtree);
-\item Term that is received by throwing out all elements that are crossed out is a \textit{residual term in the normal form};
+\item $\lambda$-term (a tree; by considering $\lambda$-term as a tree it becomes possible to cross arguments out of tree with a parent application node (denotes as $A_{\xcancel{B}}$)) is a usual lambda term with one underlined node;
+\item Context $\Gamma$ is an ordered (first-in) set of elements of the following form ($variable \mapsto (term,\ Context)$);
+\item $\Delta$ is an ordered list of pairs ($\lambda$-term, Context) (one can also think about $\Delta$ as an ordered list of pointers to the corresponding subtree stored together with a corresponding context);
 \item \textit{Initial} configuration is $\langle \lambda-term\ with\ underlined\ root,\ \emptyset,\ \$ \rangle$;
-\item \textit{Final} configuration is $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$.
+\item \textit{Final} configuration is $\langle \InContext{M}{\underline{x}} \textnormal{(term in normal form)},\ \Gamma,\ \$ \rangle$;
+\item Note, that \emph{Complete Head Linear Reduction} (CHLR) can be seen as usual \emph{Head Linear Reduction} (HLR) that is repeatedly applied to the all arguments;
+\item From the below LTS for CHLR.
 \end{itemize}
 
 
-\subsection{Rules}
+\subsection{Labelled transition system for CHLR}
 
 $$
 \Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
-     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;e_2\bullet\Delta}}
+     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;(e_2,\Gamma)\bullet\Delta}}
 \RuleNo{App}
 $$
 
@@ -105,79 +108,319 @@ $$
 $$
 
 $$
-\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;B\bullet\Delta}}
-     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x:B,\,\Gamma;\;\Delta}},\;B\ne\$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;(B,\Gamma')\bullet\Delta}}
+     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x \mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
 \RuleNo{Lam-Elim}
 $$
 
 $$
-\Rule{\State{\InContext{A}{\underline{x}};\;x:B,\,\Gamma;\;\Delta}}
-     {\State{\InContext{A}{\underline{B}};\;x:B,\,\Gamma;\;\Delta}}
+\Rule{\State{\InContext{A}{\underline{x}};\;x\mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{B}};\;\Gamma';\;\Delta}}
 \RuleNo{BVar}
 $$
 
 $$
-\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;B\bullet\$\bullet\Delta}}
-     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma;\;\$\bullet\Delta}},\;B\ne\$,\;x\notin dom\,\Gamma
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;(B,\Gamma')\bullet\$\bullet\Delta}}
+     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma';\;\$\bullet\Delta}},\;x\notin dom(\Gamma)
 \RuleNo{FVar-0}
 $$
 
 $$
-\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;B\bullet C\bullet\Delta}}
-     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma;\;\$\bullet C\bullet\Delta}},\;C\ne\$,\;B\ne\$,\;x\notin dom\,\Gamma
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;(B,\Gamma')\bullet C\bullet\Delta}}
+     {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma';\;\$\bullet C\bullet\Delta}},\;C\ne\$,\;x\notin dom(\Gamma)
 \RuleNo{FVar-1}
 $$
 
 $$
-\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet B\bullet\Delta}}
-     {\State{\InContext{A}{\InContext{M}{x}@\underline{B}};\;\Gamma;\;\Delta}},\;B\ne\$,\;x\notin dom\,\Gamma
+\Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet (B,\Gamma')\bullet\Delta}}
+     {\State{\InContext{A}{\InContext{M}{x}@\underline{B}};\;\Gamma';\;\$\bullet\Delta}},\;\;x\notin dom(\Gamma)
 \RuleNo{FVar-2}
 $$
 
-
 \subsection{Correctness proof}
 
-\subsubsection{Residual term $\InContext{M}{\underline{x}}$ has no redexes}
-\paragraph{Proof}
-We will prove by induction (with step size equal to 2) on number of steps that there is no way for redexes to appear in a path from the root to the current underlined node:
+Note that that labelled transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
+
+\paragraph{LTS for HLR}. \\
+\textbf{Remark:} it is obvious that in [Lam-Non-Elim] rule for HLR we can safely replace $\$ \bullet \Delta$ by empty list since there is no rule that pop $\$$ sign from $\Delta$.
+
+$$
+\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;(e_2,\Gamma)\bullet\Delta}}
+\RuleNo{App}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;[]}}
+     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;[]}}
+\RuleNo{Lam-Non-Elim}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;(B,\Gamma')\bullet\Delta}}
+     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x \mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
+\RuleNo{Lam-Elim}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{x}};\;x\mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{B}};\;\Gamma';\;\Delta}}
+\RuleNo{BVar}
+$$
+
+\paragraph{Expansion function.} 
+To prove correctness of HLR we introduce an axiliary expansion function $exp$. This function being applied to some state of LTS for HLR results in some $\lambda$-term which we will call \emph{an expansion}.
+
+\begin{align}
+  \label{exp1} exp\; \langle M[\underline{A}];\; \Gamma,\ x \mapsto (B, \Gamma');\; \Delta \rangle
+  &= exp\; \langle M[\underline{A}[x / B[\Gamma']]];\; \Gamma;\; \Delta \rangle \\
+  \label{exp2} exp\; \langle M_B[\underline{A}];\; \emptyset;\; (B,\Gamma')\bullet\Delta \rangle
+  &= exp\; \langle M_{B[\Gamma']}[\underline{A}];\; \emptyset;\; \Delta \rangle\\
+  \label{exp3} exp\; \langle M;\; \emptyset;\; [] \rangle &= M \\
+  \textnormal{where } B[\Gamma'] &= exp\; \langle \underline{B};\; \Gamma';\; [] \rangle
+\end{align}
+
+Note that $(1)$ substitudes $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). (2) substitudes a all variables with respect to the corresponding context in one of arguments (one call).
+
+Now consider LTS for HLR. Note that:
 \begin{itemize}
-\item \textbf{Base} $\;$ Straightforward:
-  \begin{enumerate}
-  \item $n == 0$, empty term has no redexes;
-  \item $n == 1$, path from root to itself contains no redexes.
-  \end{enumerate}
-\item \textbf{Induction Hypothesis} There is no redexes for all paths with a length less than $n$ ($2 \leq n$).
-\item \textbf{Induction Step ()}\\
-  Redex is an \textit{application node with $\lambda$-expression as a left child}. We will show that there is no way to construct such subtree without crossing application node out by case analisys on a current (the underlined one) node form:
+\item Only [Lam-Elim] rule can change an \emph{expansion};
+\item The number of transitions without applying [Lam-Elim] rule is limited since the definition of context, input term has a final size, and only [Lam-Elim] rule expands the context; Hereafter we will denote a sequence of transitions without applying [Lam-Elim] rule by $\overset{*}{\rightarrow}$;
+\item The expansion function \emph{exp} cannot change a path from the root of term to the underlined node since:
   \begin{itemize}
-  \item For $[Lam-*],\ [BVar],\ [FVar-*]$ rules this is obvious: they do not add $\lambda$ as a left or down child of some node.
-  \item The only interesting case is $[App]$ rule. I.e. the rule that was applied on previous step is an $[App]$-rule.
-    Here we have two possibilities:
-    \begin{itemize}
-    \item $e_1 \ne \lambda\ x$; in this case no redexes appear.
-    \item $e_1 == \lambda\ x$, for some $x$. In this case a redex appears but by $[App]$-rule we have:\\
-      $\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
-       {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;e_2\bullet\Delta}}$.\\
-      Note, that there \textit{exists} a rule that can be applied next --- $[Lam-Elim]$, and no other rule can be applied. This rule will cross application node with its right subterm out.\\
-    \end{itemize}
+  \item \textbf{(I)} \eqref{exp1} can only change the subtree of the current term with underlined node as a root;
+  \item \textbf{(II)} \eqref{exp2} can only change arguments of the current term that are above the underlined node; moreover each application of \eqref{exp2} change exactly one argument (that corresponds to the first elemnt of the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact.
   \end{itemize}
-  Thus, no new redexes can appear.
 \end{itemize}
 
-\subsubsection{Only $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$ can be a final state}
-\paragraph{Proof}
+
+\paragraph{Theorem}.
+
+\begin{tikzcd}
+  \langle \dots \rangle \arrow{rr}{[Lam-Elim]} & & \langle M_i;\ \Gamma_i;\ \Delta_i \rangle \arrow{d}{exp}
+  \arrow{r}{*} & \langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle
+  \arrow{dl}{exp}
+  \arrow{rr}{[Lam-Elim]} & & \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle \arrow{d}{exp} &
+  \\
+  \dots \arrow{rr}{HR} & & M_i \arrow[dotted]{rrr}{HR} & & & M_{i+1}
+\end{tikzcd}
+
+\paragraph{Proof} by induction on number of $[Lam-Elim]$ steps.
+
+Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
+
+Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion, the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
+first, LTS got stuck and nothing to prove, and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function \emph{exp} to that state results in the same term as a step of head reduction from term $M_i$.
+
+Let see what will happend if we apply \emph{exp} function to state $(i)$:
+\begin{align}
+  &exp\; \langle A[\underline{\lambda x}.\; e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle & \\
+  &\overset{exp}{\rightarrow^{*}}
+  exp\; \langle A'[\underline{\lambda x}.\; e[\Gamma]];\ \emptyset;\ (B,\Gamma')\bullet\Delta \rangle &\textnormal{by fully applying \eqref{exp1}} \\
+  \label{i3} &\overset{exp}{\rightarrow}
+  exp\; \langle A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp2}} \\
+  &\overset{exp}{\rightarrow}
+  \dots &
+\end{align}
+
+to state $(ii)$:
+\begin{align}
+  &exp \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle & \\
+  &\overset{exp}{\rightarrow^{*}}
+  exp\;\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma]];\ x \mapsto (B,\Gamma');\ \Delta \rangle &\textnormal{by elliminating $\Gamma$ following \eqref{exp1}} \\
+  \label{ii3} &\overset{exp}{\rightarrow}
+  exp\; \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp2}} \\
+  &\overset{exp}{\rightarrow}
+  \dots &
+\end{align}
+
+It is easy to see that the head redex in \eqref{i3} is $(\lambda x,\ B)$, that being applied (a step of head reduction) will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ that is equal to the first component of state \eqref{ii3}. Following \textbf{(II)} and \textbf{(I)} if we will continue to apply \emph{exp} function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i$ and the expansion of state $(ii)$ is $M_{i+1}$.
+
+\textbf{Qed} \\ \\ 
+
+\textbf{Consequences}:
 \begin{itemize}
-\item It is easy to see that the state $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$ is a final state: there is no rules that can be applied.
-\item Let's prove that there is no other final states (with respect to the form of the state). Consider another state which either :
-  \begin{itemize}
-  \item If current term is not equal to $\InContext{M}{\underline{x}}$ then either $[App]$ or $[Lam-*]$ can be applied.
-  (together they have no restrictions on $\Gamma$ and $\Delta$)
-  \item If $\Delta \ne \$$. Note that $\Delta$ can not be empty because there is no rule that can move $\$$ that is on the bottom of it. Thus, $\Delta = A \dots \$$ where either $A == \$$ or $A \ne \$$. In this case one of $[FVar-*]$ rules can be applied.
-  \end{itemize}
+\item if head linear reduction terminates then head reduction terminates;
+\item if head reduction terminates then head linear reduction terminates;
+\item Since expansion is not able to change a path from the root to the underlined node,
+  the first component of the final state of LTS for head linear reduction
+  contains a term which leftmost path is a part of the head normal form 
+  and the expansion of the final state is a node of the Boehm-tree of the input term; \\
+  Thus, a repeated head linear reduction application to all arguments
+  (complete head linear reduction) leeds to the normal form.
 \end{itemize}
 
 
 
+\section{Labelled Transition System for UNP}
+This section contains LTS for UNP. This LTS has the same number of rules that the LTS for CHLR.
+Moreover, it is easy to see that rules with the same name corresponds to each other. \\ \\
+
+\begin{itemize}
+\item $(BVar)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+      node[above,align=left,black] {$i$}  -- (4);}
+  \end{tikzpicture}
+  $\longrightarrow$ where $e$ is is a right child of $@$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ \tikzmark{5}{$=$}\ \ \tikzmark{6}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+      node[above,align=left,black] {$i$}  -- (4);}
+    {\color{green}\draw[->] (6.south) to[bend left] (2.south);}
+    {\color{brown}\draw[<-]   ($(4.north)+(0.1,0.5)$)
+      node[above,align=left,black] {$$}  -- (6);}
+  \end{tikzpicture}
+  \\ \\ The added green pointer has to point to the binder if e is a bound variable. \\ \\
+\item $(Lam-Non-Elim)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+  $\longrightarrow$ where $e$ is a right child of $@$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{4}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{blue}\draw[->] (4.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+  \\ \\
+\item $(Lam-Elim)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$\lambda x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
+  \end{tikzpicture}
+  $\longrightarrow$ where $e$ is a child of $\lambda x$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$\lambda x$}\ \ \tikzmark{5}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
+    {\color{blue}\draw[->] (5.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+\item $(App)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\]
+  $\longrightarrow$ where $e$ is a left child of $@$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{3}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+\item $(FVar-0)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
+  \end{tikzpicture}
+  $\longrightarrow$ where $e$ is a right child of $@_2$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{5}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
+    {\color{violet}\draw[->] (5.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+\item $(FVar-1)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
+  \end{tikzpicture}
+  $\longrightarrow$ where $e$ is a right child of $@_2$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{5}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
+    {\color{violet}\draw[->] (5.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+\item $(FVar-2)$
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[->] (4.north) to[bend right] (3.north);}
+  \end{tikzpicture}
+  $\longrightarrow$ where $e$ is a right child of $@_2$ \\ \\
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{5}{$e$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[->] (4.north) to[bend right] (3.north);}
+    {\color{violet}\draw[->] (5.north) to[bend right] (2.north);}
+  \end{tikzpicture}
+\end{itemize}
+
+
+
+
+
+
+
+
+%% \subsection{Correctness proof}
+
+%% \subsubsection{Residual term $\InContext{M}{\underline{x}}$ has no redexes}
+%% \paragraph{Proof}
+%% We will prove by induction (with step size equal to 2) on number of steps that there is no way for redexes to appear in a path from the root to the current underlined node:
+%% \begin{itemize}
+%% \item \textbf{Base} $\;$ Straightforward:
+%%   \begin{enumerate}
+%%   \item $n == 0$, empty term has no redexes;
+%%   \item $n == 1$, path from root to itself contains no redexes.
+%%   \end{enumerate}
+%% \item \textbf{Induction Hypothesis} There is no redexes for all paths with a length less than $n$ ($2 \leq n$).
+%% \item \textbf{Induction Step ()}\\
+%%   Redex is an \textit{application node with $\lambda$-expression as a left child}. We will show that there is no way to construct such subtree without crossing application node out by case analisys on a current (the underlined one) node form:
+%%   \begin{itemize}
+%%   \item For $[Lam-*],\ [BVar],\ [FVar-*]$ rules this is obvious: they do not add $\lambda$ as a left or down child of some node.
+%%   \item The only interesting case is $[App]$ rule. I.e. the rule that was applied on previous step is an $[App]$-rule.
+%%     Here we have two possibilities:
+%%     \begin{itemize}
+%%     \item $e_1 \ne \lambda\ x$; in this case no redexes appear.
+%%     \item $e_1 == \lambda\ x$, for some $x$. In this case a redex appears but by $[App]$-rule we have:\\
+%%       $\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
+%%        {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;e_2\bullet\Delta}}$.\\
+%%       Note, that there \textit{exists} a rule that can be applied next --- $[Lam-Elim]$, and no other rule can be applied. This rule will cross application node with its right subterm out.\\
+%%     \end{itemize}
+%%   \end{itemize}
+%%   Thus, no new redexes can appear.
+%% \end{itemize}
+
+%% \subsubsection{Only $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$ can be a final state}
+%% \paragraph{Proof}
+%% \begin{itemize}
+%% \item It is easy to see that the state $\langle \InContext{M}{\underline{x}},\ \Gamma,\ \$ \rangle$ is a final state: there is no rules that can be applied.
+%% \item Let's prove that there is no other final states (with respect to the form of the state). Consider another state which either :
+%%   \begin{itemize}
+%%   \item If current term is not equal to $\InContext{M}{\underline{x}}$ then either $[App]$ or $[Lam-*]$ can be applied.
+%%   (together they have no restrictions on $\Gamma$ and $\Delta$)
+%%   \item If $\Delta \ne \$$. Note that $\Delta$ can not be empty because there is no rule that can move $\$$ that is on the bottom of it. Thus, $\Delta = A \dots \$$ where either $A == \$$ or $A \ne \$$. In this case one of $[FVar-*]$ rules can be applied.
+%%   \end{itemize}
+%% \end{itemize}
+
+
+%% \section{Small-step semantics for Head Linear Reduction}
+
+%% In this section small-step semantics for head linear reduction is presented.
+%% Note that this is not complete HLR.
+%% I.e. it has to leed to \underline{head normal form}.
+
+%% \paragraph{Axioms}
+%% \begin{align*}
+%%   \Theta,\ (\lambda x . s) t\ &\overset{e}{\rightarrow} \Theta(\overset{x}{t}),\ s & [Expansion]\\
+%%   \Theta,\ x\ &\overset{r}{\rightarrow} \Theta,\ fresh(\Theta(x)),\; if\ \Theta(x) \downarrow & [Read]
+%% \end{align*}
+
+%% \paragraph{Rules}
+%% $$ \frac{\Theta.\ s\ \rightarrow \ \Theta^{'}.\ s^{'}}
+%% {\Theta,\ st \rightarrow\ \Theta^{'},\ s^{'}t}
+%% \hfill [App]$$
+%% $$ \frac{\Theta.\ s\ \rightarrow \ \Theta^{'}.\ s^{'} \;\;\; x \not\in N(\Theta)}
+%% {\Theta,\ \lambda x.s \rightarrow\ \Theta^{'},\ \lambda x. s^{'}}
+%% \hfill [Lam]
+%% $$
+                 
+%% \paragraph{Theorem.}
 
 
 
@@ -187,3 +430,15 @@ We will prove by induction (with step size equal to 2) on number of steps that t
 
 
 \end{document}
+
+%% Comutting diagrams
+%% \begin{tikzcd}
+%% T
+%% \arrow[drr, bend left, "x"]
+%% \arrow[ddr, bend right, "y"]
+%% \arrow[dr, dotted, "{(x,y)}" description] & & \\
+%% & X \times_Z Y \arrow[r, "p"] \arrow[d, "q"]
+%% & X \arrow[d, "f"] \\
+%% & Y \arrow[r, "g"]
+%% & Z
+%% \end{tikzcd}

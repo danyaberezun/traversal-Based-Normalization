@@ -1,22 +1,26 @@
+cc = xelatex
+option = --shell-escape
+
 all: transition_system main main2 headLinearReduction
 
 transition_system:
-	xelatex --shell-escape labelledTransitionSystem.tex
-	xelatex --shell-escape labelledTransitionSystem.tex
+	$(cc) $(option) labelledTransitionSystem.tex
+	$(cc) $(option) labelledTransitionSystem.tex
 	make clean
 
 headLinearReduction:
-	xelatex --shell-escape headLinearReductionLTS.tex
+	$(cc) $(option) headLinearReductionLTS.tex
+	$(cc) $(option) headLinearReductionLTS.tex
 	make clean
 
 main:
-	xelatex --shell-escape main.tex
-	xelatex --shell-escape main.tex
+	$(cc) $(option) main.tex
+	$(cc) $(option) main.tex
 	make clean
 
 main2:
-	xelatex --shell-escape main2.tex
-	xelatex --shell-escape main2.tex
+	$(cc) $(option) main2.tex
+	$(cc) $(option) main2.tex
 	make clean
 
 clean:
