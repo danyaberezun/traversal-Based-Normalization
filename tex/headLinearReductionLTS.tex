@@ -139,7 +139,7 @@ $$
 
 \subsection{Correctness proof}
 
-Note that that labelled transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
+Note that that labelled transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words, first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
 
 \paragraph{LTS for HLR}. \\
 \textbf{Remark:} it is obvious that in [Lam-Non-Elim] rule for HLR we can safely replace $\$ \bullet \Delta$ by empty list since there is no rule that pop $\$$ sign from $\Delta$.
@@ -180,24 +180,25 @@ To prove correctness of HLR we introduce an axiliary expansion function $exp$. T
   \textnormal{where } B[\Gamma'] &= exp\; \langle \underline{B};\; \Gamma';\; [] \rangle
 \end{align}
 
-Note that $(1)$ substitudes $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). (2) substitudes a all variables with respect to the corresponding context in one of arguments (one call).
+Note that \eqref{exp1} substitudes term $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). Each recurcive call of \eqref{exp2} substitudes all variables with respect to the corresponding context exactly in one argument term.
 
 Now consider LTS for HLR. Note that:
 \begin{itemize}
-\item Only [Lam-Elim] rule can change an \emph{expansion};
-\item The number of transitions without applying [Lam-Elim] rule is limited since the definition of context, input term has a final size, and only [Lam-Elim] rule expands the context; Hereafter we will denote a sequence of transitions without applying [Lam-Elim] rule by $\overset{*}{\rightarrow}$;
-\item The expansion function \emph{exp} cannot change a path from the root of term to the underlined node since:
+\item Only $[Lam-Elim]$ rule can change an expansion;
+\item The number of transitions without applying $[Lam-Elim]$ rule is limited since the definition of context, input term has a final size, and only $[Lam-Elim]$ rule expands the context; Hereafter we will denote a sequence of transitions without applying $[Lam-Elim]$ rule by $\overset{*}{\rightarrow}$;
+\item The expansion function $exp$ cannot change a path from the root of term to the underlined node since:
   \begin{itemize}
-  \item \textbf{(I)} \eqref{exp1} can only change the subtree of the current term with underlined node as a root;
-  \item \textbf{(II)} \eqref{exp2} can only change arguments of the current term that are above the underlined node; moreover each application of \eqref{exp2} change exactly one argument (that corresponds to the first elemnt of the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact.
+  \item recurcive call \eqref{exp1} can only change the subtree of the current term with underlined node as a root; \hfill{\textbf{(I)}}
+  \item recurcive call \eqref{exp2} can only change arguments of the current term that are above the underlined node; Moreover, each application of \eqref{exp2} change exactly one argument (that corresponds to the first element of the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact. \hfill{\textbf{(II)}}
   \end{itemize}
 \end{itemize}
 
 
-\paragraph{Theorem}.
+\paragraph{Theorem}. HLR and HR coincide as follows:
 
 \begin{tikzcd}
-  \langle \dots \rangle \arrow{rr}{[Lam-Elim]} & & \langle M_i;\ \Gamma_i;\ \Delta_i \rangle \arrow{d}{exp}
+  \langle \dots \rangle \arrow{rr}{[Lam-Elim]} \arrow{d}{exp} & &
+  \langle M_i;\ \Gamma_i;\ \Delta_i \rangle \arrow{d}{exp}
   \arrow{r}{*} & \langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle
   \arrow{dl}{exp}
   \arrow{rr}{[Lam-Elim]} & & \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle \arrow{d}{exp} &
@@ -209,10 +210,13 @@ Now consider LTS for HLR. Note that:
 
 Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
 
-Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion, the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
-first, LTS got stuck and nothing to prove, and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function \emph{exp} to that state results in the same term as a step of head reduction from term $M_i$.
+Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
 
-Let see what will happend if we apply \emph{exp} function to state $(i)$:
+first, LTS got stuck and nothing to prove,
+
+and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function $exp$ to that state results in the same term as a step of head reduction from term $M_i$.
+
+Let see what will happend if we apply $exp$ function to state $(i)$:
 \begin{align}
   &exp\; \langle A[\underline{\lambda x}.\; e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle & \\
   &\overset{exp}{\rightarrow^{*}}
@@ -234,9 +238,7 @@ to state $(ii)$:
   \dots &
 \end{align}
 
-It is easy to see that the head redex in \eqref{i3} is $(\lambda x,\ B)$, that being applied (a step of head reduction) will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ that is equal to the first component of state \eqref{ii3}. Following \textbf{(II)} and \textbf{(I)} if we will continue to apply \emph{exp} function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i$ and the expansion of state $(ii)$ is $M_{i+1}$.
-
-\textbf{Qed} \\ \\ 
+It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, a step of head reduction will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i$ and the expansion of state $(ii)$ is $M_{i+1}$. \hfill{\textbf{Qed}} \\ \\ 
 
 \textbf{Consequences}:
 \begin{itemize}
@@ -246,7 +248,7 @@ It is easy to see that the head redex in \eqref{i3} is $(\lambda x,\ B)$, that b
   the first component of the final state of LTS for head linear reduction
   contains a term which leftmost path is a part of the head normal form 
   and the expansion of the final state is a node of the Boehm-tree of the input term; \\
-  Thus, a repeated head linear reduction application to all arguments
+  Thus, a repeated application of head linear reduction to all arguments
   (complete head linear reduction) leeds to the normal form.
 \end{itemize}
 
@@ -256,97 +258,94 @@ It is easy to see that the head redex in \eqref{i3} is $(\lambda x,\ B)$, that b
 This section contains LTS for UNP. This LTS has the same number of rules that the LTS for CHLR.
 Moreover, it is easy to see that rules with the same name corresponds to each other. \\ \\
 
+
 \begin{itemize}
 \item $(BVar)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is is a right child of $@$ $\longrightarrow$}
+  \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$x$}\ \ \tikzmark{15}{$=$}\ \ \tikzmark{16}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
     {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
       node[above,align=left,black] {$i$}  -- (4);}
-  \end{tikzpicture}
-  $\longrightarrow$ where $e$ is is a right child of $@$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ \tikzmark{5}{$=$}\ \ \tikzmark{6}{$e$}\]
-  \begin{tikzpicture}[remember picture,overlay]
-    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
-    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
-      node[above,align=left,black] {$i$}  -- (4);}
-    {\color{green}\draw[->] (6.south) to[bend left] (2.south);}
-    {\color{brown}\draw[<-]   ($(4.north)+(0.1,0.5)$)
-      node[above,align=left,black] {$$}  -- (6);}
+    {\color{red}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[<-]   ($(14.north)+(0,0.5)$)
+      node[above,align=left,black] {$i$}  -- (14);}
+    {\color{green}\draw[->] (16.south) to[bend left] (12.south);}
+    {\color{brown}\draw[<-]   ($(14.north)+(0.1,0.5)$)
+      node[above,align=left,black] {$$}  -- (16);}
   \end{tikzpicture}
   \\ \\ The added green pointer has to point to the binder if e is a bound variable. \\ \\
 \item $(Lam-Non-Elim)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@$ $\longrightarrow$}
+  \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{14}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
-  \end{tikzpicture}
-  $\longrightarrow$ where $e$ is a right child of $@$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{4}{$e$}\]
-  \begin{tikzpicture}[remember picture,overlay]
-    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{blue}\draw[->] (4.north) to[bend right] (2.north);}
+    {\color{blue}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{blue}\draw[->] (14.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\
 \item $(Lam-Elim)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$\lambda x$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$\lambda x$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a child of $\lambda x$ $\longrightarrow$}
+  \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}
+  \ \ \tikzmark{13}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$\lambda x$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-  \end{tikzpicture}
-  $\longrightarrow$ where $e$ is a child of $\lambda x$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$\lambda x$}\ \ \tikzmark{5}{$e$}\]
-  \begin{tikzpicture}[remember picture,overlay]
-    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{blue}\draw[->] (5.north) to[bend right] (2.north);}
+    {\color{blue}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
+    {\color{blue}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(App)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\]
-  $\longrightarrow$ where $e$ is a left child of $@$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{3}{$e$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a left child of $@$ $\longrightarrow$}
+  \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{13}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-0)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@_2$ $\longrightarrow$}
+  \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-  \end{tikzpicture}
-  $\longrightarrow$ where $e$ is a right child of $@_2$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{5}{$e$}\]
-  \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[->] (5.north) to[bend right] (2.north);}
+    {\color{violet}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
+    {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-1)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@_2$ $\longrightarrow$}
+  \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-  \end{tikzpicture}
-  $\longrightarrow$ where $e$ is a right child of $@_2$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{5}{$e$}\]
-  \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[->] (5.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
+    {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-2)$
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\]
+  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@_2$ $\longrightarrow$}
+  \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
+  \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{violet}\draw[->] (4.north) to[bend right] (3.north);}
-  \end{tikzpicture}
-  $\longrightarrow$ where $e$ is a right child of $@_2$ \\ \\
-  \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{5}{$e$}\]
-  \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{violet}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[->] (5.north) to[bend right] (2.north);}
+    {\color{violet}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[->] (14.north) to[bend right] (13.north);}
+    {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \end{itemize}
 
