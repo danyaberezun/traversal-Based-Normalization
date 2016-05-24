@@ -258,6 +258,24 @@ It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{
 This section contains LTS for UNP. This LTS has the same number of rules that the LTS for CHLR.
 Moreover, it is easy to see that rules with the same name corresponds to each other. \\ \\
 
+There are two pointer types:
+\begin{itemize}
+\item Binder pointer (denoted as {\color{green}$\rightarrow$});
+  from the bound variables binder pointer points to the dynamic binder in the history
+  and for all other nodes it points points to the parent;
+  (these kind of pointer is omitted in these notes since they can
+  be easly defined by recurcive procedure)
+\item Pointer to the last incomplete application; there are two subtypes
+  of this pointer:
+  \begin{itemize}
+  \item Brown pointer ({\color{brown}$\rightarrow$}) can binds either
+    lambda node and application (in this case they arrise as \emph{spine redexes})
+    or any other node and some application;
+  \item Vioilet pointer ({\color{violet}$\rightarrow$}) has the same meaning
+    (pointer to the last incamplete application) together with $\$$
+    in LTS for CHLR.
+  \end{itemize}
+\end{itemize}
 
 \begin{itemize}
 \item $(BVar)$
@@ -265,27 +283,26 @@ Moreover, it is easy to see that rules with the same name corresponds to each ot
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is is a right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$x$}\ \ \tikzmark{15}{$=$}\ \ \tikzmark{16}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
-    {\color{brown}\draw[<-]   ($(4.north)+(0,0.5)$)
+    {\color{red}\draw[<-]   ($(4.north)+(0,0.5)$)
       node[above,align=left,black] {$i$}  -- (4);}
-    {\color{red}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
     {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
-    {\color{brown}\draw[<-]   ($(14.north)+(0,0.5)$)
+    {\color{red}\draw[<-]   ($(14.north)+(0,0.5)$)
       node[above,align=left,black] {$i$}  -- (14);}
-    {\color{green}\draw[->] (16.south) to[bend left] (12.south);}
-    {\color{brown}\draw[<-]   ($(14.north)+(0.1,0.5)$)
+    {\color{red}\draw[<-]   ($(14.north)+(0.1,0.5)$)
       node[above,align=left,black] {$$}  -- (16);}
   \end{tikzpicture}
-  \\ \\ The added green pointer has to point to the binder if e is a bound variable. \\ \\
+  \\ \\ NB: the colour of the added (red) pointer has to be the same as the colour of the first "red" pointer \\ \\
 \item $(Lam-Non-Elim)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{14}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{blue}\draw[->] (13.north) to[bend right] (12.north);}
-    {\color{blue}\draw[->] (14.north) to[bend right] (12.north);}
+    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[->] (14.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\
 \item $(Lam-Elim)$
@@ -295,11 +312,11 @@ Moreover, it is easy to see that rules with the same name corresponds to each ot
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}
   \ \ \tikzmark{13}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$\lambda x$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{blue}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{blue}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
     {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
-    {\color{blue}\draw[->] (15.north) to[bend right] (12.north);}
+    {\color{brown}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(App)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}
@@ -341,12 +358,13 @@ Moreover, it is easy to see that rules with the same name corresponds to each ot
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{violet}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{red}\draw[->] (13.north) to[bend right] (12.north);}
     {\color{violet}\draw[->] (14.north) to[bend right] (13.north);}
     {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
+  \\ \\ NB: the colour of the "red" pointer is not the metter in this case \\ \\
 \end{itemize}
 
 
