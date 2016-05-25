@@ -139,7 +139,7 @@ $$
 
 \subsection{Correctness proof}
 
-Note that that labelled transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words, first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
+Note that labelled transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words, first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
 
 \paragraph{LTS for HLR}. \\
 \textbf{Remark:} it is obvious that in [Lam-Non-Elim] rule for HLR we can safely replace $\$ \bullet \Delta$ by empty list since there is no rule that pop $\$$ sign from $\Delta$.
@@ -233,7 +233,7 @@ to state $(ii)$:
   &\overset{exp}{\rightarrow^{*}}
   exp\;\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma]];\ x \mapsto (B,\Gamma');\ \Delta \rangle &\textnormal{by elliminating $\Gamma$ following \eqref{exp1}} \\
   \label{ii3} &\overset{exp}{\rightarrow}
-  exp\; \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp2}} \\
+  exp\; \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp1}} \\
   &\overset{exp}{\rightarrow}
   \dots &
 \end{align}
