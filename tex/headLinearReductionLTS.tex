@@ -203,18 +203,18 @@ Now consider LTS for HLR. Note that:
   \arrow{dl}{exp}
   \arrow{rr}{[Lam-Elim]} & & \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle \arrow{d}{exp} &
   \\
-  \dots \arrow{rr}{HR} & & M_i \arrow[dotted]{rrr}{HR} & & & M_{i+1}
+  \dots \arrow{rr}{HR} & & M_i' \arrow[dotted]{rrr}{HR} & & & M_{i+1}'
 \end{tikzcd}
 
 \paragraph{Proof} by induction on number of $[Lam-Elim]$ steps.
 
 Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
 
-Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
+Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
 
 first, LTS got stuck and nothing to prove,
 
-and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function $exp$ to that state results in the same term as a step of head reduction from term $M_i$.
+and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function $exp$ to that state results in the same term as a step of head reduction from term $M_i'$. (i.e. in the term $M_{i+1}'$)
 
 Let see what will happend if we apply $exp$ function to state $(i)$:
 \begin{align}
@@ -238,7 +238,7 @@ to state $(ii)$:
   \dots &
 \end{align}
 
-It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, a step of head reduction will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i$ and the expansion of state $(ii)$ is $M_{i+1}$. \hfill{\textbf{Qed}} \\ \\ 
+It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, if we apply head reduction to this term, it will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ (by head reduction definition) that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i'$ and the expansion of state $(ii)$ is $M_{i+1}'$. \hfill{\textbf{Qed}} \\ \\ 
 
 \textbf{Consequences}:
 \begin{itemize}
@@ -273,7 +273,9 @@ There are two pointer types:
     or any other node and some application;
   \item Vioilet pointer ({\color{violet}$\rightarrow$}) has the same meaning
     (pointer to the last incamplete application) together with $\$$
-    in LTS for CHLR.
+    in LTS for CHLR;
+  \item Red pointer ({\color{red}$\rightarrow$}) is used when the real colour
+    (brown or violet) is not the metter.    
   \end{itemize}
 \end{itemize}
 
@@ -367,6 +369,7 @@ There are two pointer types:
   \\ \\ NB: the colour of the "red" pointer is not the metter in this case \\ \\
 \end{itemize}
 
+{\color{blue}TODO: formally define a corrspondence function between UNP and CHLR TLSs.}
 
 
 
