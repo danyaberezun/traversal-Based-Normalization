@@ -279,6 +279,7 @@ There are two pointer types:
   \end{itemize}
 \end{itemize}
 
+Rules to construct a traversal:
 \begin{itemize}
 \item $(BVar)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}
@@ -314,12 +315,13 @@ There are two pointer types:
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}
   \ \ \tikzmark{13}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$\lambda x$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{red}\draw[->] (13.north) to[bend right] (12.north);}
     {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
-    {\color{brown}\draw[->] (15.north) to[bend right] (12.north);}
+    {\color{red}\draw[->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
+  \\ \\ NB: the colour of the added (red) pointer has to be the same as the colour of the first "red" pointer \\ \\
 \item $(App)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a left child of $@$ $\longrightarrow$}
@@ -369,8 +371,11 @@ There are two pointer types:
   \\ \\ NB: the colour of the "red" pointer is not the metter in this case \\ \\
 \end{itemize}
 
-{\color{blue}TODO: formally define a corrspondence function between UNP and CHLR TLSs.}
-
+Note that $\Delta$ and $\Gamma$ can be easly defined from UNP LTS state as follows:
+\begin{itemize}
+\item $\Delta$ can be construct by following incomplete application pointer and storing right childs of all reachable applications in reverse order with corresponding contexts (see next item how to define context from traversal);
+\item $\Gamma$ can be construct by following binder pointers, and when faces with a lambda--tokens $\lambda x$ which has a brown pointer to some application $@$, store $x \mapsto (e, \Gamma')$ where $e$ is a right child of apllication $@$ and $\Gamma'$ is a context (which is defined recursively from token $@$).
+\end{itemize}
 
 
 
