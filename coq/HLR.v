@@ -27,18 +27,6 @@ Definition IdT : Term.
   refine (Lam  [] 0 (BVar [U] 0 1)).
 Defined.
 
-Definition AppT : Term. 
-  refine (
-    Lam [] 0 (
-      Lam [U] 1 (
-        App [U; U] 2 
-          (BVar [U;U;L] 2 1) 
-          (BVar [U;U;R] 2 0)
-      )
-    )
-  ).
-Defined.
-
 (* Auxilliary lemma *)
 Lemma cons_to_app : forall (A : Set) (a : A) (l : list A), a::l = [a] ++ l.
 Proof. auto. Qed.
@@ -249,45 +237,80 @@ Transition System for Head Linear Reduction
 
 (* Context Gamma *)
 Inductive Gamma : Type :=
- | EmptyGamma : Gamma
- | ConsGamma  : nat -> Path -> Gamma -> Gamma -> Gamma.
+| EmptyGamma : Gamma
+(* index (variable) -> argument term -> argument context -> rest of the list *)
+| ConsGamma  : nat -> Path -> Gamma -> Gamma -> Gamma.
 
 (* Incompelete Application List Delta *)
 Inductive Delta : Type :=
 | EmptyDelta : Delta
-| ConsDelta  : Path -> Gamma -> Delta.
+| ConsDelta  : Path -> Gamma -> Delta -> Delta.
 
 (* Term P l --- is an input term with indexed path *)
 (* Gamma    --- is a current condext *)
 (* Delta    --- is a current list of incomplete applications *)
 Inductive HLRState :=
-  HLRStateC : Term -> Path -> nat -> Gamma -> Delta -> HLRState.
+| HLRStateC : Term -> Path -> nat -> Gamma -> Delta -> HLRState
+| HLRStuck  : HLRState -> HLRState.
+
+Definition containsGamma : Gamma -> nat -> option (prod Path Gamma).
+  refine (
+      fix containsDelta' (G : Gamma) (N : nat): option (prod Path Gamma) :=
+        match G with
+          | EmptyGamma => None
+          | ConsGamma i p g Gs =>
+            if (beq_nat i N)
+            then Some (pair p g)
+            else containsDelta' Gs N
+        end 
+    ).
+Defined.
 
 Definition hlrStep :
   HLRState -> HLRState.
   refine (
       fun s =>
         match s with
-          | HLRStateC t P l G D =>
-            match t [P] with
-              | Some e => HLRStateC t P l G D
-              | None => s
+          | HLRStateC T P L1 G D =>
+            let T' := T [P]
+            in match T' with
+              | Some T' =>
+                match T' with
+                  | Lam  _ l t =>
+                    match D with
+                      (* [Lam-Non-Elim] *)
+                      | EmptyDelta         => HLRStateC T (getpath t) (l+1) G D
+                      (* [Lam-Elim] *)
+                      | ConsDelta px gx Ds =>
+                        HLRStateC T (getpath t) (l+1) (ConsGamma (getlamnum T') px gx G) Ds
+                    end
+                  | App  _ l t1 t2 => HLRStateC T (getpath t1) l     G (ConsDelta (getpath t2) G D)
+                  (* BVar? *)
+                  | BVar _ l i     =>
+                    match containsGamma G i with
+                      | None => HLRStuck s
+                      | Some (pair p g) =>
+                        match substsubterm T P p with
+                          | None => HLRStuck s
+                          (* BVar *)
+                          (* TODO: fix variable indexes *)
+                          | Some t => HLRStateC t P l g D
+                        end
+                    end
+                  (* stuck *)
+                  | FVar _ l       => HLRStuck s
+                end
+              | None   => HLRStuck s
             end
-
-              
-            (* match subterm P t with *)
-            (*   | Some e => *)
-            (*     match e with *)
-            (*       | existT l1 t1 => *)
-            (*         match t1 with *)
-            (*           | App t1 t2 => HLRStateC t (P ++ [L]) G D *)
-            (*           | _ => HLRStateC t ([U]) G D *)
-            (*         end *)
-            (*     end *)
-            (*   | None => HLRStateC t ([]) G D *)
-            (* end *)
-            
-
-            
+          | HLRStuck _ => s
         end).
 Defined.
+
+Definition exampleCInit : HLRState :=
+  HLRStateC exampleC ([]) 0 EmptyGamma EmptyDelta.
+
+Eval compute in hlrStep exampleCInit.
+Eval compute in hlrStep (hlrStep exampleCInit).
+Eval compute in hlrStep (hlrStep (hlrStep exampleCInit)).
+Eval compute in hlrStep (hlrStep (hlrStep (hlrStep exampleCInit))).
+Eval compute in hlrStep (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit)))).
