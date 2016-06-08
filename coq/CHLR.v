@@ -1,7 +1,7 @@
 Require Import List.
 Import ListNotations.
 Require Import Omega.
-
+Require Import Bool.
 
 (* Role of a subtree w.r.t. its parent node: whether
    it its unique descendant (U), right (R) or left (L)
@@ -77,14 +77,6 @@ Definition subterm :
       fix subterm' {P : Path} {l : nat} (P' : Path) {struct P'}
       : TermT P l -> option { l' : nat & TermT (P ++ P') l'} :=
         fun T =>
-      (*     match P' return option { l' : nat & TermT (P ++ P') l'} with *)
-      (*       | [] => Some ((existT (fun x : nat => TermT (P ++ []) x) l) *)
-      (*                       (eq_rec_r (fun l0 : list Role => TermT l0 l) T (app_nil_r P))) *)
-      (*       (* | [] => Some (existT (fun l' : nat => TermT (P ++ []) l') l) *) *)
-      (*       (*                      (eq_rec_r (fun l0 : list Role => TermT l0 l) T (app_nil_r P))) *) *)
-      (*       | _ => None *)
-      (*     end *)
-                                                                  (* ). *)
       match P' return option { l' : nat & TermT (P ++ P') l'} with
       | []   => Some _
       | x::p =>
@@ -109,20 +101,20 @@ Definition subterm :
   apply (subterm' (P++[L])  l    p) in t; rewrite <- app_assoc in t; assumption.
 Defined.
 
-Notation "A [ p ]" := (subterm p A) (at level 0).
+Notation "A [| p |]" := (subterm p A) (at level 0).
 
 Print subterm.
 Check subterm.
-Eval compute in (AppT) [[U;U]].
-Eval compute in (AppT) [[]].
-Eval compute in ((AppT) [[]] : option {l' : nat & TermT ([]) l'}).
-Eval cbv in (((AppT) [[]] : option {l' : nat & TermT ([]) l'})).
+Eval compute in (AppT) [| [U;U] |].
+Eval compute in (AppT) [|[]|].
+Eval compute in ((AppT) [|[]|] : option {l' : nat & TermT [] l'}).
+Eval cbv in (((AppT) [|[]|] : option {l' : nat & TermT [] l'})).
 
 Require Import Coq.Program.Equality.
 
 Theorem AppTEq :
-  ((AppT) [[]] : option {l' : nat & TermT ([]) l'}) =
-  Some (existT (fun x => TermT ([]) x) 0 AppT).
+  ((AppT) [|[]|] : option {l' : nat & TermT ([]) l'}) =
+  Some (existT (fun x => TermT [] x) 0 AppT).
 Proof. simpl_eq; auto. Qed.
 
 Theorem PE :
@@ -131,8 +123,8 @@ Proof. reflexivity. Qed.
 
 Theorem TEq:
   forall T : Term,
-    (T [[]] : option {l' : nat & TermT ([]) l'}) =
-    Some (existT (fun x => TermT ([]) x) 0 T).
+    (T [|[]|] : option {l' : nat & TermT [] l'}) =
+    Some (existT (fun x => TermT [] x) 0 T).
 Proof. simpl_eq; auto. Qed.
 
 Definition laminPath :
@@ -145,22 +137,6 @@ Definition laminPath :
            end
         ).
 Defined.
-
-(* Definition fixpath : *)
-(*   forall {P : Path} {l : nat} (P' : Path), *)
-(*     TermT P l -> TermT P' l. *)
-(*   refine( *)
-(*       fun P l P' t => *)
-(*         let fix fixpath' {P : Path} {l : nat} (t : TermT P l) (P' : Path) : TermT P' l := *)
-(*             match t with *)
-(*               | Lam t     => Lam P' l (fixpath' t (P' ++ [U])) *)
-(*               | App t1 t2 => App P' l (fixpath' t1 (P' ++ [L])) (fixpath' t1 (P' ++ [R])) *)
-(*               | BVar n eq => BVar P' l n eq *)
-(*               | FVar n    => FVar P' l n *)
-(*             end *)
-(*         in fixpath' t P' *)
-(*     ). *)
-(* Defined. *)
 
 Definition fixpath :
   forall {P : Path} {l : nat} (P' : Path) (l' : nat),
@@ -182,69 +158,6 @@ Definition fixpath :
   omega.
 Defined.
 
-(* Eval compute in AppT. *)
-(* Eval compute in fixpath ([U]) AppT. *)
-
-(* Definition substsubterm : *)
-(*   forall {P : Path} {l : nat}, *)
-(*   TermT P l -> Path -> Path -> option {l : nat & TermT P l}. *)
-(*   refine( *)
-(*       fun P l t p1 p2 => *)
-(*         let fix substsubterm' {P' p1 p2 : Path} {l' l1 l2 : nat} *)
-(*                 (p1' : Path) *)
-(*                 (t : TermT P' l') *)
-(*                 (t1 : TermT p1 l1) *)
-(*                 (T2 : TermT p2 l2) *)
-(*             : option {l : nat & TermT P' l} := *)
-(*             match p1' with *)
-(*               | [] => Some (existT (fun x => TermT P' x) l1 (fixpath P' t1)) *)
-(*               | x::xs => *)
-(*                 match x with *)
-(*                   | U => match t with *)
-(*                            | Lam t' => *)
-(*                              match (substsubterm' xs t' t1 T2) with *)
-(*                                | None => None *)
-(*                                | Some (existT l0 t0) => *)
-(*                                  Some _ (* (existT (fun x => TermT P' x) l (Lam P' (pred l0) t0)) *) *)
-(*                              end *)
-(*                            | _ => None *)
-(*                          end *)
-(*                   | L => match t with *)
-(*                            | App t' t'' => match (substsubterm' xs t' t1 T2) with *)
-(*                                              | None => None *)
-(*                                              | Some (existT l0 t0) => *)
-(*                                                Some _ *)
-(*                                            end *)
-(*                                       (* Some _ (* App P' l (substsubterm' t' t1 T2) t'' *) *) *)
-(*                            | _ => None *)
-(*                          end *)
-(*                   | R => match t with *)
-(*                            | App t' t'' => match (substsubterm' xs t'' t1 T2) with *)
-(*                                              | None => None *)
-(*                                              | Some (existT l0 t0) => *)
-(*                                                Some _ *)
-(*                                            end *)
-(*                                (* Some _ (* App P' l t' (substsubterm' t'' t1 T2) *) *) *)
-(*                            | _ => None *)
-(*                          end *)
-(*                 end *)
-(*             end *)
-(*         in let t' := t [p1] *)
-(*            in let t'' := t [p2] *)
-(*               in match t'' with *)
-(*                    | None     => None *)
-(*                    | Some (existT l'' t'') =>  *)
-(*                      match t' with *)
-(*                        | None    => None *)
-(*                        | Some (existT l' t') => substsubterm' p1 t t' t'' *)
-(*                      end *)
-(*                  end *)
-(*     ). *)
-(*   exists (pred l0). apply Lam. admit. *)
-(*   exists l. apply App. assumption. *)
-  
-(* Defined. *)
-
 Definition lamFromPath :
   Path -> nat.
   refine (fix lamFromPath' (P : Path) : nat :=
@@ -258,8 +171,6 @@ Definition lamFromPath :
             end
          ).
 Defined.
-
-Require Import Bool.
 
 Definition eqq : Role -> Role -> bool.
   refine (
@@ -386,13 +297,13 @@ Definition substsubterm :
 Defined.
 
 Eval compute in AppT.
-Eval compute in substsubterm ([U;U;L]) ([U;U;R]) AppT.
+Eval compute in substsubterm [U;U;L] [U;U;R] AppT.
 
 Definition TermTEquality :
   forall {P : Path} {l : nat},
     TermT P l -> TermT P l -> bool.
   refine(
-      fix eq  {P : Path} {l : nat}
+      fix eq {P : Path} {l : nat}
           (t1 t2 : TermT P l)
       : bool :=
         match t1 with
@@ -436,13 +347,21 @@ Definition OptionTermTEquality :
     ).
 Defined.
 
-Eval cbv in   OptionTermTEquality (substsubterm ([U;U;L]) ([U;U;R]) AppT) (Some AppT').
-
-Eval compute in AppT'.
-Eval compute in AppT.
+Eval cbv in  OptionTermTEquality (substsubterm [U;U;L] [U;U;R] AppT) (Some AppT').
+Eval compute in AppT'. Eval compute in AppT.
 
 Theorem substExample :
   OptionTermTEquality (substsubterm ([U;U;L]) ([U;U;R]) AppT) (Some AppT') = true.
 Proof.
   unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq;  simpl_eq; auto.
 Qed.
+
+(* Theorem substExample' : *)
+(*   substsubterm ([U;U;L]) ([U;U;R]) AppT = Some (AppT'). *)
+(* Proof. *)
+(*   unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq.  simpl_eq. *)
+(*   (* How to unfold AppT'  *) *)
+(*   Admitted. *)
+(* Qed. *)
+
+
