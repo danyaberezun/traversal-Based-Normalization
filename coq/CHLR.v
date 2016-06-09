@@ -2,6 +2,8 @@ Require Import List.
 Import ListNotations.
 Require Import Omega.
 Require Import Bool.
+Require Import Coq.Program.Equality.
+Set Asymmetric Patterns.
 
 (* Role of a subtree w.r.t. its parent node: whether
    it its unique descendant (U), right (R) or left (L)
@@ -55,35 +57,36 @@ Definition AppT' : Term.
                       (BVar [U;U;R] 2 0 _)
                 )
           )
-    ).
-  omega. omega.
-Defined.
-
-Eval compute in AppT'.
-Eval compute in AppT.
-
-Definition exampleC : Term.
-  refine (
-      Lam ([]) 0
-          (App ([U]) 1
-               (App ([U;L]) 1
-                    (Lam ([U;L;L]) 1
-                         (BVar ([U;L;L;U]) 2 1 _))
-                    (Lam ([U;L;R]) 1
-                         (BVar ([U;L;R;U]) 2 1 _))
-               )
-               (Lam ([U;R]) 1 (
-                      App ([U;R;U]) 2 
-                          (BVar ([U;R;U;L]) 2 0 _) 
-                          (BVar ([U;R;U;R]) 2 1 _)))
-               )
     ); omega.
 Defined.
+
+Definition exampleC : Term. 
+  refine (
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (App [U;L;U] 2
+                         (BVar [U;L;U;L] 2 0 _)
+                         (Lam [U;L;U;R] 2 (BVar [U;L;U;R;U] 3 0 _))
+                    )
+               )
+               (Lam [U;R] 1
+                    (App [U;R;U] 2
+                         (BVar [U;R;U;L] 2 1 _)
+                         (BVar [U;R;U;R] 2 0 _)
+                    )
+               )
+          )
+    ); omega.
+Defined.
+
+Eval compute in AppT.
+Eval compute in AppT'.
+Eval compute in exampleC.
 
 (* Auxilliary lemma *)
 Lemma cons_to_app : forall (A : Set) (a : A) (l : list A), a::l = [a] ++ l.
 Proof. auto. Qed.
-
 
 (* Subterm: subterm t p returns a subterm of t, indexed by 
    (relative) path p; if the term does not exists, returns None
@@ -100,20 +103,20 @@ Definition subterm :
       | x::p =>
           match x return option { l' : nat & TermT (P ++ x::p) l'} with
           | U => match T return option { l' : nat & TermT (P ++ U::p) l'} with
-                 | Lam _ _ t => _
+                 | Lam t => _
                  | _     => None
                  end
           | L => match T return option { l' : nat & TermT (P ++ L::p) l'} with
-                 | App _ _ t _ => _
+                 | App t _ => _
                  | _       => None
                  end
           | R => match T return option { l' : nat & TermT (P ++ R::p) l'} with
-                 | App _ _ _ t => _
+                 | App _ t => _
                  | _       => None
                  end
         end
   end).
-  exists l. rewrite app_nil_r. apply T.
+  exists l; rewrite app_nil_r; apply T.
   apply (subterm' (P++[U]) (S l) p) in t. rewrite <- app_assoc in t. assumption.
   apply (subterm' (P++[R])  l    p) in t; rewrite <- app_assoc in t; assumption.
   apply (subterm' (P++[L])  l    p) in t; rewrite <- app_assoc in t; assumption.
@@ -127,8 +130,6 @@ Eval compute in (AppT) [| [U;U] |].
 Eval compute in (AppT) [|[]|].
 Eval compute in ((AppT) [|[]|] : option {l' : nat & TermT [] l'}).
 Eval cbv in (((AppT) [|[]|] : option {l' : nat & TermT [] l'})).
-
-Require Import Coq.Program.Equality.
 
 Theorem AppTEq :
   ((AppT) [|[]|] : option {l' : nat & TermT ([]) l'}) =
@@ -145,123 +146,124 @@ Theorem TEq:
     Some (existT (fun x => TermT [] x) 0 T).
 Proof. simpl_eq; auto. Qed.
 
-Definition laminPath :
-  Path -> nat.
-  refine(fix laminPath' (p : Path) : nat :=
-           match p with
-             | [] => 0
-             | U :: ps => 1 + laminPath' ps
-             | _ :: ps => laminPath' ps
-           end
-        ).
-Defined.
-
+(* fixpath : by a given P' : Path, l' : nat, and t : TermT P l 
+  returns a TermT P' l' that is a same "term" with a new
+  path and lambda counter.
+  This function will be user futher in linear substitution
+*)
 Definition fixpath :
-  forall {P : Path} {l : nat} (P' : Path) (l' : nat),
+  forall {P : Path} {l : nat} (P' : Path) (l' ll: nat),
     TermT P l -> l' >= l ->TermT P' l'.
   refine(
-      fun P l P' l' t EQ =>
-        let fix fixpath' {P : Path} {l : nat} (t : TermT P l) (l' : nat) (P' : Path) (pr : l' >= l)
+      fun P l P' l' ll t EQ =>
+        let fix fixpath' {P : Path} {l : nat} (t : TermT P l) (l' : nat) (P' : Path) (pr : l' >= l) (ll : nat)
             : TermT P' l' :=
             match t with
-              | Lam _ _ t     => Lam P' l' (fixpath' t (S l') (P' ++ [U]) _)
-              | App _ _ t1 t2 => App P' l' (fixpath' t1 l' (P' ++ [L]) pr) (fixpath' t1 l' (P' ++ [R]) _)
-              | BVar _ _ n eq => BVar P' l' n _
-              | FVar _ _ n    => FVar P' l' n
+              | Lam t        => Lam P' l' (fixpath' t (S l') (P' ++ [U]) _ ll)
+              | App t1 t2 => App P' l' (fixpath' t1 l' (P' ++ [L]) pr ll ) (fixpath' t2 l' (P' ++ [R]) _ ll)
+              | BVar n eq => match n <? ll with
+                               | true => BVar P' l' 0 _
+                               | false => BVar P' l' (l' - l + n) _
+                             end
+              | FVar n    => FVar P' l' n
             end
-        in fixpath' t l' P' EQ
-    ).
-  omega.
-  omega.
-  omega.
+        in fixpath' t l' P' EQ ll
+    ); omega.
 Defined.
 
-Definition lamFromPath :
-  Path -> nat.
-  refine (fix lamFromPath' (P : Path) : nat :=
-            match P with
-              | [] => 0
-              | x :: xs => let l := (lamFromPath' xs)
-                           in match x with
-                                | U => S l
-                                | _ => l
-                              end
-            end
-         ).
-Defined.
+(* lamInPath : is an auxiliary function that returns a number of
+  lambda nodes in a given path
+*)
+Fixpoint lamInPath (P : Path) : nat :=
+  match P with
+    | [] => 0
+    | x :: xs => let l := (lamInPath xs)
+                 in match x with
+                      | U => S l
+                      | _ => l
+                    end
+  end.
 
-Definition eqq : Role -> Role -> bool.
-  refine (
-      fun r1 r2 => match r1 with
-                     | U => match r2 with
-                              | U => true
-                              | _ => false
-                            end
-                     | L => match r2 with
-                              | L => true
-                              | _ => false
-                            end
-                     | R => match r2 with
-                              | R => true
-                              | _ => false
-                            end
-                   end
-    ).
-Defined.
+(* An equality function for Role *)
+Definition eqq (r1 r2 : Role) : bool :=
+  match r1 with
+    | U => match r2 with
+             | U => true
+             | _ => false
+           end
+    | L => match r2 with
+             | L => true
+             | _ => false
+           end
+    | R => match r2 with
+             | R => true
+             | _ => false
+           end
+  end.
 
-Definition substsubterm1 :
+(* An auxiliary funciton for linearSubstitution function *)
+Definition linearSubstitution1 :
   forall {p p1 : Path} {l l1 : nat}
                            (p1' : Path)
                            (t : TermT p l)
                            (T : TermT p1 l1)
-                           (eq : l >= l1),
+                           (eq : l >= l1)
+                           (ll : nat),
             option (TermT p l).
   refine(
-      fix substsubterm' {p p1: Path} {l l1 : nat}
-                           (p1' : Path)
-                           (t : TermT p l)
-                           (T : TermT p1 l1)
-                           (eq : l >= l1)
-            : option (TermT p l) :=
-            match p1' with
-              | [] => Some (fixpath p l T _)
-              | x :: xs => match x with
-                             | U => match t with
-                                      | Lam _ _ t => match substsubterm' xs t T _ with
-                                                       | None => None
-                                                       | Some t => Some (Lam p l t)
-                                                     end
-                                      | _ => None
-                                    end
-                             | L => match t with
-                                      | App _ _ t1 t2 => match substsubterm' xs t1 T _ with
-                                                       | None => None
-                                                       | Some t1 => Some (App p l t1 t2)
-                                                         end
-                                      | _ => None
-                                    end
-                             | R => match t with
-                                      | App _ _ t1 t2 => match substsubterm' xs t2 T _ with
-                                                       | None => None
-                                                       | Some t2 => Some (App p l t1 t2)
-                                                         end
-                                      | _ => None
-                                    end
-                           end
-            end
-    ).
-  omega.
-  omega.
-  omega.
-  omega.
+      fix linearSubstitution' {p p1: Path} {l l1 : nat}
+          (p1' : Path)
+          (t : TermT p l)
+          (T : TermT p1 l1)
+          (eq : l >= l1)
+          (ll : nat)
+      : option (TermT p l) :=
+        match p1' with
+          | [] => match t with
+                    (* check : we replace BVar *)
+                    (* check : we substitudes the correct variable : i.e. ll == i+1 *)
+                    | BVar i _ => if beq_nat ll (i+1)
+                                  then Some (fixpath p l ll T _)
+                                  else None
+                    (* | BVar i _ => Some (fixpath p l ll T _) *)
+                    | _ => None
+                  end
+          | x :: xs => match x with
+                         | U => match t with
+                                  | Lam t => match linearSubstitution' xs t T _ ll with
+                                               | None => None
+                                               | Some t => Some (Lam p l t)
+                                             end
+                                  | _ => None
+                                end
+                         | L => match t with
+                                  | App t1 t2 => match linearSubstitution' xs t1 T _ ll with
+                                                   | None => None
+                                                   | Some t1 => Some (App p l t1 t2) 
+                                                 end
+                                  | _ => None
+                                end
+                         | R => match t with
+                                  | App t1 t2 => match linearSubstitution' xs t2 T _ ll with
+                                                   | None => None
+                                                   | Some t2 => Some (App p l t1 t2)
+                                                 end
+                                  | _ => None
+                                end
+                       end
+        end
+    ); omega.
 Defined.
 
-Definition substsubterm :
+(* linearSubstitution : is a function that performs a linear substitution.
+  p1 is path to the BVar to be replaced by the subtree indexed by the path p2
+ *)
+Definition linearSubstitution :
   forall {P : Path} {l : nat} (p1 p2 : Path),
   TermT P l -> option (TermT P l).
   refine(
       fun P l p1 p2 t =>
-        let fix substsubterm' {p : Path} {l : nat}
+        let fix linearSubstitution' {p : Path} {l : nat}
                 (p1' p2' : Path)
                 (t : TermT p l)
             : option (TermT p l) :=
@@ -269,171 +271,117 @@ Definition substsubterm :
               | [] => None
               | [R] => match p1' with
                          | L :: ys => match t with
-                                        | App _ _ t1 t2 => match substsubterm1 ys t1 t2 _ with
-                                                             | None => None
-                                                             | Some t1 => Some (App p l t1 t2)
-                                                           end
+                                        | App t1 t2 => match linearSubstitution1 ys t1 t2 _ l with
+                                                         | None => None
+                                                         | Some t1 => Some (App p l t1 t2)
+                                                       end
                                         | _ => None
                                       end
                          | _ => None
                        end
-              | [L] => None
-              | [U] => None
+              | [_] => None
               | x :: xs =>
                 match p1' with
-                             | [] => None
-                             | y :: ys => match eqq x y with
-                                            | true => match x with
-                                                 | U => match t with
-                                                          | Lam _ _ t' => match (substsubterm' ys xs t') with
-                                                                            | None => None
-                                                                            | Some t' => Some (Lam p l t')
-                                                                          end
-                                                          | _ => None
-                                                        end
-                                                 | L =>  match t with
-                                                          | App _ _ t' t'' => match (substsubterm' ys xs t') with
-                                                                                | None => None
-                                                                                | Some t' => Some (App p l t' t'')
-                                                                              end
-                                                          | _ => None
-                                                        end
-                                                 | R =>  match t with
-                                                           | App _ _ t' t'' => match (substsubterm' ys xs t'') with
-                                                                                 | None => None
-                                                                                 | Some t'' => Some (App p l t' t'')
-                                                                               end
-                                                          | _ => None
-                                                         end
-                                                         end
-                                            | false => None
-                                          end
-                           end
+                  | [] => None
+                  | y :: ys => match eqq x y with
+                                 | true => match x with
+                                             | U => match t with
+                                                      | Lam t' => match linearSubstitution' ys xs t' with
+                                                                    | None => None
+                                                                    | Some t' => Some (Lam p l t')
+                                                                  end
+                                                      | _ => None
+                                                    end
+                                             | L =>  match t with
+                                                       | App t' t'' => match linearSubstitution' ys xs t' with
+                                                                         | None => None
+                                                                         | Some t' => Some (App p l t' t'')
+                                                                       end
+                                                       | _ => None
+                                                     end
+                                             | R =>  match t with
+                                                       | App t' t'' => match linearSubstitution' ys xs t'' with
+                                                                         | None => None
+                                                                         | Some t'' => Some (App p l t' t'')
+                                                                       end
+                                                       | _ => None
+                                                     end
+                                           end
+                                 | false => None
+                               end
+                end
             end
-        in substsubterm' p1 p2 t
-    ).
-  auto.   
+        in linearSubstitution' p1 p2 t
+    ); auto.   
 Defined.
 
-Eval compute in substsubterm [U;L;L;U] [U;R] exampleC.
-Eval compute in AppT.
-Eval compute in substsubterm [U;U;L] [U;U;R] AppT.
+Notation "T [| p1 --> p2 |]" := (linearSubstitution p1 p2 T) (at level 0).
 
-Definition TermTEquality :
-  forall {P : Path} {l : nat},
-    TermT P l -> TermT P l -> bool.
+(* An equality function for TermT *)
+Fixpoint TermTEquality {P : Path} {l : nat} (t1 t2 : TermT P l) : bool :=
+  match t1 with
+    | Lam t1 => match t2 with
+                  | Lam t2 =>  TermTEquality t1 t2
+                  | _ => false
+                end
+    | App t1' t1'' => match t2 with
+                        | App t2' t2'' => TermTEquality t1' t2' && TermTEquality t1'' t2''
+                        | _ => false
+                      end
+    | BVar n _ => match t2 with
+                    | BVar m _ => beq_nat m n
+                    | _ => false
+                  end
+    | FVar n => match t2 with
+                  | FVar m => beq_nat m n
+                  | _ => false
+                end
+  end.
+
+(* An equality function for option TermT *)
+Definition OptionTermTEquality {P : Path} {l : nat} (t1 t2 : option (TermT P l)) : bool :=
+  match t1 with
+    | None => match t2 with
+                | None => true
+                | _ => false
+              end
+    | Some t1 => match t2 with
+                   | None => false
+                   | Some t2 => TermTEquality t1 t2
+                 end
+  end.
+
+Example otpe : OptionTermTEquality (AppT [| [U;U;L] --> [U;U;R] |]) (Some AppT') = true. auto. Qed.
+
+Definition exampleC' : Term.
   refine(
-      fix eq {P : Path} {l : nat}
-          (t1 t2 : TermT P l)
-      : bool :=
-        match t1 with
-          | Lam _ _ t1 => match t2 with
-                            | Lam _ _ t2 => eq t1 t2
-                            | _ => false
-                          end
-          | App  _ _ t1' t1'' => match t2 with
-                            | App _ _ t2' t2'' => eq t1' t2' && eq t1'' t2''
-                            | _ => false
-                          end
-          | BVar _ _ n _ => match t2 with
-                            | BVar _ _ m _ => beq_nat m n
-                            | _ => false
-                          end
-          | FVar _ _ n => match t2 with
-                            | FVar _ _ m => beq_nat m n
-                            | _ => false
-                          end
-        end
-    ).
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (App [U;L;U] 2
+                         (Lam [U;L;U;L] 2
+                              (App [U;L;U;L;U] 3
+                                   (BVar [U;L;U;L;U;L] 3 2 _)
+                                   (BVar [U;L;U;L;U;R] 3 0 _)))
+                         (Lam [U;L;U;R] 2 (BVar [U;L;U;R;U] 3 0 _))))
+               (Lam [U;R] 1
+                    (App [U;R;U] 2
+                         (BVar [U;R;U;L] 2 1 _)
+                         (BVar [U;R;U;R] 2 0 _))))
+    ); omega.
 Defined.
 
-Definition OptionTermTEquality :
-  forall {P : Path} {l : nat},
-    option (TermT P l) -> option (TermT P l) -> bool.
-  refine(
-      fix eq  {P : Path} {l : nat}
-          (t1 t2 : option (TermT P l))
-      : bool :=
-        match t1 with
-          | None => match t2 with
-                      | None => true
-                      | _ => false
-                    end
-          | Some t1 => match t2 with
-                      | None => false
-                      | Some t2 => TermTEquality t1 t2
-                    end
-        end
-    ).
-Defined.
+Example exampleCULLUandUR :
+  OptionTermTEquality (exampleC [| [U;L;U;L] --> [U;R] |]) (Some exampleC') = true.
+repeat simpl_eq; auto. Qed.
 
-Eval cbv in  OptionTermTEquality (substsubterm [U;U;L] [U;U;R] AppT) (Some AppT').
-Eval compute in AppT'. Eval compute in AppT.
+Example exampleCULLUandULUR :
+  exampleC [| [U;L;U;L] --> [U;L;U;R] |] = None.
+repeat simpl_eq; auto. Qed.
 
-Theorem substExample :
-  OptionTermTEquality (substsubterm ([U;U;L]) ([U;U;R]) AppT) (Some AppT') = true.
-Proof.
-  unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq;  simpl_eq; auto.
-Qed.
-
-(* Theorem substExample' : *)
-(*   substsubterm ([U;U;L]) ([U;U;R]) AppT = Some (AppT'). *)
-(* Proof. *)
-(*   unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq.  simpl_eq. *)
-(*   (* How to unfold AppT'  *) *)
-(*   Admitted. *)
-(* Qed. *)
-
-Theorem exampleCULLUandUR :
-  OptionTermTEquality (substsubterm [U;L;L;U] [U;R] exampleC)
-                      (Some
-                         (Lam [] 0
-                              (App [U] 1
-                                   (App [U; L] 1
-                                        (Lam [U; L; L] 1
-                                             (Lam [U; L; L; U] 2
-                                                  (App [U; L; L; U; U] 3
-                                                       (BVar [U; L; L; U; U; L] 3 0
-                                                             (Decidable.dec_not_not (1 <= 3) 
-                                                                                    (dec_lt 0 3)
-                                                                                    (fun H : 1 <= 3 -> False =>
-                                                                                       Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
-                                                                                                eq_refl)))
-                                                       (BVar [U; L; L; U; U; R] 3 0
-                                                             (Decidable.dec_not_not (1 <= 3) 
-                                                                                    (dec_lt 0 3)
-                                                                                    (fun H : 1 <= 3 -> False =>
-                                                                                       Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
-                                                                                                eq_refl))))))
-                                        (Lam [U; L; R] 1
-                                             (BVar [U; L; R; U] 2 1
-                                                   (Decidable.dec_not_not (2 <= 2) 
-                                                                          (dec_lt 1 2)
-                                                                          (fun H : 2 <= 2 -> False =>
-                                                                             Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
-                                                                                      eq_refl))
-                                             )))
-                                   (Lam [U; R] 1
-                                        (App [U; R; U] 2
-                                             (BVar [U; R; U; L] 2 0
-                                                   (Decidable.dec_not_not (1 <= 2) 
-                                                                          (dec_lt 0 2)
-                                                                          (fun H : 1 <= 2 -> False =>
-                                                                             Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H))
-                                                                                      eq_refl)))
-                                             (BVar [U; R; U; R] 2 1
-                                                   (Decidable.dec_not_not (2 <= 2) 
-                                                                          (dec_lt 1 2)
-                                                                          (fun H : 2 <= 2 -> False =>
-                                                                             Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
-                                                                                      eq_refl))
-                                             ))))))
-  = true.
-Proof.  unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq;  simpl_eq; auto. Qed.
-
-Theorem exampleCULLandUR :
-  substsubterm [U;L;L;U] [U;R;R] exampleC = None.
-Proof.  unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq;  simpl_eq; auto. Qed.
+Example exampleCULLandUR :
+   exampleC [| [U;L;L;U] --> [U;R;R] |] = None.
+simpl_eq; auto. Qed.
 
 
 (**
@@ -473,13 +421,9 @@ Definition containsGamma : Gamma -> nat -> option (prod Path Gamma).
     ).
 Defined.
 
-Definition getpath : forall {P : Path} {l : nat}, TermT P l -> Path :=
-  fun P _ _  => P.
+Definition getpath : forall {P : Path} {l : nat}, TermT P l -> Path := fun P _ _  => P.
 
-Definition getlamnum : forall {P : Path} {l : nat}, TermT P l -> nat :=
-  fun _ l _  => l.
-
-Set Asymmetric Patterns.
+Definition getlamnum : forall {P : Path} {l : nat}, TermT P l -> nat := fun _ l _  => l.
 
 Definition hlrStep :
   HLRState -> HLRState.
@@ -498,14 +442,15 @@ Definition hlrStep :
                                                  HLRStateC T (getpath t) (l+1) (ConsGamma (getlamnum T') px gx G) Ds
                                              end
                                 | App  t1 t2 => HLRStateC T (getpath t1) l G (ConsDelta (getpath t2) G D)
-                                | BVar i _  => match containsGamma G i with
+                                | BVar i _  =>
+                                (* match containsGamma G index (l - i -1) with *)
+                                  match containsGamma G (l - i -1) with
                                                  | None => HLRStuck s
                                                  | Some (pair p g) =>
-                                                   match substsubterm P p T with
+                                                   match T [| P -->  p |] with
                                                      | None => HLRStuck s
                                                      (* BVar *)
-                                                     (* TODO: fix variable indexes *)
-                                                     | Some t => HLRStateC t P l g D
+                                                     | Some T => HLRStateC T P l g D
                                                    end
                                                end
                                 | FVar _  => HLRStuck s
@@ -516,8 +461,7 @@ Definition hlrStep :
         end).
 Defined.
 
-Definition exampleCInit : HLRState :=
-  HLRStateC exampleC ([]) 0 EmptyGamma EmptyDelta.
+Definition exampleCInit : HLRState := HLRStateC exampleC ([]) 0 EmptyGamma EmptyDelta.
 
 Fixpoint pathEq (xs ys : Path) : bool :=
   match xs with
@@ -571,83 +515,65 @@ Fixpoint  hlrStateEq (s1 s2 : HLRState) : bool :=
                                   end
   end.
 
-Theorem exampleCIntS1 :
+Example exampleCIntS1 :
   hlrStateEq (hlrStep exampleCInit) (HLRStateC exampleC [U] 1 EmptyGamma EmptyDelta) = true.
-Proof.  simpl_eq; auto. Qed.
+simpl_eq; auto. Qed.
 
-Theorem exampleCIntS2 :
+Example exampleCIntS2 :
   hlrStateEq (hlrStep (hlrStep exampleCInit))
              (HLRStateC exampleC [U; L] 1 EmptyGamma
                         (ConsDelta [U; R] EmptyGamma EmptyDelta)) = true.
-Proof. repeat simpl_eq; auto. Qed.
+repeat simpl_eq; auto. Qed.
 
-Theorem exampleCIntS3 :
+Example exampleCIntS3 :
   hlrStateEq (hlrStep (hlrStep (hlrStep exampleCInit)))
-             (HLRStateC exampleC [U; L; L] 1 EmptyGamma
-                        (ConsDelta [U; L; R] EmptyGamma
-                                   (ConsDelta [U; R] EmptyGamma EmptyDelta)))
+             (HLRStateC exampleC [U; L; U] 2
+                        (ConsGamma 1 [U; R] EmptyGamma EmptyGamma)
+                        EmptyDelta)
   = true.
-Proof. repeat simpl_eq; auto. Qed.
+repeat simpl_eq; auto. Qed.
 
-Theorem exampleCIntS4 :
+Example exampleCIntS4 :
   hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit))))
-             (HLRStateC exampleC [U; L; L; U] 2
-                        (ConsGamma 1 [U; L; R] EmptyGamma EmptyGamma)
-                        (ConsDelta [U; R] EmptyGamma EmptyDelta))
+             (HLRStateC exampleC [U; L; U;L] 2
+                        (ConsGamma 1 [U; R] EmptyGamma EmptyGamma)
+                        (ConsDelta [U;L;U;R] (ConsGamma 1 [U; R] EmptyGamma EmptyGamma) EmptyDelta))
   = true.
-Proof. repeat simpl_eq; auto. Qed.
+repeat simpl_eq; auto. Qed.
 
-Theorem exampleCIntS5 :
+Example exampleCIntS5 :
   hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit)))))
              (HLRStateC
                 (Lam [] 0
                      (App [U] 1
-                          (App [U; L] 1
-                               (Lam [U; L; L] 1
-                                    (Lam [U; L; L; U] 2
-                                         (BVar [U; L; L; U; U] 3 1
-                                               (Decidable.dec_not_not (2 <= 3) 
-                                                                      (dec_lt 1 3)
-                                                                      (fun H : 2 <= 3 -> False =>
-                                                                         Zge_left 1 3 (proj1 (Nat2Z.inj_ge 1 3) (not_lt 1 3 H))
-                                                                                  eq_refl))
-                                         )
-                                    )
-                               )
-                               (Lam [U; L; R] 1
-                                    (BVar [U; L; R; U] 2 1
-                                          (Decidable.dec_not_not (2 <= 2) 
-                                                                 (dec_lt 1 2)
-                                                                 (fun H : 2 <= 2 -> False =>
-                                                                    Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
-                                                                             eq_refl))
-                                    )
-                               )
-                          )
+                          (Lam [U; L] 1
+                               (App [U; L;U] 2
+                                    (Lam [U; L; U; L] 2
+                                         (App [U; L; U; L; U] 3
+                                              (BVar [U; L; U; L; U; L] 3 2
+                                                    (Decidable.dec_not_not (3 <= 3) (dec_lt 2 3)
+                                                                           (fun H : 3 <= 3 -> False => Zge_left 2 3 (proj1 (Nat2Z.inj_ge 2 3) (not_lt 2 3 H))
+                                                                                                                eq_refl)))
+                                              (BVar [U; L; U; L; U; R] 3 0
+                                                    (Decidable.dec_not_not (1 <= 3) (dec_lt 0 3)
+                                                                           (fun H : 1 <= 3 -> False => Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                                eq_refl)))))
+                                    (Lam [U; L; U; R] 2
+                                         (BVar [U; L; U; R; U] 3 0
+                                               (Decidable.dec_not_not (1 <= 3) (dec_lt 0 3)
+                                                                      (fun H : 1 <= 3 -> False => Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                           eq_refl))))))
                           (Lam [U; R] 1
                                (App [U; R; U] 2
-                                    (BVar [U; R; U; L] 2 0
-                                          (Decidable.dec_not_not (1 <= 2) 
-                                                                 (dec_lt 0 2)
-                                                                 (fun H : 1 <= 2 -> False =>
-                                                                    Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H))
-                                                                             eq_refl))
-                                    )
-                                    (BVar [U; R; U; R] 2 1
-                                          (Decidable.dec_not_not (2 <= 2) 
-                                                                 (dec_lt 1 2)
-                                                                 (fun H : 2 <= 2 -> False =>
-                                                                    Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
-                                                                             eq_refl))
-                                    )
-                               )
-                          )
-                     )
-                )
-                [U; L; L; U]
+                                    (BVar [U; R; U; L] 2 1
+                                          (Decidable.dec_not_not (2 <= 2) (dec_lt 1 2)
+                                                                 (fun H : 2 <= 2 -> False => Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H)) eq_refl)))
+                                    (BVar [U; R; U; R] 2 0
+                                          (Decidable.dec_not_not (1 <= 2) (dec_lt 0 2)
+                                                                 (fun H : 1 <= 2 -> False => Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H)) eq_refl)))))))
+                [U; L; U; L]
                 2
                 EmptyGamma
-                (ConsDelta [U; R] EmptyGamma EmptyDelta))
+                (ConsDelta [U;L;U;R] (ConsGamma 1 [U; R] EmptyGamma EmptyGamma) EmptyDelta))
   = true.
-Proof. repeat simpl_eq; auto. Qed.
-
+repeat simpl_eq; auto. Qed.
