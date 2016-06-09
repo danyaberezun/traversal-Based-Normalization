@@ -386,49 +386,48 @@ Qed.
 
 Theorem exampleCULLUandUR :
   OptionTermTEquality (substsubterm [U;L;L;U] [U;R] exampleC)
-                      (
-                        Some
-                          (Lam [] 0
-                               (App [U] 1
-                                    (App [U; L] 1
-                                         (Lam [U; L; L] 1
-                                              (Lam [U; L; L; U] 2
-                                                   (App [U; L; L; U; U] 3
-                                                        (BVar [U; L; L; U; U; L] 3 0
-                                                              (Decidable.dec_not_not (1 <= 3) 
-                                                                                     (dec_lt 0 3)
-                                                                                     (fun H : 1 <= 3 -> False =>
-                                                                                        Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
-                                                                                                 eq_refl)))
-                                                        (BVar [U; L; L; U; U; R] 3 0
-                                                              (Decidable.dec_not_not (1 <= 3) 
-                                                                                     (dec_lt 0 3)
-                                                                                     (fun H : 1 <= 3 -> False =>
-                                                                                        Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
-                                                                                                 eq_refl))))))
-                                         (Lam [U; L; R] 1
-                                              (BVar [U; L; R; U] 2 1
-                                                    (Decidable.dec_not_not (2 <= 2) 
-                                                                           (dec_lt 1 2)
-                                                                           (fun H : 2 <= 2 -> False =>
-                                                                              Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
-                                                                                       eq_refl))
-                                              )))
-                                    (Lam [U; R] 1
-                                         (App [U; R; U] 2
-                                              (BVar [U; R; U; L] 2 0
-                                                    (Decidable.dec_not_not (1 <= 2) 
-                                                                           (dec_lt 0 2)
-                                                                           (fun H : 1 <= 2 -> False =>
-                                                                              Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H))
-                                                                                       eq_refl)))
-                                              (BVar [U; R; U; R] 2 1
-                                                    (Decidable.dec_not_not (2 <= 2) 
-                                                                           (dec_lt 1 2)
-                                                                           (fun H : 2 <= 2 -> False =>
-                                                                              Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
-                                                                                       eq_refl))
-                                              ))))))
+                      (Some
+                         (Lam [] 0
+                              (App [U] 1
+                                   (App [U; L] 1
+                                        (Lam [U; L; L] 1
+                                             (Lam [U; L; L; U] 2
+                                                  (App [U; L; L; U; U] 3
+                                                       (BVar [U; L; L; U; U; L] 3 0
+                                                             (Decidable.dec_not_not (1 <= 3) 
+                                                                                    (dec_lt 0 3)
+                                                                                    (fun H : 1 <= 3 -> False =>
+                                                                                       Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                eq_refl)))
+                                                       (BVar [U; L; L; U; U; R] 3 0
+                                                             (Decidable.dec_not_not (1 <= 3) 
+                                                                                    (dec_lt 0 3)
+                                                                                    (fun H : 1 <= 3 -> False =>
+                                                                                       Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                eq_refl))))))
+                                        (Lam [U; L; R] 1
+                                             (BVar [U; L; R; U] 2 1
+                                                   (Decidable.dec_not_not (2 <= 2) 
+                                                                          (dec_lt 1 2)
+                                                                          (fun H : 2 <= 2 -> False =>
+                                                                             Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
+                                                                                      eq_refl))
+                                             )))
+                                   (Lam [U; R] 1
+                                        (App [U; R; U] 2
+                                             (BVar [U; R; U; L] 2 0
+                                                   (Decidable.dec_not_not (1 <= 2) 
+                                                                          (dec_lt 0 2)
+                                                                          (fun H : 1 <= 2 -> False =>
+                                                                             Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H))
+                                                                                      eq_refl)))
+                                             (BVar [U; R; U; R] 2 1
+                                                   (Decidable.dec_not_not (2 <= 2) 
+                                                                          (dec_lt 1 2)
+                                                                          (fun H : 2 <= 2 -> False =>
+                                                                             Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
+                                                                                      eq_refl))
+                                             ))))))
   = true.
 Proof.  unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq;  simpl_eq; auto. Qed.
 
@@ -436,88 +435,219 @@ Theorem exampleCULLandUR :
   substsubterm [U;L;L;U] [U;R;R] exampleC = None.
 Proof.  unfold substsubterm; unfold substsubterm1; unfold fixpath; unfold eqq;  simpl_eq; auto. Qed.
 
-(* (**  *)
-(* =========================================== *)
-(* Transition System for Head Linear Reduction *)
-(*  =========================================== *)
-(* *) *)
 
-(* (* Context Gamma *) *)
-(* Inductive Gamma : Type := *)
-(* | EmptyGamma : Gamma *)
-(* (* index (variable) -> argument term -> argument context -> rest of the list *) *)
-(* | ConsGamma  : nat -> Path -> Gamma -> Gamma -> Gamma. *)
+(**
+===========================================
+  Transition System for Head Linear Reduction
+ ===========================================
+**)
 
-(* (* Incompelete Application List Delta *) *)
-(* Inductive Delta : Type := *)
-(* | EmptyDelta : Delta *)
-(* | ConsDelta  : Path -> Gamma -> Delta -> Delta. *)
+(* Context Gamma *)
+Inductive Gamma : Type :=
+| EmptyGamma : Gamma
+(* index (variable) -> argument term -> argument context -> rest of the list *)
+| ConsGamma  : nat -> Path -> Gamma -> Gamma -> Gamma.
 
-(* (* Term P l --- is an input term with indexed path *) *)
-(* (* Gamma    --- is a current condext *) *)
-(* (* Delta    --- is a current list of incomplete applications *) *)
-(* Inductive HLRState := *)
-(* | HLRStateC : Term -> Path -> nat -> Gamma -> Delta -> HLRState *)
-(* | HLRStuck  : HLRState -> HLRState. *)
+(* Incompelete Application List Delta *)
+Inductive Delta : Type :=
+| EmptyDelta : Delta
+| ConsDelta  : Path -> Gamma -> Delta -> Delta.
 
-(* Definition containsGamma : Gamma -> nat -> option (prod Path Gamma). *)
-(*   refine ( *)
-(*       fix containsDelta' (G : Gamma) (N : nat): option (prod Path Gamma) := *)
-(*         match G with *)
-(*           | EmptyGamma => None *)
-(*           | ConsGamma i p g Gs => *)
-(*             if (beq_nat i N) *)
-(*             then Some (pair p g) *)
-(*             else containsDelta' Gs N *)
-(*         end  *)
-(*     ). *)
-(* Defined. *)
+(* Term P l --- is an input term with indexed path *)
+(* Gamma    --- is a current condext *)
+(* Delta    --- is a current list of incomplete applications *)
+Inductive HLRState :=
+| HLRStateC : Term -> Path -> nat -> Gamma -> Delta -> HLRState
+| HLRStuck  : HLRState -> HLRState.
 
-(* Definition hlrStep : *)
-(*   HLRState -> HLRState. *)
-(*   refine ( *)
-(*       fun s => *)
-(*         match s with *)
-(*           | HLRStateC T P L1 G D => *)
-(*             let T' := T [P] *)
-(*             in match T' with *)
-(*               | Some T' => *)
-(*                 match T' with *)
-(*                   | Lam  _ l t => *)
-(*                     match D with *)
-(*                       (* [Lam-Non-Elim] *) *)
-(*                       | EmptyDelta         => HLRStateC T (getpath t) (l+1) G D *)
-(*                       (* [Lam-Elim] *) *)
-(*                       | ConsDelta px gx Ds => *)
-(*                         HLRStateC T (getpath t) (l+1) (ConsGamma (getlamnum T') px gx G) Ds *)
-(*                     end *)
-(*                   | App  _ l t1 t2 => HLRStateC T (getpath t1) l     G (ConsDelta (getpath t2) G D) *)
-(*                   (* BVar? *) *)
-(*                   | BVar _ l i     => *)
-(*                     match containsGamma G i with *)
-(*                       | None => HLRStuck s *)
-(*                       | Some (pair p g) => *)
-(*                         match substsubterm T P p with *)
-(*                           | None => HLRStuck s *)
-(*                           (* BVar *) *)
-(*                           (* TODO: fix variable indexes *) *)
-(*                           | Some t => HLRStateC t P l g D *)
-(*                         end *)
-(*                     end *)
-(*                   (* stuck *) *)
-(*                   | FVar _ l       => HLRStuck s *)
-(*                 end *)
-(*               | None   => HLRStuck s *)
-(*             end *)
-(*           | HLRStuck _ => s *)
-(*         end). *)
-(* Defined. *)
+Definition containsGamma : Gamma -> nat -> option (prod Path Gamma).
+  refine (
+      fix containsDelta' (G : Gamma) (N : nat): option (prod Path Gamma) :=
+        match G with
+          | EmptyGamma => None
+          | ConsGamma i p g Gs =>
+            if (beq_nat i N)
+            then Some (pair p g)
+            else containsDelta' Gs N
+        end
+    ).
+Defined.
 
-(* Definition exampleCInit : HLRState := *)
-(*   HLRStateC exampleC ([]) 0 EmptyGamma EmptyDelta. *)
+Definition getpath : forall {P : Path} {l : nat}, TermT P l -> Path :=
+  fun P _ _  => P.
 
-(* Eval compute in hlrStep exampleCInit. *)
-(* Eval compute in hlrStep (hlrStep exampleCInit). *)
-(* Eval compute in hlrStep (hlrStep (hlrStep exampleCInit)). *)
-(* Eval compute in hlrStep (hlrStep (hlrStep (hlrStep exampleCInit))). *)
-(* Eval compute in hlrStep (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit)))). *)
+Definition getlamnum : forall {P : Path} {l : nat}, TermT P l -> nat :=
+  fun _ l _  => l.
+
+Set Asymmetric Patterns.
+
+Definition hlrStep :
+  HLRState -> HLRState.
+  refine (
+      fun s =>
+        match s with
+          | HLRStateC T P L1 G D =>
+            match T [| P |] with
+                 | Some (existT l T') => match T' with
+                                           | Lam  t =>
+                                             match D with
+                                               (* [Lam-Non-Elim] *)
+                                               | EmptyDelta => HLRStateC T (getpath t) (l + 1) G D
+                                               (* [Lam-Elim] *)
+                                               | ConsDelta px gx Ds =>
+                                                 HLRStateC T (getpath t) (l+1) (ConsGamma (getlamnum T') px gx G) Ds
+                                             end
+                                | App  t1 t2 => HLRStateC T (getpath t1) l G (ConsDelta (getpath t2) G D)
+                                | BVar i _  => match containsGamma G i with
+                                                 | None => HLRStuck s
+                                                 | Some (pair p g) =>
+                                                   match substsubterm P p T with
+                                                     | None => HLRStuck s
+                                                     (* BVar *)
+                                                     (* TODO: fix variable indexes *)
+                                                     | Some t => HLRStateC t P l g D
+                                                   end
+                                               end
+                                | FVar _  => HLRStuck s
+                              end
+                 | None => HLRStuck s
+               end
+          | HLRStuck _ => s
+        end).
+Defined.
+
+Definition exampleCInit : HLRState :=
+  HLRStateC exampleC ([]) 0 EmptyGamma EmptyDelta.
+
+Fixpoint pathEq (xs ys : Path) : bool :=
+  match xs with
+    | [] => match ys with
+              | [] => true
+              | _ => false
+            end
+    | x :: xs => match ys with
+                   | y :: ys => eqq x y && pathEq xs ys
+                   | [] => false
+                 end
+  end.
+
+Fixpoint gammaEq (g1 g2 : Gamma) : bool :=
+  match g1 with
+    | EmptyGamma => match g2 with
+                      | EmptyGamma => true
+                      | _ => false
+                    end
+    | ConsGamma l1 p1 g11 g12 => match g1 with
+                                   | ConsGamma l2 p2  g21 g22 =>
+                                     beq_nat l1 l2 && pathEq p1 p2 && gammaEq g11 g21 && gammaEq g12 g22
+                                   | _ => false
+                                 end
+  end.
+
+Fixpoint deltaEq (d1 d2 : Delta) : bool :=
+  match d1 with
+    | EmptyDelta => match d2 with
+                      | EmptyDelta => true
+                      | _ => false
+                    end
+    | ConsDelta p1 g1 d1 => match d2 with
+                                   | ConsDelta p2 g2 d2 =>
+                                     pathEq p1 p2 && gammaEq g1 g2 && deltaEq d1 d2
+                                   | _ => false
+                                 end
+  end.
+
+Fixpoint  hlrStateEq (s1 s2 : HLRState) : bool :=
+  match s1 with
+    | HLRStuck s1 => match s2 with
+                       | HLRStuck s2 => hlrStateEq s1 s2
+                       | _ => false
+                     end
+    | HLRStateC T1 P1 L1 G1 D1 => match s2 with
+                                    | HLRStateC T2 P2 L2 G2 D2 =>
+                                      TermTEquality T1 T2 && pathEq P1 P2 && beq_nat L1 L2 &&
+                                             gammaEq G1 G2 && deltaEq D1 D2
+                                    | _ => false
+                                  end
+  end.
+
+Theorem exampleCIntS1 :
+  hlrStateEq (hlrStep exampleCInit) (HLRStateC exampleC [U] 1 EmptyGamma EmptyDelta) = true.
+Proof.  simpl_eq; auto. Qed.
+
+Theorem exampleCIntS2 :
+  hlrStateEq (hlrStep (hlrStep exampleCInit))
+             (HLRStateC exampleC [U; L] 1 EmptyGamma
+                        (ConsDelta [U; R] EmptyGamma EmptyDelta)) = true.
+Proof. repeat simpl_eq; auto. Qed.
+
+Theorem exampleCIntS3 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep exampleCInit)))
+             (HLRStateC exampleC [U; L; L] 1 EmptyGamma
+                        (ConsDelta [U; L; R] EmptyGamma
+                                   (ConsDelta [U; R] EmptyGamma EmptyDelta)))
+  = true.
+Proof. repeat simpl_eq; auto. Qed.
+
+Theorem exampleCIntS4 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit))))
+             (HLRStateC exampleC [U; L; L; U] 2
+                        (ConsGamma 1 [U; L; R] EmptyGamma EmptyGamma)
+                        (ConsDelta [U; R] EmptyGamma EmptyDelta))
+  = true.
+Proof. repeat simpl_eq; auto. Qed.
+
+Theorem exampleCIntS5 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit)))))
+             (HLRStateC
+                (Lam [] 0
+                     (App [U] 1
+                          (App [U; L] 1
+                               (Lam [U; L; L] 1
+                                    (Lam [U; L; L; U] 2
+                                         (BVar [U; L; L; U; U] 3 1
+                                               (Decidable.dec_not_not (2 <= 3) 
+                                                                      (dec_lt 1 3)
+                                                                      (fun H : 2 <= 3 -> False =>
+                                                                         Zge_left 1 3 (proj1 (Nat2Z.inj_ge 1 3) (not_lt 1 3 H))
+                                                                                  eq_refl))
+                                         )
+                                    )
+                               )
+                               (Lam [U; L; R] 1
+                                    (BVar [U; L; R; U] 2 1
+                                          (Decidable.dec_not_not (2 <= 2) 
+                                                                 (dec_lt 1 2)
+                                                                 (fun H : 2 <= 2 -> False =>
+                                                                    Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
+                                                                             eq_refl))
+                                    )
+                               )
+                          )
+                          (Lam [U; R] 1
+                               (App [U; R; U] 2
+                                    (BVar [U; R; U; L] 2 0
+                                          (Decidable.dec_not_not (1 <= 2) 
+                                                                 (dec_lt 0 2)
+                                                                 (fun H : 1 <= 2 -> False =>
+                                                                    Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H))
+                                                                             eq_refl))
+                                    )
+                                    (BVar [U; R; U; R] 2 1
+                                          (Decidable.dec_not_not (2 <= 2) 
+                                                                 (dec_lt 1 2)
+                                                                 (fun H : 2 <= 2 -> False =>
+                                                                    Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H))
+                                                                             eq_refl))
+                                    )
+                               )
+                          )
+                     )
+                )
+                [U; L; L; U]
+                2
+                EmptyGamma
+                (ConsDelta [U; R] EmptyGamma EmptyDelta))
+  = true.
+Proof. repeat simpl_eq; auto. Qed.
+
