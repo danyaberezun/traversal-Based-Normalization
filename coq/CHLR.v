@@ -453,6 +453,7 @@ Definition containsGamma : Gamma -> nat -> option (prod Path Gamma).
 Defined.
 
 Definition getpath : forall {P : Path} {l : nat}, TermT P l -> Path := fun P _ _  => P.
+
 Definition getlamnum : forall {P : Path} {l : nat}, TermT P l -> nat := fun _ l _  => l.
 
 Definition isLam {P : Path} {l : nat} (t : TermT P l)  :=
@@ -991,3 +992,47 @@ Definition headRedex : Term -> option Path.
 
 Example hreC : headRedex exampleC = Some [U]. auto. Qed.
 
+Example exampleCIntS4 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit))))
+             (HLRStateC exampleC [U; L; U;L] 2
+                        (ConsGamma 1 [U; R] EmptyGamma EmptyGamma)
+                        (ConsDelta [U;L;U;R] (ConsGamma 1 [U; R] EmptyGamma EmptyGamma) EmptyDelta))
+  = true.
+repeat simpl_eq; auto. Qed.
+
+Example exampleCIntS5 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit)))))
+             (HLRStateC
+                (Lam [] 0
+                     (App [U] 1
+                          (Lam [U; L] 1
+                               (App [U; L;U] 2
+                                    (Lam [U; L; U; L] 2
+                                         (App [U; L; U; L; U] 3
+                                              (BVar [U; L; U; L; U; L] 3 2
+                                                    (Decidable.dec_not_not (3 <= 3) (dec_lt 2 3)
+                                                                           (fun H : 3 <= 3 -> False => Zge_left 2 3 (proj1 (Nat2Z.inj_ge 2 3) (not_lt 2 3 H))
+                                                                                                                eq_refl)))
+                                              (BVar [U; L; U; L; U; R] 3 0
+                                                    (Decidable.dec_not_not (1 <= 3) (dec_lt 0 3)
+                                                                           (fun H : 1 <= 3 -> False => Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                                eq_refl)))))
+                                    (Lam [U; L; U; R] 2
+                                         (BVar [U; L; U; R; U] 3 0
+                                               (Decidable.dec_not_not (1 <= 3) (dec_lt 0 3)
+                                                                      (fun H : 1 <= 3 -> False => Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                           eq_refl))))))
+                          (Lam [U; R] 1
+                               (App [U; R; U] 2
+                                    (BVar [U; R; U; L] 2 1
+                                          (Decidable.dec_not_not (2 <= 2) (dec_lt 1 2)
+                                                                 (fun H : 2 <= 2 -> False => Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H)) eq_refl)))
+                                    (BVar [U; R; U; R] 2 0
+                                          (Decidable.dec_not_not (1 <= 2) (dec_lt 0 2)
+                                                                 (fun H : 1 <= 2 -> False => Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H)) eq_refl)))))))
+                [U; L; U; L]
+                2
+                EmptyGamma
+                (ConsDelta [U;L;U;R] (ConsGamma 1 [U; R] EmptyGamma EmptyGamma) EmptyDelta))
+  = true.
+repeat simpl_eq; auto. Qed.

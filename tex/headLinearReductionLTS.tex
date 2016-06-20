@@ -268,13 +268,13 @@ There are two pointer types:
 \item Pointer to the last incomplete application; there are two subtypes
   of this pointer:
   \begin{itemize}
-  \item Brown pointer ({\color{brown}$\rightarrow$}) can binds either
+  \item Thick brown pointer can binds either
     lambda node and application (in this case they arrise as \emph{spine redexes})
     or any other node and some application;
-  \item Vioilet pointer ({\color{violet}$\rightarrow$}) has the same meaning
+  \item Vioilet pointer has the same meaning
     (pointer to the last incamplete application) together with $\$$
     in LTS for CHLR;
-  \item Red pointer ({\color{red}$\rightarrow$}) is used when the real colour
+  \item Dashed red pointer is used when the real colour
     (brown or violet) is not the metter.    
   \end{itemize}
 \end{itemize}
@@ -286,15 +286,15 @@ Rules to construct a traversal:
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is is a right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$x$}\ \ \tikzmark{15}{$=$}\ \ \tikzmark{16}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (3.north) to[bend right] (2.north);}
     {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
-    {\color{red}\draw[<-]   ($(4.north)+(0,0.5)$)
+    {\color{red}\draw[line width=0.5mm,dashed,<-]   ($(4.north)+(0,0.5)$)
       node[above,align=left,black] {$i$}  -- (4);}
-    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (13.north) to[bend right] (12.north);}
     {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
-    {\color{red}\draw[<-]   ($(14.north)+(0,0.5)$)
+    {\color{red}\draw[line width=0.5mm,dashed,<-]   ($(14.north)+(0,0.5)$)
       node[above,align=left,black] {$i$}  -- (14);}
-    {\color{red}\draw[<-]   ($(14.north)+(0.1,0.5)$)
+    {\color{red}\draw[line width=0.5mm,dashed,<-]   ($(14.north)+(0.1,0.5)$)
       node[above,align=left,black] {$$}  -- (16);}
   \end{tikzpicture}
   \\ \\ NB: the colour of the added (red) pointer has to be the same as the colour of the first "red" pointer \\ \\
@@ -303,9 +303,9 @@ Rules to construct a traversal:
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{14}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{violet}\draw[->] (13.north) to[bend right] (12.north);}
-    {\color{violet}\draw[->] (14.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (14.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\
 \item $(Lam-Elim)$
@@ -315,11 +315,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}
   \ \ \tikzmark{13}{$@_2$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$\lambda x$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{red}\draw[->] (13.north) to[bend right] (12.north);}
-    {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
-    {\color{red}\draw[->] (15.north) to[bend right] (12.north);}
+    {\color{red}\draw[line width=0.5mm,dashed,->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
+    {\color{red}\draw[line width=0.5mm,dashed,->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{red}\draw[line width=0.5mm,dashed,->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\ NB: the colour of the added (red) pointer has to be the same as the colour of the first "red" pointer \\ \\
 \item $(App)$
@@ -327,7 +327,7 @@ Rules to construct a traversal:
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a left child of $@$ $\longrightarrow$}
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{13}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (13.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-0)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -336,11 +336,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[->] (13.north) to[bend right] (12.north);}
-    {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-1)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -349,11 +349,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{brown}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{brown}\draw[->] (13.north) to[bend right] (12.north);}
-    {\color{brown}\draw[->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-2)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -362,11 +362,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{red}\draw[->] (3.north) to[bend right] (2.north);}
-    {\color{violet}\draw[->] (4.north) to[bend right] (3.north);}
-    {\color{red}\draw[->] (13.north) to[bend right] (12.north);}
-    {\color{violet}\draw[->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[->] (15.north) to[bend right] (12.north);}
+    {\color{red}\draw[line width=0.5mm,dashed,->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (4.north) to[bend right] (3.north);}
+    {\color{red}\draw[line width=0.5mm,dashed,->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (14.north) to[bend right] (13.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\ NB: the colour of the "red" pointer is not the metter in this case \\ \\
 \end{itemize}
