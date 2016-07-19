@@ -2,6 +2,7 @@
 \usepackage[margin=0.5in]{geometry}
 \usepackage[utf8]{inputenc}%кодировка
 \usepackage[russian]{babel}%используем русский и английский языки с переносами
+\usepackage{fontspec}
 \usepackage{cite}
 \usepackage{multirow}
 \usepackage{float}
@@ -11,7 +12,6 @@
 \usepackage{amsmath}
 \usepackage{listings}
 \usepackage{cancel}
-
 
 \usepackage{tikz}
 \usetikzlibrary{arrows}
@@ -78,7 +78,220 @@
 
 \begin{document}
 
-\section{Labelled Transition System for Complete Head Linear Reduction}
+Everywhere in this notes we will consider a lambda term as a tree.
+
+\section{Head Linear Reduction}
+
+This section introduces the \emph{head linear reduction} (\textbf{HLR}) in a way that
+is similar to [?'Danos].
+The head linear reduction is a reduction stratagy that performs a linear substitution
+by replacing a so called \emph{head variable occurence} (\emph{hoc}) on each step.
+\emph{hoc} can be found as a leaf on the left-most path in a tree. If this leaf is not
+a variable or represents a free variable then \textbf{HLR} got stuck and results in a
+\emph{quasi-head normal form} (\emph{ghn}).
+
+To be more concrete let's present a HLR as the following \textbf{transition system}:
+\begin{itemize}
+\item A state is a tuple $\langle$ $A[\underline{B}]$; $\Gamma$; $\Delta$ $\rangle$, where
+  \begin{itemize}
+  \item $A[\underline{B}]$ is a $\lambda$-term $A$ with an underline node $B$;
+  \item $\Gamma$ is an environment that binds variables; an environment can be considered
+    as a \emph{set}; we will denote environment as follows:
+    $$\Gamma \ = \ var \mapsto (t,\ \Gamma_1),\ \Gamma_2$$ where
+    $var$ is a variable, $t$ is a $\lambda$-term, $\Gamma_1$ is a stored environment,
+    $\Gamma_2$ is a rest of environment $\Gamma$;
+  \item $\Delta$ is a stack of pairs $(t_1, \ \Gamma_1)$ where $t_1$ is a $\lambda$-term and
+    $\Gamma_1$ is an environment.
+    $$\textnormal{Denotation: } \Delta \ = \ (t_1,\ \Gamma_1) \bullet \Delta_1$$
+    where $\Delta_1$ is a rest of the stack $\Delta$.
+  \end{itemize}
+\item The \emph{initial} state is $\langle\ \lambda-term\ with\ underlined\ root;\ \emptyset;\ [\ ]\ \rangle$
+  where $\emptyset$ denotes an empty set and $[\ ]$ --- empty stack.
+\item The \emph{final} state is $\langle\ A [\underline{x}];\ \Gamma;\ [\ ]\ \rangle$ where
+  \begin{itemize}
+  \item $A [\underline{x}]$ is a $\lambda$-term with a variable $x$ as an underlined node
+  \item $x \not\in \Gamma$
+  \end{itemize}
+\end{itemize}
+
+\subsection{Rules}
+
+$$
+\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;(e_2,\Gamma)\bullet\Delta}}
+\RuleNo{App}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;[]}}
+     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;[]}}
+\RuleNo{Lam-Non-Elim}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;(B,\Gamma')\bullet\Delta}}
+     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x \mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
+\RuleNo{Lam-Elim}
+$$
+
+$$
+\Rule{\State{\InContext{A}{\underline{x}};\;x\mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
+     {\State{\InContext{A}{\underline{B}};\;\Gamma';\;\Delta}}
+\RuleNo{BVar}
+$$
+
+\subsubsection{Example}
+
+Consider the following input term $(\lambda \ x\ .\ x)\ @\ (\lambda \ y\ .\  y)$.
+\begin{align}
+  \label{Ex1}
+  \langle (\lambda \ x\ .\ x)\ \underline{@}\ (\lambda \ y\ .\  y);\ & \ \emptyset;\ & [\ ] \rangle & \rightarrow^{[App]} \\
+  \label{Ex2}
+  \langle (\underline{\lambda \ x}\ .\ x)\ @\ (\lambda \ y\ .\  y);\ & \ \emptyset;\ & ((\lambda\ y\ .\ y),\ \emptyset)
+  \rangle & \rightarrow^{[Lam-Elim]} \\
+  \label{Ex3}
+  \langle (\xcancel{\lambda \ x}\ .\ \underline{x})\ \xcancel{@}\ \xcancel{(\lambda \ y\ .\  y)};\ &
+  \ x \mapsto ((\lambda\ y\ .\ y),\ \emptyset);\ & [\ ] \rangle & \rightarrow^{[BVar]} \\
+  \label{Ex4}
+  \langle (\xcancel{\lambda \ x}\ .\ \underline{\lambda \ y}\ . y )\ \xcancel{@}\ \xcancel{(\lambda \ y\ .\  y)};\ &
+  \ \emptyset; \ & [\ ] \rangle & \rightarrow^{[Lam-Non-Elim]} \\
+  \label{Ex5}
+  \langle (\xcancel{\lambda \ x}\ .\ \lambda \ y\ . \underline{y} )\ \xcancel{@}\ \xcancel{(\lambda \ y\ .\  y)};\ &
+  \ \emptyset; \ & [\ ] \rangle & \not\rightarrow
+\end{align}
+
+\subsection{Correctness proof}
+In this section correctness with respect to the \textbf{head reduction} is presented.
+To perform that we will define an auxiliary function "\emph{expansion (exp)}".
+
+\paragraph{Expansion function.} 
+\emph{exp} by a given transition system state provides a $\lambda$-term.
+Informally speaking function \emph{exp} performs head substition of all
+variables that are presented in the environments.
+
+\begin{align}
+  \label{exp1} exp\; \langle M[\underline{A}];\; \Gamma,\ x \mapsto (B, \Gamma');\; \Delta \rangle
+  &= exp\; \langle M[\underline{A}[x / B[\Gamma']]];\; \Gamma;\; \Delta \rangle \\
+  \label{exp2} exp\; \langle M_B[\underline{A}];\; \emptyset;\; (B,\Gamma')\bullet\Delta \rangle
+  &= exp\; \langle M_{B[\Gamma']}[\underline{A}];\; \emptyset;\; \Delta \rangle\\
+  \label{exp3} exp\; \langle M;\; \emptyset;\; [\ ] \rangle &= M' \\
+  \textnormal{where } B[\Gamma'] &= exp\; \langle \underline{B};\; \Gamma';\; [\ ] \rangle \\
+  & M' \textnormal{ is a term } M \textnormal{ where all nodes that are crossed over are crosed out }
+\end{align}
+
+Note that \eqref{exp1} substitudes term $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). Each recurcive call of \eqref{exp2} substitudes all variables with respect to the corresponding context exactly in one argument term.
+
+Now consider LTS for HLR. Note that:
+\begin{itemize}
+\item Only $[Lam-Elim]$ rule can change an expansion;
+\item The number of transitions without applying $[Lam-Elim]$ rule is limited since the definition of context, input term has a final size, and only $[Lam-Elim]$ rule expands the context; Hereafter we will denote a sequence of transitions without applying $[Lam-Elim]$ rule by $\overset{*}{\rightarrow}$;
+\item The expansion function $exp$ cannot change a path from the root of term to the underlined node since:
+  \begin{itemize}
+  \item recurcive call \eqref{exp1} can only change the subtree of the current term with underlined node as a root; \hfill{\textbf{(I)}}
+  \item recurcive call \eqref{exp2} can only change arguments of the current term that are above the underlined node; Moreover, each application of \eqref{exp2} change exactly one argument (that corresponds to the first element of the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact. \hfill{\textbf{(II)}}
+  \end{itemize}
+\end{itemize}
+
+\subsubsection{Example}
+\begin{align*}
+  exp (\textnormal{\eqref{Ex1}})\ & =\  exp (\langle (\lambda \ x\ .\ x)\ \underline{@}\ (\lambda \ y\ .\  y);\ \emptyset;\ [\ ]
+  \rangle) =  (\lambda \ x\ .\ x)\ @\ (\lambda \ y\ .\  y) \\
+  exp (\textnormal{\eqref{Ex2}})\ & =\ exp ( \langle (\underline{\lambda \ x}\ .\ x)\ @\ (\lambda \ y\ .\  y);\ \emptyset;\
+  ((\lambda\ y\ .\ y),\ \emptyset)  \rangle)\ =
+  exp ( \langle (\underline{\lambda \ x}\ .\ x)\ @\ (\lambda \ y\ .\  y);\ \emptyset;\
+  [\ ]  \rangle)\ \\ & = \ (\lambda \ x\ .\ x)\ @\ (\lambda \ y\ .\  y) \\
+  exp (\textnormal{\eqref{Ex3}})\ & =\ exp ( \langle (\xcancel{\lambda \ x}\ .\ \underline{x})\ \xcancel{@}\
+  \xcancel{(\lambda \ y\ .\  y)};\ x \mapsto ((\lambda\ y\ .\ y),\ \emptyset);\ [\ ] \rangle ) \\
+  & =  exp ( \langle (\xcancel{\lambda \ x}\ .\ \underline{\lambda\ y}\ .\ y)\ \xcancel{@}\
+  \xcancel{(\lambda \ y\ .\  y)};\ \emptyset;\ [\ ] \rangle )\ =\ \lambda\ y\ .\ y\\
+  exp (\textnormal{\eqref{Ex4}})\ & =\ exp (\langle (\xcancel{\lambda \ x}\ .\ \underline{\lambda \ y}\ . y )\
+  \xcancel{@}\ \xcancel{(\lambda \ y\ .\  y)};\ \emptyset; \ [\ ] \rangle)\ =\ \lambda \ y\ .\ y \\
+  exp (\textnormal{\eqref{Ex5}})\ & =\ exp (\langle (\xcancel{\lambda \ x}\ .\ \lambda \ y\ . \underline{y} )\
+  \xcancel{@}\ \xcancel{(\lambda \ y\ .\  y)};\ \emptyset; \ [\ ] \rangle) \ = \ \lambda \ y\ .\ y
+\end{align*}
+
+\paragraph{Correspondence with respect to Head Reduction} (Informally; formally see in the following sections) \\
+Expansion cannot be changed by any TS rules except $[Lam-Elim]$ rule. Thus, 
+it is easy to see the correspondence between head linear reduction and usual head
+reduction. Each application of $[Lam-Elim]$ rule performs exactly one step of head
+reduction after applying the $exp$-function.
+
+\begin{align*}
+  (\lambda \ x\ .\ x)\ @\ (\lambda \ y\ .\  y) \rightarrow &\ \textnormal{corresponds to first to steps} \\
+  \lambda \ y\ .\ y  &\ \textnormal{corresponds to last three steps}
+\end{align*}
+
+\subsubsection{Theorem} HLR and HR coincide as follows:
+
+TODO:
+
+\begin{tikzcd}
+  \langle \dots \rangle \arrow{rr}{[Lam-Elim]} \arrow{d}{exp} & &
+  \langle M_i;\ \Gamma_i;\ \Delta_i \rangle \arrow{d}{exp}
+  \arrow{r}{*} & \langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle
+  \arrow{dl}{exp}
+  \arrow{rr}{[Lam-Elim]} & & \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle \arrow{d}{exp} &
+  \\
+  \dots \arrow{rr}{HR} & & M_i' \arrow[dotted]{rrr}{HR} & & & M_{i+1}'
+\end{tikzcd}
+
+\paragraph{Proof} by induction on number of $[Lam-Elim]$ steps.
+
+Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
+
+Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
+
+first, LTS got stuck and nothing to prove,
+
+and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function $exp$ to that state results in the same term as a step of head reduction from term $M_i'$. (i.e. in the term $M_{i+1}'$)
+
+Let see what will happend if we apply $exp$ function to state $(i)$:
+\begin{align}
+  &exp\; \langle A[\underline{\lambda x}.\; e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle & \\
+  &\overset{exp}{\rightarrow^{*}}
+  exp\; \langle A'[\underline{\lambda x}.\; e[\Gamma]];\ \emptyset;\ (B,\Gamma')\bullet\Delta \rangle &\textnormal{by fully applying \eqref{exp1}} \\
+  \label{i3} &\overset{exp}{\rightarrow}
+  exp\; \langle A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp2}} \\
+  &\overset{exp}{\rightarrow}
+  \dots &
+\end{align}
+
+to state $(ii)$:
+\begin{align}
+  &exp \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle & \\
+  &\overset{exp}{\rightarrow^{*}}
+  exp\;\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma]];\ x \mapsto (B,\Gamma');\ \Delta \rangle &\textnormal{by elliminating $\Gamma$ following \eqref{exp1}} \\
+  \label{ii3} &\overset{exp}{\rightarrow}
+  exp\; \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp1}} \\
+  &\overset{exp}{\rightarrow}
+  \dots &
+\end{align}
+
+It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, if we apply head reduction to this term, it will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ (by head reduction definition) that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i'$ and the expansion of state $(ii)$ is $M_{i+1}'$. \hfill{\textbf{Qed}} \\ \\ 
+
+\textbf{Consequences}:
+\begin{itemize}
+\item if head linear reduction terminates then head reduction terminates;
+\item if head reduction terminates then head linear reduction terminates;
+\item Since expansion is not able to change a path from the root to the underlined node,
+  the first component of the final state of TS for head linear reduction
+  contains a term which leftmost path is a part of the head normal form 
+  and the expansion of the final state is a node of the Boehm-tree of the input term; \\
+  Thus, a repeated application of head linear reduction to all arguments
+  (complete head linear reduction) leeds to the normal form.
+\end{itemize}
+
+
+\section{Complete Head Linear Reduction}
+\emph{Complete head linear reduction} is a reduction strategy that can be seen as a repeated application
+of head linear reduction.
+
+TODO: description and fix following
+
+\subsection{Transition System for Complete Head Linear Reduction}
+
+Note that transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words, first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
+
 
 \subsection{Notes}
 State is a tuple $\langle$ $\lambda$-term with underlined node; context; list of pairs (argument, context) $\rangle$, where
@@ -137,121 +350,13 @@ $$
 \RuleNo{FVar-2}
 $$
 
+\subsection{Expansion function}
+
+TODO
+
 \subsection{Correctness proof}
 
-Note that labelled transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words, first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
-
-\paragraph{LTS for HLR}. \\
-\textbf{Remark:} it is obvious that in [Lam-Non-Elim] rule for HLR we can safely replace $\$ \bullet \Delta$ by empty list since there is no rule that pop $\$$ sign from $\Delta$.
-
-$$
-\Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
-     {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;(e_2,\Gamma)\bullet\Delta}}
-\RuleNo{App}
-$$
-
-$$
-\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;[]}}
-     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;[]}}
-\RuleNo{Lam-Non-Elim}
-$$
-
-$$
-\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;(B,\Gamma')\bullet\Delta}}
-     {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;x \mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
-\RuleNo{Lam-Elim}
-$$
-
-$$
-\Rule{\State{\InContext{A}{\underline{x}};\;x\mapsto (B,\Gamma'),\,\Gamma;\;\Delta}}
-     {\State{\InContext{A}{\underline{B}};\;\Gamma';\;\Delta}}
-\RuleNo{BVar}
-$$
-
-\paragraph{Expansion function.} 
-To prove correctness of HLR we introduce an axiliary expansion function $exp$. This function being applied to some state of LTS for HLR results in some $\lambda$-term which we will call \emph{an expansion}.
-
-\begin{align}
-  \label{exp1} exp\; \langle M[\underline{A}];\; \Gamma,\ x \mapsto (B, \Gamma');\; \Delta \rangle
-  &= exp\; \langle M[\underline{A}[x / B[\Gamma']]];\; \Gamma;\; \Delta \rangle \\
-  \label{exp2} exp\; \langle M_B[\underline{A}];\; \emptyset;\; (B,\Gamma')\bullet\Delta \rangle
-  &= exp\; \langle M_{B[\Gamma']}[\underline{A}];\; \emptyset;\; \Delta \rangle\\
-  \label{exp3} exp\; \langle M;\; \emptyset;\; [] \rangle &= M \\
-  \textnormal{where } B[\Gamma'] &= exp\; \langle \underline{B};\; \Gamma';\; [] \rangle
-\end{align}
-
-Note that \eqref{exp1} substitudes term $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). Each recurcive call of \eqref{exp2} substitudes all variables with respect to the corresponding context exactly in one argument term.
-
-Now consider LTS for HLR. Note that:
-\begin{itemize}
-\item Only $[Lam-Elim]$ rule can change an expansion;
-\item The number of transitions without applying $[Lam-Elim]$ rule is limited since the definition of context, input term has a final size, and only $[Lam-Elim]$ rule expands the context; Hereafter we will denote a sequence of transitions without applying $[Lam-Elim]$ rule by $\overset{*}{\rightarrow}$;
-\item The expansion function $exp$ cannot change a path from the root of term to the underlined node since:
-  \begin{itemize}
-  \item recurcive call \eqref{exp1} can only change the subtree of the current term with underlined node as a root; \hfill{\textbf{(I)}}
-  \item recurcive call \eqref{exp2} can only change arguments of the current term that are above the underlined node; Moreover, each application of \eqref{exp2} change exactly one argument (that corresponds to the first element of the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact. \hfill{\textbf{(II)}}
-  \end{itemize}
-\end{itemize}
-
-
-\paragraph{Theorem}. HLR and HR coincide as follows:
-
-\begin{tikzcd}
-  \langle \dots \rangle \arrow{rr}{[Lam-Elim]} \arrow{d}{exp} & &
-  \langle M_i;\ \Gamma_i;\ \Delta_i \rangle \arrow{d}{exp}
-  \arrow{r}{*} & \langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle
-  \arrow{dl}{exp}
-  \arrow{rr}{[Lam-Elim]} & & \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle \arrow{d}{exp} &
-  \\
-  \dots \arrow{rr}{HR} & & M_i' \arrow[dotted]{rrr}{HR} & & & M_{i+1}'
-\end{tikzcd}
-
-\paragraph{Proof} by induction on number of $[Lam-Elim]$ steps.
-
-Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
-
-Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
-
-first, LTS got stuck and nothing to prove,
-
-and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function $exp$ to that state results in the same term as a step of head reduction from term $M_i'$. (i.e. in the term $M_{i+1}'$)
-
-Let see what will happend if we apply $exp$ function to state $(i)$:
-\begin{align}
-  &exp\; \langle A[\underline{\lambda x}.\; e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle & \\
-  &\overset{exp}{\rightarrow^{*}}
-  exp\; \langle A'[\underline{\lambda x}.\; e[\Gamma]];\ \emptyset;\ (B,\Gamma')\bullet\Delta \rangle &\textnormal{by fully applying \eqref{exp1}} \\
-  \label{i3} &\overset{exp}{\rightarrow}
-  exp\; \langle A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp2}} \\
-  &\overset{exp}{\rightarrow}
-  \dots &
-\end{align}
-
-to state $(ii)$:
-\begin{align}
-  &exp \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle & \\
-  &\overset{exp}{\rightarrow^{*}}
-  exp\;\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma]];\ x \mapsto (B,\Gamma');\ \Delta \rangle &\textnormal{by elliminating $\Gamma$ following \eqref{exp1}} \\
-  \label{ii3} &\overset{exp}{\rightarrow}
-  exp\; \langle A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]];\ \emptyset;\ \Delta \rangle &\textnormal{by one step of \eqref{exp1}} \\
-  &\overset{exp}{\rightarrow}
-  \dots &
-\end{align}
-
-It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, if we apply head reduction to this term, it will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ (by head reduction definition) that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i'$ and the expansion of state $(ii)$ is $M_{i+1}'$. \hfill{\textbf{Qed}} \\ \\ 
-
-\textbf{Consequences}:
-\begin{itemize}
-\item if head linear reduction terminates then head reduction terminates;
-\item if head reduction terminates then head linear reduction terminates;
-\item Since expansion is not able to change a path from the root to the underlined node,
-  the first component of the final state of LTS for head linear reduction
-  contains a term which leftmost path is a part of the head normal form 
-  and the expansion of the final state is a node of the Boehm-tree of the input term; \\
-  Thus, a repeated application of head linear reduction to all arguments
-  (complete head linear reduction) leeds to the normal form.
-\end{itemize}
-
+TODO
 
 
 \section{Labelled Transition System for UNP}
