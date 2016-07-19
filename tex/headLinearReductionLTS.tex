@@ -112,6 +112,8 @@ To be more concrete let's present a HLR as the following \textbf{transition syst
   \item $A [\underline{x}]$ is a $\lambda$-term with a variable $x$ as an underlined node
   \item $x \not\in \Gamma$
   \end{itemize}
+\item Denotation: $\InContext{A_{\xcancel{B}}}{\xcancel{\lambda\ x}\ .\ e}$ ---
+  is a term $A$ where subterm $B$  and node ``$\lambda x$'' are crossed over.
 \end{itemize}
 
 \subsection{Rules}
@@ -181,7 +183,7 @@ variables that are presented in the environments.
 
 Note that \eqref{exp1} substitudes term $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). Each recurcive call of \eqref{exp2} substitudes all variables with respect to the corresponding context exactly in one argument term.
 
-Now consider LTS for HLR. Note that:
+Now consider TS for HLR. Note that:
 \begin{itemize}
 \item Only $[Lam-Elim]$ rule can change an expansion;
 \item The number of transitions without applying $[Lam-Elim]$ rule is limited since the definition of context, input term has a final size, and only $[Lam-Elim]$ rule expands the context; Hereafter we will denote a sequence of transitions without applying $[Lam-Elim]$ rule by $\overset{*}{\rightarrow}$;
@@ -223,7 +225,14 @@ reduction after applying the $exp$-function.
 
 \subsubsection{Theorem} HLR and HR coincide as follows:
 
-TODO:
+Suppose that we have some current TS state (denoted $\langle \dots \rangle$) with some expansion (denoted $\dots$)
+such that the next rule to be applied is $[Lam-Elim]$ and results in state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ witch
+expansion is some term $M'_i$. Then TS make several new steps without applying $[Lam-Elim]$ rule and results in some
+state $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ witch expansion is still term
+$M'_i$. Then 
+\emph{\textbf{If} $[Lam-Elim]$ rule can be applied by extending environment $\Gamma$ with new binding 
+  $x \mapsto (B,\Gamma')$ and expansion of the result is some term $M'_{i+1}$
+  \textbf{then} $M'_{i+1}$ can be obtained by one step of head reduction from the term $M'_i$}.
 
 \begin{tikzcd}
   \langle \dots \rangle \arrow{rr}{[Lam-Elim]} \arrow{d}{exp} & &
@@ -239,9 +248,9 @@ TODO:
 
 Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
 
-Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some LTS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
+Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some TS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
 
-first, LTS got stuck and nothing to prove,
+first, TS got stuck and nothing to prove,
 
 and second, we can apply the $[Lam-Elim]$ rule. In the second case we know the form of the state (following the $[Lam-Elim]$ definition), i.e. $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ (let us denote it $(i)$), and by assumption the result of applying $[Lam-Elim]$ rule is a state $\langle A_{\xcancel{B}}[\xcancel{\lambda x}.\underline{e}];\ x \mapsto (B,\Gamma'),\Gamma;\ \Delta \rangle$ (let us denote it $(ii)$). Now we have to show that applying function $exp$ to that state results in the same term as a step of head reduction from term $M_i'$. (i.e. in the term $M_{i+1}'$)
 
@@ -283,30 +292,22 @@ It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{
 
 
 \section{Complete Head Linear Reduction}
-\emph{Complete head linear reduction} is a reduction strategy that can be seen as a repeated application
-of head linear reduction.
-
-TODO: description and fix following
+\emph{Complete Head Linear Reduction} (CHLR) can be seen as usual head linear reduction that is repeatedly
+applied to the all arguments.
+In this section transition system for CHLR is presented. It is a simple extension of TS for HLR.
 
 \subsection{Transition System for Complete Head Linear Reduction}
 
-Note that transition system for HLR can be obtained by removing [FVAR-*] rules from the LTS for CHLR. In other words, first four rules describe HLR while [FVAR-*] rules describes a repeated application of HLR to the arguments.
+To perform serial application of HLR in all arguments three new rules $[FVar-*]$ are introduced.
+Informally, these three rules handle the situation when HLR results is some state with first component
+be a term with underlined unbouned (or free) variable.
 
-
-\subsection{Notes}
-State is a tuple $\langle$ $\lambda$-term with underlined node; context; list of pairs (argument, context) $\rangle$, where
 \begin{itemize}
-\item $\lambda$-term (a tree; by considering $\lambda$-term as a tree it becomes possible to cross arguments out of tree with a parent application node (denotes as $A_{\xcancel{B}}$)) is a usual lambda term with one underlined node;
-\item Context $\Gamma$ is an ordered (first-in) set of elements of the following form ($variable \mapsto (term,\ Context)$);
-\item $\Delta$ is an ordered list of pairs ($\lambda$-term, Context) (one can also think about $\Delta$ as an ordered list of pointers to the corresponding subtree stored together with a corresponding context);
-\item \textit{Initial} configuration is $\langle \lambda-term\ with\ underlined\ root,\ \emptyset,\ \$ \rangle$;
-\item \textit{Final} configuration is $\langle \InContext{M}{\underline{x}} \textnormal{(term in normal form)},\ \Gamma,\ \$ \rangle$;
-\item Note, that \emph{Complete Head Linear Reduction} (CHLR) can be seen as usual \emph{Head Linear Reduction} (HLR) that is repeatedly applied to the all arguments;
-\item From the below LTS for CHLR.
+\item Stack of pairs $\Delta$ is extended by special marker $\$$;
+\item \textit{Initial} state is $\langle \lambda-term\ with\ underlined\ root;\ \emptyset;\ \$ \rangle$;
+\item \textit{Final} state is $\langle \InContext{M}{\underline{x}} \textnormal{(term in normal form)};\ \Gamma;\ \$ \rangle$;
+\item Changes (differences between TS for CHLR and TS for HLR) are {\color{red}colored}
 \end{itemize}
-
-
-\subsection{Labelled transition system for CHLR}
 
 $$
 \Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
@@ -315,8 +316,8 @@ $$
 $$
 
 $$
-\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;\$\bullet\Delta}}
-     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;\$\bullet\Delta}}
+\Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;{\color{red}\$\bullet\Delta}}}
+     {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;{\color{red}\$\bullet\Delta}}}
 \RuleNo{Lam-Non-Elim}
 $$
 
@@ -335,19 +336,19 @@ $$
 $$
 \Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;(B,\Gamma')\bullet\$\bullet\Delta}}
      {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma';\;\$\bullet\Delta}},\;x\notin dom(\Gamma)
-\RuleNo{FVar-0}
+\RuleNo{{\color{red}FVar-0}}
 $$
 
 $$
 \Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;(B,\Gamma')\bullet C\bullet\Delta}}
      {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma';\;\$\bullet C\bullet\Delta}},\;C\ne\$,\;x\notin dom(\Gamma)
-\RuleNo{FVar-1}
+\RuleNo{{\color{red}FVar-1}}
 $$
 
 $$
 \Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet (B,\Gamma')\bullet\Delta}}
      {\State{\InContext{A}{\InContext{M}{x}@\underline{B}};\;\Gamma';\;\$\bullet\Delta}},\;\;x\notin dom(\Gamma)
-\RuleNo{FVar-2}
+\RuleNo{{\color{red}FVar-2}}
 $$
 
 \subsection{Expansion function}
@@ -359,8 +360,8 @@ TODO
 TODO
 
 
-\section{Labelled Transition System for UNP}
-This section contains LTS for UNP. This LTS has the same number of rules that the LTS for CHLR.
+\section{Transition System for UNP}
+This section contains TS for UNP. This TS has the same number of rules that the TS for CHLR.
 Moreover, it is easy to see that rules with the same name corresponds to each other. \\ \\
 
 There are two pointer types:
@@ -378,7 +379,7 @@ There are two pointer types:
     or any other node and some application;
   \item Vioilet pointer has the same meaning
     (pointer to the last incamplete application) together with $\$$
-    in LTS for CHLR;
+    in TS for CHLR;
   \item Dashed red pointer is used when the real colour
     (brown or violet) is not the metter.    
   \end{itemize}
@@ -408,9 +409,9 @@ Rules to construct a traversal:
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{14}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
-    {\color{violet}\draw[line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
-    {\color{violet}\draw[line width=0.5mm,|->] (14.north) to[bend right] (12.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (14.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\
 \item $(Lam-Elim)$
@@ -441,11 +442,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-1)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -454,11 +455,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{brown}\draw[solid,line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{brown}\draw[dashed,line width=1mm,->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
-    {\color{brown}\draw[solid,line width=1mm,->] (13.north) to[bend right] (12.north);}
+    {\color{brown}\draw[dashed,line width=1mm,->] (13.north) to[bend right] (12.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-2)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -471,12 +472,12 @@ Rules to construct a traversal:
     {\color{violet}\draw[line width=0.5mm,|->] (4.north) to[bend right] (3.north);}
     {\color{red}\draw[line width=0.5mm,dashed,->] (13.north) to[bend right] (12.north);}
     {\color{violet}\draw[line width=0.5mm,|->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[dashed,line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\ NB: the colour of the "red" pointer is not the metter in this case \\ \\
 \end{itemize}
 
-Note that $\Delta$ and $\Gamma$ can be easly defined from UNP LTS state as follows:
+Note that $\Delta$ and $\Gamma$ can be easly defined from UNP TS state as follows:
 \begin{itemize}
 \item $\Delta$ can be construct by following incomplete application pointer and storing right childs of all reachable applications in reverse order with corresponding contexts (see next item how to define context from traversal);
 \item $\Gamma$ can be construct by following binder pointers, and when faces with a lambda--tokens $\lambda x$ which has a brown pointer to some application $@$, store $x \mapsto (e, \Gamma')$ where $e$ is a right child of apllication $@$ and $\Gamma'$ is a context (which is defined recursively from token $@$).
