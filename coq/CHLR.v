@@ -91,60 +91,69 @@ Proof. auto. Qed.
 (* Subterm: subterm t p returns a subterm of t, indexed by 
    (relative) path p; if the term does not exists, returns None
 *)
+(* Definition subterm :  *)
+(*   forall {P : Path} {l : nat} (P' : Path), *)
+(*   TermT P l -> option { l' : nat & TermT (P ++ P') l'}. *)
+(*   refine ( *)
+(*       fix subterm' {P : Path} {l : nat} (P' : Path) {struct P'} *)
+(*       : TermT P l -> option { l' : nat & TermT (P ++ P') l'} := *)
+(*         fun T => *)
+(*       match P' return option { l' : nat & TermT (P ++ P') l'} with *)
+(*       | []   => Some _ *)
+(*       | x::p => *)
+(*           match x return option { l' : nat & TermT (P ++ x::p) l'} with *)
+(*           | U => match T return option { l' : nat & TermT (P ++ U::p) l'} with *)
+(*                  | Lam t => _ *)
+(*                  | _     => None *)
+(*                  end *)
+(*           | L => match T return option { l' : nat & TermT (P ++ L::p) l'} with *)
+(*                  | App t _ => _ *)
+(*                  | _       => None *)
+(*                  end *)
+(*           | R => match T return option { l' : nat & TermT (P ++ R::p) l'} with *)
+(*                  | App _ t => _ *)
+(*                  | _       => None *)
+(*                  end *)
+(*         end *)
+(*   end). *)
+(*   exists l; rewrite app_nil_r; apply T. *)
+(*   apply (subterm' (P++[U]) (S l) p) in t. rewrite <- app_assoc in t. assumption. *)
+(*   apply (subterm' (P++[R])  l    p) in t; rewrite <- app_assoc in t; assumption. *)
+(*   apply (subterm' (P++[L])  l    p) in t; rewrite <- app_assoc in t; assumption. *)
+(* Defined. *)
+
 Definition subterm : 
-  forall {P : Path} {l : nat} (P' : Path),
-  TermT P l -> option { l' : nat & TermT (P ++ P') l'}.
+  forall {P P2 : Path} {l : nat} (P' : Path),
+    TermT P l -> P2 = P ++ P' -> option { l' : nat & TermT P2 l'}.
   refine (
-      fix subterm' {P : Path} {l : nat} (P' : Path) {struct P'}
-      : TermT P l -> option { l' : nat & TermT (P ++ P') l'} :=
-        fun T =>
-      match P' return option { l' : nat & TermT (P ++ P') l'} with
-      | []   => Some _
-      | x::p =>
-          match x return option { l' : nat & TermT (P ++ x::p) l'} with
-          | U => match T return option { l' : nat & TermT (P ++ U::p) l'} with
-                 | Lam t => _
-                 | _     => None
-                 end
-          | L => match T return option { l' : nat & TermT (P ++ L::p) l'} with
-                 | App t _ => _
-                 | _       => None
-                 end
-          | R => match T return option { l' : nat & TermT (P ++ R::p) l'} with
-                 | App _ t => _
-                 | _       => None
-                 end
-        end
-  end).
-  exists l; rewrite app_nil_r; apply T.
-  apply (subterm' (P++[U]) (S l) p) in t. rewrite <- app_assoc in t. assumption.
-  apply (subterm' (P++[R])  l    p) in t; rewrite <- app_assoc in t; assumption.
-  apply (subterm' (P++[L])  l    p) in t; rewrite <- app_assoc in t; assumption.
+      fix subterm' {P P2 : Path} {l : nat} (P' : Path) {struct P'}
+      : TermT P l -> P2 = P ++ P'  -> option { l' : nat & TermT P2 l'} :=
+        fun T EQ => _
+    ).
+  induction P'.
+  apply Some; exists l; rewrite app_nil_r in EQ; rewrite EQ; assumption.
+  destruct a.
+  - destruct T.
+    apply (subterm' (P++[U]) P2 (S l) P') in T; [auto | rewrite <- app_assoc];  assumption.
+    apply None.
+    apply None.
+    apply None.
+  - destruct T.
+    apply None.
+    apply (subterm' (P++[R]) P2 l P') in T2; [auto | rewrite <- app_assoc];  assumption.
+    apply None.
+    apply None.
+  - destruct T.
+    apply None.
+    apply (subterm' (P++[L]) P2 l P') in T1; [auto | rewrite <- app_assoc];  assumption.
+    apply None.
+    apply None.
 Defined.
 
-Notation "A [| p |]" := (subterm p A) (at level 0).
+Notation "A [| p |] l1" := (subterm p A l1) (at level 0).
 
-Print subterm.
-Check subterm.
-Eval compute in (AppT) [| [U;U] |].
-Eval compute in (AppT) [|[]|].
-Eval compute in ((AppT) [|[]|] : option {l' : nat & TermT [] l'}).
-Eval cbv in (((AppT) [|[]|] : option {l' : nat & TermT [] l'})).
-
-Theorem AppTEq :
-  ((AppT) [|[]|] : option {l' : nat & TermT ([]) l'}) =
-  Some (existT (fun x => TermT [] x) 0 AppT).
-Proof. simpl_eq; auto. Qed.
-
-Theorem PE :
-  option {l' : nat & TermT ([] ++ []) l'} = option {l' : nat & TermT ([]) l'}.
-Proof. reflexivity. Qed.
-
-Theorem TEq:
-  forall T : Term,
-    (T [|[]|] : option {l' : nat & TermT [] l'}) =
-    Some (existT (fun x => TermT [] x) 0 T).
-Proof. simpl_eq; auto. Qed.
+Lemma l1 : [U;U] = [U;U] ++ []. auto. Qed.
+Eval compute in AppT [| [U;U] |] l1.
 
 (* fixpath : by a given P' : Path, l' : nat, and t : TermT P l 
   returns a TermT P' l' that is a same "term" with a new
@@ -404,8 +413,30 @@ Inductive Delta : Type :=
 (* Term P l --- is an input term with indexed path *)
 (* Gamma    --- is a current condext *)
 (* Delta    --- is a current list of incomplete applications *)
+(* Inductive HLRState := *)
+(* | HLRStateC : Term -> Path -> nat -> Gamma -> Delta -> HLRState *)
+(* | HLRStuck  : HLRState -> HLRState. *)
+
+
+TODO: fix all with respect to the new definition of subterm
+
+Definition ValidPathLam {P : Path} {l : nat} (t : TermT P l) (p : Path) (l1 : nat)  :=
+  exists t' : TermT (P ++ p) l1,
+    Some (existT (fun x => TermT (P ++ p) x) l1 t') = t [|p|] 
+.
+
+Check ValidPathLam.
+
+
+(* match t[|p|] with *)
+  (*   | None => False *)
+  (*   | Some (existT l' T') => l1 = l' *)
+  (* end. *)
+
 Inductive HLRState :=
-| HLRStateC : Term -> Path -> nat -> Gamma -> Delta -> HLRState
+| HLRStateC :
+    forall (t : Term) (p : Path) (l : nat), ValidPathLam t p l
+                                  -> Gamma -> Delta -> HLRState
 | HLRStuck  : HLRState -> HLRState.
 
 Definition containsGamma : Gamma -> nat -> option (prod Path Gamma).
@@ -425,40 +456,107 @@ Definition getpath : forall {P : Path} {l : nat}, TermT P l -> Path := fun P _ _
 
 Definition getlamnum : forall {P : Path} {l : nat}, TermT P l -> nat := fun _ l _  => l.
 
+Definition isLam {P : Path} {l : nat} (t : TermT P l)  :=
+  exists t' : TermT (P ++ [U]) (S l), t = Lam P l t'.
+
+Lemma ListTypes :
+  forall (P p1 p2 : Path) (l : nat), TermT ((P ++ p1) ++ p2) l = TermT (P ++ p1 ++ p2) l.
+Proof. intros; rewrite app_assoc; reflexivity. Qed.
+
+
+
+Lemma subtermAss :
+  forall {P : Path} {l : nat} (t : TermT P l) (p1 p2 : Path) (l1 l2: nat),
+    (exists (t1 : TermT (P ++ p1) l1) (t2 : TermT ((P ++ p1) ++ p2) l2),
+       Some (existT (fun x : nat => TermT (P ++ p1) x) l1 t1) = (t) [|p1|] /\ Some (existT (fun x : nat => TermT ((P ++ p1) ++ p2) x) l2 t2) = (t1) [|p2|])
+    -> (exists t3 : TermT (P ++ p1 ++ p2) l2,
+       Some (existT (fun x : nat => TermT (P ++ p1 ++ p2) x) l2 t3) = (t) [|p1 ++ p2|]).
+Proof.
+intros. inversion H as [t1 [t2 [H1 H2]]].
+
+induction p2.
+- assert (E : TermT (P ++ p1 ++ []) l2) by (rewrite app_assoc; assumption).
+  exists E. 
+
+
+  rewrite app_nil_r.
+   rewrite <- app_nil_r.
+
+
+clear H2.
+rewrite <- app_assoc in t2.
+exists t2.  
+
+
+
+Qed.
+  
+Theorem ValidPathLamU :
+  forall {P : Path} {l : nat} (t : TermT P l) (p : Path) (l1 : nat),
+  (exists (t' : TermT (P ++ p) l1),
+    Some (existT (fun x => TermT (P ++ p) x) l1 t') = t [| p |] /\ isLam t' )->
+    exists (t'' : TermT (P ++ p ++ [U]) (S l1)),
+      Some (existT (fun x => TermT (P ++ p ++ [U]) x) (S l1) t'') = t [| p ++ [U] |].
+Proof.
+  intros P l t p l1 H; inversion H as [t' [H1 H2]].
+  unfold isLam in H2; inversion H2 as [T H3].
+  assert (E : P ++ p ++ [U] = (P ++ p) ++ [U]) by (rewrite app_assoc; reflexivity).
+
+  clear H3.
+  rewrite <- E in T.
+  exists T.
+  
+
+  
+  rewrite <- ListTypes.
+  ?????
+  rewrite <- E in T.
+  exists T.
+  rewrite <- app_assoc.
+  
+Qed.
+  
 Definition hlrStep :
   HLRState -> HLRState.
   refine (
       fun s =>
         match s with
-          | HLRStateC T P L1 G D =>
+          | HLRStateC T P E L1 G D =>
             match T [| P |] with
                  | Some (existT l T') => match T' with
                                            | Lam  t =>
                                              match D with
                                                (* [Lam-Non-Elim] *)
-                                               | EmptyDelta => HLRStateC T (getpath t) (l + 1) G D
+                                               | EmptyDelta => HLRStateC T (P ++ [U]) (E + 1) _ G D
                                                (* [Lam-Elim] *)
                                                | ConsDelta px gx Ds =>
-                                                 HLRStateC T (getpath t) (l+1) (ConsGamma (getlamnum T') px gx G) Ds
+                                                 HLRStateC T (P ++ [U]) (l+1) _ (ConsGamma (getlamnum T') px gx G) Ds
                                              end
-                                | App  t1 t2 => HLRStateC T (getpath t1) l G (ConsDelta (getpath t2) G D)
+                                | App  t1 t2 => HLRStateC T (P ++ [L]) l _ G (ConsDelta (P ++ [R]) G D)
                                 | BVar i _  =>
-                                (* match containsGamma G index (l - i -1) with *)
-                                  match containsGamma G (l - i -1) with
-                                                 | None => HLRStuck s
-                                                 | Some (pair p g) =>
-                                                   match T [| P -->  p |] with
-                                                     | None => HLRStuck s
-                                                     (* BVar *)
-                                                     | Some T => HLRStateC T P l g D
-                                                   end
-                                               end
+                                  (* check that i+1 <= l; otherwise do nothing *)
+                                  (* TODO unnecessary: l > i by the definition*)
+                                  if i <? l
+                                  then match containsGamma G (l - i -1) with
+                                         (* match containsGamma G index (l - i -1) with *)
+                                         | None => HLRStuck s
+                                         | Some (pair p g) =>
+                                           match T [| P -->  p |] with
+                                             | None => HLRStuck s
+                                             (* BVar *)
+                                             | Some T => HLRStateC T P l _ g D
+                                           end
+                                       end
+                                  else HLRStuck s
                                 | FVar _  => HLRStuck s
                               end
                  | None => HLRStuck s
                end
           | HLRStuck _ => s
         end).
+  
+  
+
 Defined.
 
 Definition exampleCInit : HLRState := HLRStateC exampleC ([]) 0 EmptyGamma EmptyDelta.
@@ -672,6 +770,25 @@ Definition fixpath11 : forall {P P' : Path} {l l' : nat} (P1 : Path) (l1 : nat),
             (*              (* then BVar P1 l1 (n - 1) _ *) *)
             (*              (* else FVar P1 l1 n *) *)
             (*         else _ (*BVar P1 l1 n _*) *)
+=======
+(**
+=====================
+  General substitution
+=====================
+**)
+
+(* function substitution' is an auxiliary function that is used in function substitution  *)
+Definition substitution' : forall {P P' : Path} {l l' : nat} (P1 : Path) (l1 : nat),
+                         nat -> TermT P  l -> TermT P' l' ->
+                         l > 0 -> l1 >= l' -> S l1 = l -> TermT P1 l1.
+  refine (
+      fix st' {P P' : Path} {l l' : nat} (P1 : Path) (l1 ll : nat) (t : TermT P  l ) (T : TermT P' l')
+          (EQ0 : l > 0) (EQ1 : l1 >= l') (EQ2 : S l1 = l) : TermT P1 l1 :=
+        match t with
+          | Lam t => Lam P1 l1 (st' (P1 ++ [U]) (S l1) ll t T _ _ _)
+          | App t1 t2 => App P1 l1(st'  (P1 ++ [L]) l1 ll t1 T _ _ _) (st' (P1 ++ [R]) l1 ll t2 T _ _ _)
+          | FVar n => FVar P1 l1 n
+          | BVar n _ => _
         end
     ); try omega.
   remember (lt_eq_lt_dec (l - ll - 1) n) as b eqn:E; destruct b as [[b1 | b2] | b3].
@@ -685,6 +802,9 @@ Definition fixpath11 : forall {P P' : Path} {l l' : nat} (P1 : Path) (l1 : nat),
     omega.
 Defined.
 
+(* function substitution performs a general substitution.
+   arguments: term and a path to the redex (to the argument of the redex)
+ *)
 Definition substitution : Term -> Path -> option Term.
   refine(
       let fix st {P : Path} {l : nat} (t : TermT P l) (p : Path) : option (TermT P l) :=
@@ -695,6 +815,7 @@ Definition substitution : Term -> Path -> option Term.
                        | App (Lam t) T => Some (
                                               fixpath11 P l l t T _ _ _
                                             )
+                       | App (Lam t) T => Some (substitution' P l l t T _ _ _)
                        | _ => None
                      end
             | U :: p => match t with
@@ -759,6 +880,75 @@ Definition substex : Term.
 Defined.
 
 Definition substex' : Term. 
+(* args:
+  - term (куда подставляем)
+  - argument (что подставляем)
+  - index (???)
+*)
+Definition general_substitution : forall {P P1 : Path} {l l1 : nat},
+                                    TermT P l -> TermT P1 l1 -> nat -> l >= l1 -> TermT P l.
+  refine(
+      fix st {P P1 : Path} {l l1 : nat} (t : TermT P l) (T : TermT P1 l1) (i : nat) (EQ : l >= l1) : TermT P l :=
+          match t with
+            | Lam t => Lam P l (st t T i _)
+            | App t1 t2 => App P l (st t1 T i _) (st t2 T i _)
+            | BVar n _ => if beq_nat (l - n - 1) i
+                          then fixpath P l l T _
+                          else t
+            | FVar _ => t
+          end
+    ); try omega.
+Defined.
+
+(* Examples *)
+Definition substex : Term. 
+  refine (
+      Lam [] 0 (BVar [U] 1 0 _)
+    ); omega.
+Defined.
+Definition substex1 : TermT [U;R] 1. 
+  refine (
+      Lam [U;R] 1
+          (App [U;R;U] 2
+               (BVar [U;R;U;L] 2 1 _)
+               (BVar [U;R;U;R] 2 0 _))
+    ); omega.
+Defined.
+Definition substex2 : Term.
+  refine (
+      Lam [] 0
+          (Lam [U] 1
+               (App [U;U] 2
+                    (BVar [U;U;L] 2 1 _)
+                    (BVar [U;U;R] 2 0 _)
+               )
+          )
+    ); omega.
+Defined.
+Example gs1 :
+  TermTEquality (general_substitution substex substex1)
+                (substex2)
+                = true.
+
+
+
+
+
+Notation "A {| p |}" := (substitution A p) (at level 0).
+
+(* Examples *)
+Definition substex : Term. 
+  refine (
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (BVar [U;L;U] 2 0 _))
+               (Lam [U;R] 1
+                    (App [U;R;U] 2
+                         (BVar [U;R;U;L] 2 1 _)
+                         (BVar [U;R;U;R] 2 0 _))))
+    ); omega.
+Defined.Definition substex' : Term. 
   refine (
       Lam [] 0
           (Lam [U] 1
@@ -786,12 +976,80 @@ Definition expansion (s : HLRState)  : option Term :=
   let fix expansion' (ll : nat) (s : HLRState) {struct ll}  : option Term :=
       match ll, s with 0%nat, _ => None
                     | S _, HLRStuck s => None (* expansion s *)
+                    (BVar [U;U;R] 2 0 _)))
+    ); omega.
+Defined.
+Definition substex1 : Term. 
+  refine (
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (App [U;L;U] 2
+                         (BVar [U;L;U;L] 2 0 _)
+                         (BVar [U;L;U;R] 2 0 _)))
+               (Lam [U;R] 1
+                    (App [U;R;U] 2
+                         (BVar [U;R;U;L] 2 1 _)
+                         (BVar [U;R;U;R] 2 0 _))))
+    ); omega.
+Defined.
+Definition substex1' : Term. 
+  refine (
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (App [U;L;U] 2
+                         (BVar [U;L;U;L] 2 1 _)
+                         (BVar [U;L;U;R] 2 0 _)))
+               (Lam [U;R] 1
+                    (App [U;R;U] 2
+                         (BVar [U;R;U;L] 2 1 _)
+                         (BVar [U;R;U;R] 2 0 _)))
+          )
+    ); omega.
+Defined.
+Example ss' : 
+    OptionTermTEquality
+      (substex {| [U;R] |})
+      (Some substex') = true. auto. Qed.
+Example ss1' : 
+    OptionTermTEquality
+      (substex1 {| [U;R] |})
+      (Some substex1') = true. auto. Qed.
+
+(* Auxiliary functions that computes "size" of the HLR stateSize
+    and thus, enforces termination of expansion function 
+*)
+Fixpoint gammaSize (g : Gamma) : nat :=
+  match g with
+    | EmptyGamma => 0
+    | ConsGamma _ _ _ gs => 1 + gammaSize gs
+  end.
+
+Fixpoint deltaSize (d : Delta) : nat :=
+  match d with
+    | EmptyDelta => 1
+    | ConsDelta _ g' ds => gammaSize g' +  deltaSize ds
+  end.
+
+Fixpoint stateSize (s : HLRState) : nat :=
+  match s with
+    | HLRStuck s => stateSize s
+    | HLRStateC _ _ _ g d => gammaSize g +  deltaSize d
+  end.
+
+(* An expansion function *)
+Definition expansion (s : HLRState)  : option Term :=
+  let fix expansion' (ll : nat) (s : HLRState) {struct ll}  : option Term :=
+      match ll, s with 0%nat, _ => None
+                    | S _, HLRStuck s => None (* TODO : expansion s *)
                     | S ll, HLRStateC t p l g d =>
                       match g with
                         | EmptyGamma =>
                           match d with
                             | EmptyDelta => Some t
                             | ConsDelta p' g' ds => expansion' ll (HLRStateC t p l g' ds)
+                            | ConsDelta p' g' ds => None (* expansion' ll (HLRStateC t p l g' ds) *)
                           end
                         | ConsGamma l' p' g' gs =>
                           (*TODO: incorrect! here have to be:
@@ -801,6 +1059,12 @@ Definition expansion (s : HLRState)  : option Term :=
                                                      | Some t => expansion' ll (HLRStateC t p l gs d)
                                                      | None => None
                                                    end
+                        (* match t [| p --> p' |] with *)
+                          match t {| p' |} with
+                            | Some t => ???
+                            (* expansion' ll (HLRStateC t p l gs d) *)
+                            | None => None
+                          end
                       end
       end
   in expansion' (stateSize s) s.
@@ -809,6 +1073,66 @@ Example est :
   OptionTermTEquality (expansion (hlrStep exampleCInit))
                       (Some exampleC) = true.
 simpl_eq; auto. Qed.
+
+Example est1 :
+  OptionTermTEquality (expansion (hlrStep exampleCInit))
+                      (Some exampleC) = true.
+simpl_eq; auto. Qed.
+(**)
+Definition exampleC2 : Term. 
+  refine (
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (App [U;L;U] 2
+                         (BVar [U;L;U;L] 2 1 _)
+                         (BVar [U;L;U;R] 2 0 _)
+                    )
+               )
+               (Lam [U;R] 1
+                    (BVar [U;R;U] 2 0 _))
+          )
+    ); omega.
+Defined.
+
+Example est2 :
+  OptionTermTEquality (expansion (hlrStep (hlrStep exampleCInit)))
+                      (Some exampleC2) = true.
+repeat simpl_eq; auto. Qed.
+
+Example exampleCIntS2 :
+  hlrStateEq (hlrStep (hlrStep exampleCInit))
+             (HLRStateC exampleC [U; L] 1 EmptyGamma
+                        (ConsDelta [U; R] EmptyGamma EmptyDelta)) = true.
+repeat simpl_eq; auto. Qed.
+
+Example exampleCIntS3 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep exampleCInit)))
+             (HLRStateC exampleC [U; L; U] 2
+                        (ConsGamma 1 [U; R] EmptyGamma EmptyGamma)
+                        EmptyDelta)
+  = true.
+repeat simpl_eq; auto. Qed.
+
+Definition exampleC : Term. 
+  refine (
+      Lam [] 0
+          (App [U] 1
+               (Lam [U;L] 1
+                    (App [U;L;U] 2
+                         (BVar [U;L;U;L] 2 0 _)
+                         (Lam [U;L;U;R] 2 (BVar [U;L;U;R;U] 3 0 _))
+                    )
+               )
+               (Lam [U;R] 1
+                    (App [U;R;U] 2
+                         (BVar [U;R;U;L] 2 1 _)
+                         (BVar [U;R;U;R] 2 0 _)
+                    )
+               )
+          )
+    ); omega.
+Defined.
 
 
 (**==============
@@ -832,3 +1156,47 @@ Definition headRedex : Term -> option Path.
 
 Example hreC : headRedex exampleC = Some [U]. auto. Qed.
 
+Example exampleCIntS4 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit))))
+             (HLRStateC exampleC [U; L; U;L] 2
+                        (ConsGamma 1 [U; R] EmptyGamma EmptyGamma)
+                        (ConsDelta [U;L;U;R] (ConsGamma 1 [U; R] EmptyGamma EmptyGamma) EmptyDelta))
+  = true.
+repeat simpl_eq; auto. Qed.
+
+Example exampleCIntS5 :
+  hlrStateEq (hlrStep (hlrStep (hlrStep (hlrStep (hlrStep exampleCInit)))))
+             (HLRStateC
+                (Lam [] 0
+                     (App [U] 1
+                          (Lam [U; L] 1
+                               (App [U; L;U] 2
+                                    (Lam [U; L; U; L] 2
+                                         (App [U; L; U; L; U] 3
+                                              (BVar [U; L; U; L; U; L] 3 2
+                                                    (Decidable.dec_not_not (3 <= 3) (dec_lt 2 3)
+                                                                           (fun H : 3 <= 3 -> False => Zge_left 2 3 (proj1 (Nat2Z.inj_ge 2 3) (not_lt 2 3 H))
+                                                                                                                eq_refl)))
+                                              (BVar [U; L; U; L; U; R] 3 0
+                                                    (Decidable.dec_not_not (1 <= 3) (dec_lt 0 3)
+                                                                           (fun H : 1 <= 3 -> False => Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                                eq_refl)))))
+                                    (Lam [U; L; U; R] 2
+                                         (BVar [U; L; U; R; U] 3 0
+                                               (Decidable.dec_not_not (1 <= 3) (dec_lt 0 3)
+                                                                      (fun H : 1 <= 3 -> False => Zge_left 0 3 (proj1 (Nat2Z.inj_ge 0 3) (not_lt 0 3 H))
+                                                                                                           eq_refl))))))
+                          (Lam [U; R] 1
+                               (App [U; R; U] 2
+                                    (BVar [U; R; U; L] 2 1
+                                          (Decidable.dec_not_not (2 <= 2) (dec_lt 1 2)
+                                                                 (fun H : 2 <= 2 -> False => Zge_left 1 2 (proj1 (Nat2Z.inj_ge 1 2) (not_lt 1 2 H)) eq_refl)))
+                                    (BVar [U; R; U; R] 2 0
+                                          (Decidable.dec_not_not (1 <= 2) (dec_lt 0 2)
+                                                                 (fun H : 1 <= 2 -> False => Zge_left 0 2 (proj1 (Nat2Z.inj_ge 0 2) (not_lt 0 2 H)) eq_refl)))))))
+                [U; L; U; L]
+                2
+                EmptyGamma
+                (ConsDelta [U;L;U;R] (ConsGamma 1 [U; R] EmptyGamma EmptyGamma) EmptyDelta))
+  = true.
+repeat simpl_eq; auto. Qed.
