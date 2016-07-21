@@ -400,7 +400,7 @@ $$
               }
             }
           }
-          child { node {$@_5$}[sibling distance=3em]
+          child { node {$@_5$}[sibling distance=3em] 
             child { node {$z$}}
             child { node {$a$}}
           }
@@ -955,9 +955,9 @@ Rules to construct a traversal:
   \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{14}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (14.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (14.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\
 \item $(Lam-Elim)$
@@ -988,11 +988,11 @@ Rules to construct a traversal:
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (13.north) to[bend right] (12.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-1)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -1005,7 +1005,7 @@ Rules to construct a traversal:
     {\color{brown}\draw[solid,line width=1mm,->] (4.north) to[bend right] (3.north);}
     {\color{brown}\draw[dashed,line width=1mm,->] (13.north) to[bend right] (12.north);}
     {\color{brown}\draw[solid,line width=1mm,->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
 \item $(FVar-2)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
@@ -1018,7 +1018,7 @@ Rules to construct a traversal:
     {\color{violet}\draw[line width=0.5mm,|->] (4.north) to[bend right] (3.north);}
     {\color{red}\draw[line width=0.5mm,dashed,->] (13.north) to[bend right] (12.north);}
     {\color{violet}\draw[line width=0.5mm,|->] (14.north) to[bend right] (13.north);}
-    {\color{violet}\draw[dashed,line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
+    {\color{violet}\draw[line width=0.5mm,|->] (15.north) to[bend right] (12.north);}
   \end{tikzpicture}
   \\ \\ NB: the colour of the "red" pointer is not the metter in this case \\ \\
 \end{itemize}
