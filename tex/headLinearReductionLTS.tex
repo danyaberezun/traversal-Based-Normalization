@@ -347,17 +347,563 @@ $$
 
 $$
 \Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;\$\bullet (B,\Gamma')\bullet\Delta}}
-     {\State{\InContext{A}{\InContext{M}{x}@\underline{B}};\;\Gamma';\;\$\bullet\Delta}},\;\;x\notin dom(\Gamma)
+     {\State{\InContext{A}{\InContext{M}{x}@\underline{B}};\;\Gamma';\;\Delta_1}},\;\;x\notin dom(\Gamma),\;
+     \Delta_1 = \left\{
+     \begin{array}{ll}
+       \Delta, \textnormal{if } \Delta = \$\bullet \dots \\
+         \$\bullet\Delta, \textnormal{otherwise}
+       \end{array}
+       \right.
 \RuleNo{{\color{red}FVar-2}}
 $$
 
 \subsection{Expansion function}
 
-TODO
+Expansion function for TS for CHLR is a simple extansion of the expansion function for TS state for HLR.
+Only one new case is added to handle $\$$ appearence on stack : \eqref{exp13}.
 
-\subsection{Correctness proof}
+\begin{align}
+  \label{exp11} exp\; \langle M[\underline{A}];\; \Gamma,\ x \mapsto (B, \Gamma');\; \Delta \rangle
+  &= exp\; \langle M[\underline{A}[x / B[\Gamma']]];\; \Gamma;\; \Delta \rangle \\
+  \label{exp12} exp\; \langle M_B[\underline{A}];\; \emptyset;\; (B,\Gamma')\bullet\Delta \rangle
+  &= exp\; \langle M_{B[\Gamma']}[\underline{A}];\; \emptyset;\; \Delta \rangle\\
+  \label{exp13}  {\color{red} exp\; \langle M_B[\underline{A}];\; \emptyset;\;  \$ \bullet \Delta \rangle}
+  &{\color{red}= exp\; \langle M_{B[\Gamma']}[\underline{A}];\; \emptyset;\; \Delta \rangle } \\
+  \label{exp14} exp\; \langle M;\; \emptyset;\; [\ ] \rangle &= M' \\
+  \textnormal{where } B[\Gamma'] &= exp\; \langle \underline{B};\; \Gamma';\; [\ ] \rangle \\
+  & M' \textnormal{ is a term } M \textnormal{ where all nodes that are crossed over are crosed out }
+\end{align}
 
-TODO
+
+\subsection{Example}
+$$((\lambda h\ \lambda z\ .\ (h\ @_1\ (\lambda x\ .\ ((h\ @_2\ (\lambda q\ .\ x))\ @_3\ a)))\ @_4\ (z\ @_5\ a))\
+@_6\ (\lambda f\ \lambda y\ .\ f\ @_7\ ((g\ @_8\ (\lambda h\ .\ h))\ @_9\ y)))\ @_{10}\ (g\ @_{11}\ (\lambda n\ .\ n))
+$$
+
+\begin{tikzpicture}[sibling distance=3em,level distance=2em]
+  \node {$@_{10}$}[sibling distance=10em]
+  child { node {$@_{6}$}
+    child { node {$\lambda h$}[sibling distance=6em]
+      child { node {$\lambda z$}
+        child { node {$@_4$}
+          child { node {$@_1$}[sibling distance=3em]
+            child { node {$h$}}
+            child { node {$\lambda x$}
+              child { node {$@_3$}
+                child { node {$@_2$}
+                  child { node {$h$}}
+                  child { node {$\lambda q$}
+                    child { node {$x$}}
+                  }
+                }
+                child { node {$a$}}
+              }
+            }
+          }
+          child { node {$@_5$}[sibling distance=3em]
+            child { node {$z$}}
+            child { node {$a$}}
+          }
+        }
+      }
+    }
+    child { node {$\lambda f$}[sibling distance=3em]
+      child { node {$\lambda y$}
+        child { node {$@_{7}$}
+          child { node {$f$}}
+          child { node {$@_{9}$}
+            child { node {$@_{8}$}
+              child { node {$g$}}
+              child { node {$\lambda b$}
+                child { node {$b$}}
+              }
+            }
+            child { node {$y$}}
+          }
+        }
+      }
+    }
+  }
+  child { node {$@_{11}$}[sibling distance=3em]
+    child { node {$g$}}
+    child { node {$\lambda n$}
+      child { node {$n$}}}}
+  ;
+\end{tikzpicture}
+
+\begin{align*}
+  \langle \begin{tikzpicture}[sibling distance=2em,level distance=2em]
+    \node {\underline{$@_{10}$}}
+    child { node {$@_6$}
+      child { node {$\dots$}}}
+    child { node {$@_{11}$}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \emptyset;\ \$ \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=2em,level distance=2em]
+    \node {$@_{10}$}
+    child { node {\underline{$@_6$}}
+      child { node {$\dots$}}}
+    child { node {$@_{11}$}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \emptyset;\ (@_{11}, \emptyset) \bullet \$ \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=2em,level distance=2em]
+    \node {$@_{10}$}
+    child { node {$@_6$}
+      child { node {\underline{$\lambda h$}}
+        child { node {$\dots$}}}}
+    child { node {$@_{11}$}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \emptyset;\ (\lambda f, \emptyset) \bullet (@_{11}, \emptyset) \bullet \$
+  \rangle & \rightarrow^{[Lam-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {$@_{10}$}
+    child { node {\xcancel{$@_6$}}
+      child { node {\xcancel{$\lambda h$}}
+        child { node {\underline{$\lambda z$}}
+          child { node {$\dots$}}}}
+      child { node {\xcancel{$\lambda f$}}
+        child { node {\xcancel{$\dots$}}}}}
+    child { node {$@_{11}$}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \{h \mapsto (\lambda f, \emptyset)\};\
+  (@_{11}, \emptyset) \bullet \$  \rangle & \rightarrow^{[Lam-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$@_{10}$}}
+    child { node {\xcancel{$@_6$}}
+      child { node {\xcancel{$\lambda h$}}
+        child { node {\xcancel{$\lambda z$}}
+          child { node {\underline{$@_4$}}
+            child { node {$\dots$}}
+            child { node {$\dots$}}}}}
+      child { node {\xcancel{$\lambda f$}}
+        child { node {\xcancel{$\dots$}}}}}
+    child { node {\xcancel{$@_{11}$}}
+      child { node {\xcancel{$\dots$}}}};
+  \end{tikzpicture};\ \underbrace{\{z \mapsto (@_{11},\ \emptyset),\
+    h \mapsto (\lambda f, \emptyset)\}}_{\Gamma_1};\ \$  \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_4$}
+      child { node {\underline{$@_1$}}
+        child { node {$h$}}
+        child { node {$\dots$}}}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \Gamma_1;\ (@_5,\ \Gamma_1) \bullet \$  \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_4$}
+      child { node {$@_1$}
+        child { node {\underline{$h$}}}
+        child { node {$\dots$}}}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \Gamma_1;\ (\lambda x,\ \Gamma_1) \bullet (@_5,\ \Gamma_1) \bullet \$  \rangle & \rightarrow^{[BVar]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_4$}
+      child { node {$@_1$}
+        child { node {\underline{$\lambda f$}}
+          child { node {$\lambda y$}
+            child { node {$\dots$}}}}
+        child { node {$\dots$}}}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \emptyset;\ (\lambda x,\ \Gamma_1) \bullet (@_5,\ \Gamma_1) \bullet \$  \rangle &
+  \rightarrow^{[Lam-Elim]}\\
+  \hline
+\end{align*}
+\begin{align*}
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_4$}
+      child { node {\xcancel{$@_1$}}
+        child { node {\xcancel{$\lambda f$}}
+          child { node {\underline{$\lambda y$}}
+            child { node {$\dots$}}}}
+        child { node {\xcancel{$\dots$}}}}
+      child { node {$\dots$}}};
+  \end{tikzpicture};\ \{f \mapsto (\lambda x,\ \Gamma_1)\};\ (@_5,\ \Gamma_1) \bullet \$  \rangle &
+  \rightarrow^{[Lam-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {\xcancel{$@_4$}}
+      child { node {\xcancel{$@_1$}}
+        child { node {\xcancel{$\lambda f$}}
+          child { node {\xcancel{$\lambda y$}}
+            child { node {\underline{$@_7$}}
+              child { node {$f$}}
+              child { node {$\cdots$}}}}}
+        child { node {\xcancel{$\dots$}}}}
+      child { node {\xcancel{$\dots$}}}};
+  \end{tikzpicture};\ \underbrace{\{y \mapsto (@_5,\ \Gamma_1),\ f \mapsto (\lambda x,\ \Gamma_1)\}}_{\Gamma_2}
+  ;\ \$  \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_7$}
+      child { node {$\underline{f}$}}
+      child { node {$\cdots$}}};
+  \end{tikzpicture};\ \Gamma_2;\ (@_9,\ \Gamma_2) \bullet\$  \rangle & \rightarrow^{[BVar]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_7$}
+      child { node {$\underline{\lambda q}$}
+        child { node {$@_3$}
+          child { node {$@_2$}
+            child { node {$\dots$}}
+            child { node {$\dots$}}}
+          child { node {$\dots$}}}}
+      child { node {$\cdots$}}};
+  \end{tikzpicture};\ \Gamma_1;\ (@_9,\ \Gamma_2) \bullet\$  \rangle & \rightarrow^{[Lam-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$\xcancel{@_7}$}
+      child { node {$\xcancel{\lambda x}$}
+        child { node {$\underline{@_3}$}
+          child { node {$@_2$}
+            child { node {$h$}}
+            child { node {$\lambda q \; \dots$}}}
+          child { node {$a$}}}}
+      child { node {\xcancel{$\cdots$}}}};
+  \end{tikzpicture};\
+  \underbrace{\{x \mapsto (@_9,\ \Gamma_2)\} \cup \Gamma_1}_{\Gamma_3};\ \$  \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_3$}
+      child { node {\underline{$@_2$}}
+        child { node {$h$}}
+        child { node {$\lambda q \; \dots$}}}
+      child { node {$a$}}};
+  \end{tikzpicture};\ \Gamma_3;\ (a,\ \Gamma_3) \bullet\$  \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_3$}
+      child { node {$@_2$}
+        child { node {\underline{$h$}}}
+        child { node {$\lambda q \; \dots$}}}
+      child { node {$a$}}};
+  \end{tikzpicture};\ \Gamma_3;\ (\lambda q,\ \Gamma_3) \bullet (a,\ \Gamma_3) \bullet\$  \rangle & \rightarrow^{[BVar]} \\
+  \hline
+\end{align*}
+\begin{align*}
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_3$}
+      child { node {$@_2$}
+        child { node {\underline{$\lambda f$}}
+          child { node {$\lambda y$}
+            child { node {$\dots$}}}}
+        child { node {$\lambda q \; \dots$}}}
+      child { node {$a$}}};
+  \end{tikzpicture};\ \emptyset;\ (\lambda q,\ \Gamma_3) \bullet (a,\ \Gamma_3) \bullet\$  \rangle & \rightarrow^{[Lam-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_3$}
+      child { node {\xcancel{$@_2$}}
+        child { node {\xcancel{$\lambda f$}}
+          child { node {\underline{$\lambda y$}}
+            child { node {$\dots$}}}}
+        child { node {\xcancel{$\lambda q \; \dots$}}}}
+      child { node {$a$}}};
+  \end{tikzpicture};\ \{f \mapsto (\lambda q,\ \Gamma_3)\};\ (a,\ \Gamma_3) \bullet\$  \rangle & \rightarrow^{[Lam-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {\xcancel{$@_3$}}
+      child { node {\xcancel{$@_2$}}
+        child { node {\xcancel{$\lambda f$}}
+          child { node {\xcancel{$\lambda y$}}
+            child { node {\underline{$@_7$}}
+              child { node {$f$}}
+              child { node {$@_9\;\dots$}}}}}
+        child { node {\xcancel{$\lambda q \; \dots$}}}}
+      child { node {\xcancel{$a$}}}};
+  \end{tikzpicture};\ \underbrace{\{y \mapsto (a,\ \Gamma_3),\ f \mapsto (\lambda q,\ \Gamma_3)\}}_{\Gamma_4};\
+  \$  \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_7$}
+      child { node {\underline{$f$}}}
+      child { node {$@_9\;\dots$}}};
+  \end{tikzpicture};\ \Gamma_4;\ (@_9,\ \Gamma_4) \bullet \$ \rangle & \rightarrow^{[BVar]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_7$}
+      child { node {\underline{$\lambda q$}}
+        child { node {$x$}}}
+      child { node {$@_9\;\dots$}}};
+  \end{tikzpicture};\ \Gamma_3;\ (@_9,\ \Gamma_4) \bullet \$ \rangle & \rightarrow^{[Lam-Elim]}\\
+  \hline
+%%\end{align*}
+%%\newpage
+%% \begin{align*}
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {\xcancel{$@_7$}}
+%%       child { node {\xcancel{$\lambda x$}}
+%%         child { node {$\underline{@_3}$}
+%%           child { node {$\dots$}}
+%%           child { node {$\dots$}}}}
+%%       child { node {\xcancel{$@_9\;\dots$}}}};
+%% \end{tikzpicture};\ \underbrace{\{x \mapsto (@_9,\ \Gamma_4)\} \cup \Gamma_3}_{\Gamma_5};\
+%% \$ \rangle & \rightarrow^{[App]}\\
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {$@_3$}
+%%       child { node {$\underline{@_2}$}
+%%         child { node {$h$}}
+%%         child { node {$\lambda q\; \dots$}}}
+%%       child { node {$a$}}};
+%% \end{tikzpicture};\ \Gamma_5;\ (a,\ \Gamma_5) \bullet \$ \rangle & \rightarrow^{[App]} \\
+%% \hline
+%% \end{align*}
+%%\begin{align*}
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {$@_3$}
+%%       child { node {$@_2$}
+%%         child { node {\underline{$h$}}}
+%%         child { node {$\lambda q\; \dots$}}}
+%%       child { node {$a$}}};
+%% \end{tikzpicture};\ \Gamma_5;\ (\lambda q,\ \Gamma_5) \bullet (a,\ \Gamma_5) \bullet \$ \rangle & \rightarrow^{[App]}\\
+%% \hline
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {$@_3$}
+%%       child { node {$@_2$}
+%%         child { node {\underline{$\lambda f$}}
+%%           child { node {$\lambda y$}
+%%             child { node {$\dots$}}}}
+%%         child { node {$\lambda q\; \dots$}}}
+%%       child { node {$a$}}};
+%% \end{tikzpicture};\ \Gamma_5;\ (\lambda q,\ \Gamma_5) \bullet (a,\ \Gamma_5) \bullet \$ \rangle & \rightarrow^{[Lam-Elim]}\\
+%% \hline
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {$@_3$}
+%%       child { node {\xcancel{$@_2$}}
+%%         child { node {\xcancel{$\lambda f$}}
+%%           child { node {\underline{$\lambda y$}}
+%%             child { node {$\dots$}}}}
+%%         child { node {\xcancel{$\lambda q\; \dots$}}}}
+%%       child { node {$a$}}};
+%% \end{tikzpicture};\ \{f \mapsto (\lambda q,\ \Gamma_5)\} \cup \Gamma_5;\ (a,\ \Gamma_5) \bullet \$ \rangle
+%% & \rightarrow^{[Lam-Elim]}\\
+%% \hline
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {\xcancel{$@_3$}}
+%%       child { node {\xcancel{$@_2$}}
+%%         child { node {\xcancel{$\lambda f$}}
+%%           child { node {\xcancel{$\lambda y$}}
+%%             child { node {\underline{$@_7$}}}}}
+%%         child { node {\xcancel{$\lambda q\; \dots$}}}}
+%%       child { node {\xcancel{$a$}}}};
+%% \end{tikzpicture};\ \underbrace{\{y \mapsto (a,\ \Gamma_5),\ f \mapsto (\lambda q,\ \Gamma_5)\} \cup \Gamma_5}_{\Gamma_6};\ \$ \rangle
+%% & \rightarrow^{[App]}\\
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {$@_7$}
+%%       child { node {$\underline{f}$}}
+%%       child { node {$@_9 \dots$}}};
+%% \end{tikzpicture};\ \Gamma_6;\ (@_9,\ \Gamma_6) \bullet \$ \rangle
+%% & \rightarrow^{[BVar]}\\
+%% \hline
+%% \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+%%     \node {\xcancel{$\dots$}}
+%%     child { node {$@_7$}
+%%       child { node {$\underline{\lambda q}$}
+%%         child { node {$x$}}}
+%%       child { node {$@_9 \dots$}}};
+%% \end{tikzpicture};\ \underbrace{\{q \mapsto (@_9,\ \Gamma_3)\} \cup \Gamma_3}_{\Gamma_5};\
+%% (@_9,\ \Gamma_6) \bullet \$ \rangle
+%% & \rightarrow^{[Lam-Elim]}\\
+%%\hline
+\langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$\xcancel{@_7}$}
+      child { node {$\xcancel{\lambda q}$}
+        child { node {$\underline{x}$}}}
+      child { node {$\xcancel{@_9 \dots}$}}};
+\end{tikzpicture};\ \{q \mapsto (@_9,\ \Gamma_3)\} \cup \Gamma_3;\ \$ \rangle
+& \rightarrow^{[BVar]}\\
+\hline
+\langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$\underline{@_9}$}
+      child { node {$@_8\ \dots$}}
+      child { node {$y$}}};
+\end{tikzpicture};\ \{q \mapsto (@_9,\ \Gamma_3)\} \cup \Gamma_3;\ \$ \rangle
+& \rightarrow^{[App]} \\
+\hline
+\end{align*}
+\begin{align*}
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$\underline{@_8}$}
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$y$}}};
+  \end{tikzpicture};\ \Gamma_2;\ (y,\ \Gamma_2) \bullet \$ \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}
+        child { node {$\underline{g}$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$y$}}};
+  \end{tikzpicture};\ \Gamma_2;\ (\lambda b,\ \Gamma_2) \bullet (y,\ \Gamma_2) \bullet \$ \rangle &
+  \rightarrow^{\color{red}[FVar-1]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}
+        child { node {$g$}}
+        child { node {$\underline{\lambda b}$}
+          child { node {$b$}}}}
+      child { node {$y$}}};
+  \end{tikzpicture};\ \Gamma_2;\ \$ \bullet (y,\ \Gamma_2) \bullet \$ \rangle & \rightarrow^{[Lam-Non-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$\underline{b}$}}}}
+      child { node {$y$}}};
+  \end{tikzpicture};\ \Gamma_2;\ \$ \bullet (y,\ \Gamma_2) \bullet \$ \rangle & \rightarrow^{[FVar-?]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$\underline{y}$}}};
+  \end{tikzpicture};\ \Gamma_2;\ \$ \rangle & \rightarrow^{[BVar]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=3em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$\underline{@_5}$}[sibling distance=1em]
+        child { node {$z$}}
+        child { node {$a$}}}};
+  \end{tikzpicture};\ \Gamma_1;\ \$ \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=5em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$@_5$}[sibling distance=3em]
+        child { node {$\underline{z}$}}
+        child { node {$a$}}}};
+  \end{tikzpicture};\ \Gamma_1;\ (a,\ \Gamma_1) \bullet \$ \rangle & \rightarrow^{[BVar]} \\
+  \hline
+\end{align*}
+\begin{align*}
+  \langle \begin{tikzpicture}[sibling distance=5em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$@_5$}[sibling distance=3em]
+        child { node {$\underline{@_{11}}$}
+          child { node {$g$}}
+          child { node {$\lambda n$}
+            child { node {$n$}}}}
+        child { node {$a$}}}};
+  \end{tikzpicture};\ \emptyset;\ (a,\ \Gamma_1) \bullet \$ \rangle & \rightarrow^{[App]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=5em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$@_5$}[sibling distance=3em]
+        child { node {$@_{11}$}
+          child { node {$\underline{g}$}}
+          child { node {$\lambda n$}
+            child { node {$n$}}}}
+        child { node {$a$}}}};
+  \end{tikzpicture};\ \emptyset;\ (\lambda n,\ \emptyset) \bullet (a,\ \Gamma_1) \bullet \$ \rangle &
+  \rightarrow^{\color{red}[FVar-1]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=5em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$@_5$}[sibling distance=3em]
+        child { node {$@_{11}$}
+          child { node {$g$}}
+          child { node {$\underline{\lambda n}$}
+            child { node {$n$}}}}
+        child { node {$a$}}}};
+  \end{tikzpicture};\ \emptyset;\ \$ \bullet (a,\ \Gamma_1) \bullet \$ \rangle & \rightarrow^{[Lam-Non-Elim]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=5em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$@_5$}[sibling distance=3em]
+        child { node {$@_{11}$}
+          child { node {$g$}}
+          child { node {$\lambda n$}
+            child { node {$\underline{n}$}}}}
+        child { node {$a$}}}};
+  \end{tikzpicture};\ \emptyset;\ \$ \bullet (a,\ \Gamma_1) \bullet \$ \rangle & \rightarrow^{\color{red}[FVar-2]}\\
+  \hline
+  \langle \begin{tikzpicture}[sibling distance=5em,level distance=2em]
+    \node {\xcancel{$\dots$}}
+    child { node {$@_9$}
+      child { node {$@_8$}[sibling distance=1em]
+        child { node {$g$}}
+        child { node {$\lambda b$}
+          child { node {$b$}}}}
+      child { node {$@_5$}[sibling distance=3em]
+        child { node {$@_{11}$}
+          child { node {$g$}}
+          child { node {$\lambda n$}
+            child { node {$n$}}}}
+        child { node {$\underline{a}$}}}};
+  \end{tikzpicture};\ \Gamma_1;\ \$ \rangle & \not\rightarrow
+\end{align*}
 
 
 \section{Transition System for UNP}
