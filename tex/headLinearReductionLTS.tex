@@ -1105,11 +1105,1174 @@ Note that $\Delta$ and $\Gamma$ can be easly defined from UNP TS state as follow
 \item $\Gamma$ can be construct by following binder pointers, and when faces with a lambda--tokens $\lambda x$ which has a brown pointer to some application $@$, store $x \mapsto (e, \Gamma')$ where $e$ is a right child of apllication $@$ and $\Gamma'$ is a context (which is defined recursively from token $@$).
 \end{itemize}
 
+\subsection{Example}
+Consider again $NPR$ example. It is possible to redefine rules described above to that will cross over nodes that will apear in normal form but if so then rules become more complex. Thus, instead one can reconstruct normal form from the whole traversal using $display$ function that is defined in next subsection.
 
+  \[\tikzmark{}{$@_{10}$}\]
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+  \end{tikzpicture}
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+  \end{tikzpicture}
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+  \end{tikzpicture}
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+  \end{tikzpicture}
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+ \end{tikzpicture}
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+  \end{tikzpicture} 
+  $$\rightarrow^{(BVar)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+  \end{tikzpicture} 
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+  \end{tikzpicture} 
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+  \end{tikzpicture} 
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(BVar)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+  \end{tikzpicture}
+  \\[1in]
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(BVar)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(BVar)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{20}{$\lambda q$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(Lam-Elim)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(BVar)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{22}{$@_9$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+  \end{tikzpicture} 
+  \\[1in]
+    $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\ \ \tikzmark{}{\color{brown}{=}}\ \ \tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(App)}$$
+  \[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+  \end{tikzpicture}
+  \\[1in]
+  $$\rightarrow^{(FVar-1)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$\lambda b$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(Lam-Non-Elim)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(FVar-2)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(BVar)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(App)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\ \ \tikzmark{30}{$z$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (30.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (30.south) to[bend left] (4.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(BVar)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\ \ \tikzmark{30}{$z$}\tikzmark{}{\color{brown}{=}}\tikzmark{31}{$@_{11}$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (30.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (30.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (31.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (31.south) to[bend left] (1.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(App)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\ \ \tikzmark{30}{$z$}\tikzmark{}{\color{brown}{=}}\tikzmark{31}{$@_{11}$}\ \ \tikzmark{32}{$g$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (30.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (30.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (31.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (31.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (32.north) to[bend right] (31.north);}
+    {\color{green}\draw[->] (32.south) to[bend left] (31.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(FVar-1)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\ \ \tikzmark{30}{$z$}\tikzmark{}{\color{brown}{=}}\tikzmark{31}{$@_{11}$}\ \ \tikzmark{32}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{33}{$\lambda n$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (30.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (30.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (31.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (31.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (32.north) to[bend right] (31.north);}
+    {\color{green}\draw[->] (32.south) to[bend left] (31.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (33.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (33.south) to[bend left] (31.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(Lam-Non-Elim)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\ \ \tikzmark{30}{$z$}\tikzmark{}{\color{brown}{=}}\tikzmark{31}{$@_{11}$}\ \ \tikzmark{32}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{33}{$\lambda n$}\ \tikzmark{34}{$n$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (30.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (30.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (31.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (31.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (32.north) to[bend right] (31.north);}
+    {\color{green}\draw[->] (32.south) to[bend left] (31.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (33.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (33.south) to[bend left] (31.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (34.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (34.south) to[bend left] (33.south);}
+  \end{tikzpicture} 
+  \\[1in]
+  $$\rightarrow^{(FVar-2)}$$
+\[\tikzmark{1}{$@_{10}$}\ \ \tikzmark{2}{$@_6$}\ \ \tikzmark{3}{$\lambda h$}\ \ \tikzmark{4}{$\lambda z$}\ \ \tikzmark{5}{$@_4$}\ \ \tikzmark{6}{$@_1$}\ \ \tikzmark{7}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{8}{$\lambda f$}\ \ \tikzmark{9}{$\lambda y$}\ \ \tikzmark{10}{$@_7$}\ \ \tikzmark{11}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{12}{$\lambda x$}\ \ \tikzmark{13}{$@_3$}\ \ \tikzmark{14}{$@_2$}\ \ \tikzmark{15}{$h$}\tikzmark{}{\color{brown}{=}}\tikzmark{16}{$\lambda f$}\ \ \tikzmark{17}{$\lambda y$}\ \ \tikzmark{18}{$@_7$}\ \ \tikzmark{19}{$f$}\tikzmark{}{\color{brown}{=}}\tikzmark{20}{$\lambda q$}\ \ \tikzmark{21}{$x$}\tikzmark{}{\color{brown}{=}}\tikzmark{22}{$@_9$}\ \ \tikzmark{23}{$@_8$}\ \ \tikzmark{24}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{25}{$g$}\ \ \tikzmark{26}{$b$}\tikzmark{}{\color{red}{||}}\tikzmark{27}{$y$}\tikzmark{}{\color{brown}{=}}\tikzmark{29}{$@_5$}\ \ \tikzmark{30}{$z$}\tikzmark{}{\color{brown}{=}}\tikzmark{31}{$@_{11}$}\ \ \tikzmark{32}{$g$}\tikzmark{}{\color{red}{||}}\tikzmark{33}{$\lambda n$}\ \tikzmark{34}{$n$}\tikzmark{}{\color{red}{||}}\tikzmark{35}{$a$}\]
+  \begin{tikzpicture}[remember picture,overlay]
+    {\color{brown}\draw[solid,line width=1mm,->] (2.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (2.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (3.north) to[bend right] (2.north);}
+    {\color{green}\draw[->] (3.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (4.north) to[bend right] (1.north);}
+    {\color{green}\draw[->] (4.south) to[bend left] (3.south);}
+    {\color{green}\draw[->] (5.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (6.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (6.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (7.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (7.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (8.north) to[bend right] (6.north);}
+    {\color{green}\draw[->] (8.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (9.north) to[bend right] (5.north);}
+    {\color{green}\draw[->] (9.south) to[bend left] (8.south);}
+    {\color{green}\draw[->] (10.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (11.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (11.south) to[bend left] (8.south);}
+    {\color{brown}\draw[line width=1mm,->] (12.north) to[bend right] (10.north);}
+    {\color{green}\draw[->] (12.south) to[bend left] (6.south);}
+    {\color{green}\draw[->] (13.south) to[bend left] (12.south);}
+    {\color{brown}\draw[line width=1mm,->] (14.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (14.south) to[bend left] (13.south);}
+    {\color{brown}\draw[line width=1mm,->] (15.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (15.south) to[bend left] (3.south);}
+    {\color{brown}\draw[line width=1mm,->] (16.north) to[bend right] (14.north);}
+    {\color{green}\draw[->] (16.south) to[bend left] (2.south);}
+    {\color{brown}\draw[line width=1mm,->] (17.north) to[bend right] (13.north);}
+    {\color{green}\draw[->] (17.south) to[bend left] (16.south);}
+    {\color{green}\draw[->] (18.south) to[bend left] (17.south);}
+    {\color{brown}\draw[line width=1mm,->] (19.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (19.south) to[bend left] (16.south);}
+    {\color{brown}\draw[line width=1mm,->] (20.north) to[bend right] (18.north);}
+    {\color{green}\draw[->] (20.south) to[bend left] (14.south);}
+    {\color{green}\draw[->] (21.south) to[bend left] (12.south);}
+    {\color{green}\draw[->] (22.south) to[bend left] (9.south);}
+    {\color{brown}\draw[line width=1mm,->] (23.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (23.south) to[bend left] (22.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{brown}\draw[line width=1mm,->] (24.north) to[bend right] (23.north);}
+    {\color{green}\draw[->] (24.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (25.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (25.south) to[bend left] (23.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (26.north) to[bend right] (22.north);}
+    {\color{green}\draw[->] (26.south) to[bend left] (25.south);}
+    {\color{green}\draw[->] (27.south) to[bend left] (9.south);}
+    {\color{green}\draw[->] (29.south) to[bend left] (5.south);}
+    {\color{brown}\draw[line width=1mm,->] (30.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (30.south) to[bend left] (4.south);}
+    {\color{brown}\draw[line width=1mm,->] (31.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (31.south) to[bend left] (1.south);}
+    {\color{brown}\draw[line width=1mm,->] (32.north) to[bend right] (31.north);}
+    {\color{green}\draw[->] (32.south) to[bend left] (31.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (33.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (33.south) to[bend left] (31.south);}
+    {\color{violet}\draw[line width=0.5mm,|->] (34.north) to[bend right] (29.north);}
+    {\color{green}\draw[->] (34.south) to[bend left] (33.south);}
+    {\color{green}\draw[->] (35.south) to[bend left] (29.south);}
+  \end{tikzpicture} 
 
-
-
-
+\subsection{Display function}
+TODO:
+  
 %% \subsection{Correctness proof}
 
 %% \subsubsection{Residual term $\InContext{M}{\underline{x}}$ has no redexes}
