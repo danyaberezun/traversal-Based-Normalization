@@ -1,12 +1,7 @@
 cc = xelatex
 option = --shell-escape
 
-all: transition_system main main2 headLinearReduction
-
-transition_system:
-	$(cc) $(option) labelledTransitionSystem.tex
-	$(cc) $(option) labelledTransitionSystem.tex
-	make clean
+all: main main2 headLinearReduction
 
 headLinearReduction:
 	$(cc) $(option) headLinearReductionLTS.tex
