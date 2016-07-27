@@ -582,7 +582,7 @@ under consideration is as follows:
 In this section correctness with respect to the \textbf{head reduction} is presented.
 To perform that we will define an auxiliary function "\emph{expansion (exp)}".
 
-\paragraph{Expansion function.} 
+\paragraph{Expansion function} 
 \emph{exp} by a given transition system state provides a $\lambda$-term.
 Informally speaking function \emph{exp} performs head substition of all
 variables that are presented in the environments.
@@ -807,6 +807,11 @@ Only one new case is added to handle $\$$ appearence on stack : \eqref{exp13}.
   \textnormal{where } B[\Gamma'] &= exp\; \langle \underline{B};\; \Gamma';\; [\ ] \rangle \\
   & M' \textnormal{ is a term } M \textnormal{ where all nodes that are crossed over are crosed out }
 \end{align}
+
+Note, that $[FVar-*]$ rules cannot change the expansion of the state.
+Thus, it is trivial consequence from this fact and  the correctness theorem for HLR that
+CHLR terminates if and only if head reduction terminates and the expansion function being applied to
+the result of CHLR is results in the normal form of the input term.
 
 
 \subsection{Example}
