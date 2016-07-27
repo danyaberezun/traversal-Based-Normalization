@@ -86,35 +86,35 @@ Everywhere in this notes we will consider a lambda term as a tree.
 This section introduces the \emph{head linear reduction} (\textbf{HLR}) in a way that
 is similar to [?'Danos].
 The head linear reduction is a reduction stratagy that performs a linear substitution
-by replacing a so called \emph{head variable occurence} (\emph{hoc}) on each step.
+by replacing a so called \emph{head variable occurrence} (\emph{hoc}) on each step.
 \emph{hoc} can be found as a leaf on the left-most path in a tree. If this leaf is not
-a variable or represents a free variable then \textbf{HLR} got stuck and results in a
+a variable or represents a free variable then \textbf{HLR} get stuck and results in a
 \emph{quasi-head normal form} (\emph{ghn}).
 
 To be more concrete let's present a HLR as the following \textbf{transition system}:
 \begin{itemize}
 \item A state is a tuple $\langle$ $A[\underline{B}]$; $\Gamma$; $\Delta$ $\rangle$, where
   \begin{itemize}
-  \item $A[\underline{B}]$ is a $\lambda$-term $A$ with an underline node $B$;
-  \item $\Gamma$ is an environment that binds variables; an environment can be considered
+  \item $A[\underline{B}]$ is a $\lambda$-term $A$ with an underline node $B$
+  \item $\Gamma$ is an \emph{environment (binding set)} that binds variables; an environment can be considered
     as a \emph{set}; we will denote environment as follows:
     $$\Gamma \ = \ \{var \mapsto (t,\ \Gamma_1),\ \dots\}$$ where
-    $var$ is a variable, $t$ is a $\lambda$-term, $\Gamma_1$ is a stored environment,
-    $\Gamma_2$ is a rest of environment $\Gamma$;
-  \item $\Delta$ is a stack of pairs $(t_1, \ \Gamma_1)$ where $t_1$ is a $\lambda$-term and
-    $\Gamma_1$ is an environment.
-    $$\textnormal{Denotation: } \Delta \ = \ [ (t_1,\ \Gamma_1) \bullet \dots ]$$
-    where $\Delta_1$ is a rest of the stack $\Delta$.
+    $var$ is a variable, $t$ is a $\lambda$-term, $\Gamma_1$ is a stored environment; \\
+    \textbf{NB} : we are considered $\Gamma$ as a \emph{disjoint ordered set}
+  \item $\Delta$ (\emph{pending applies}) is a \textbf{stack} of pairs $(t_1, \ \Gamma_1)$ where $t_1$ is a $\lambda$-term
+    and $\Gamma_1$ is an environment
+    $$\textnormal{Denotation: } \Delta \ = \ [ (t_1,\ \Gamma_1) \bullet \Delta_1 ]$$
+    where $\Delta_1$ is a rest of the stack $\Delta$
   \end{itemize}
 \item The \emph{initial} state is $\langle\ \lambda-term\ with\ underlined\ root;\ \emptyset;\ [\ ]\ \rangle$
-  where $\emptyset$ denotes an empty set and $[\ ]$ --- empty stack.
+  where $\emptyset$ denotes an empty set and $[\ ]$ --- empty stack
 \item The \emph{final} state is $\langle\ A [\underline{x}];\ \Gamma;\ \Delta\ \rangle$ where
   \begin{itemize}
   \item $A [\underline{x}]$ is a $\lambda$-term with a variable $x$ as an underlined node
   \item $x \not\in \Gamma$
   \end{itemize}
 \item Denotation: $\InContext{A_{\xcancel{B}}}{\xcancel{\lambda\ x}\ .\ e}$ ---
-  is a term $A$ where subterm $B$  and node ``$\lambda x$'' are crossed over
+  is a term $A$ where subterm $B$  and a node ``$\lambda x$'' are crossed over
 %% \item \textbf{Result}: the result (in a qhn form) can be extrcated from a final state 
 %%   by crossing out all nodes that are crossed over from the first component of the final
 %%   state and binding all variable from current environment at the beginning
@@ -125,25 +125,27 @@ To be more concrete let's present a HLR as the following \textbf{transition syst
 $$
 \Rule{\State{\InContext{A}{e_1\underline{@}e_2};\;\Gamma;\;\Delta}}
      {\State{\InContext{A}{\underline{e_1}@e_2};\;\Gamma;\;[(e_2,\Gamma)\bullet\Delta]}}
-\RuleNo{App}
+     \RuleNo{App}
 $$
 
 $$
 \Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;[]}}
      {\State{\InContext{A}{\lambda x.\underline{e}};\;\Gamma;\;[]}}
-\RuleNo{Lam-Non-Elim}
+     \RuleNo{Lam-Non-Elim}
 $$
 
 $$
 \Rule{\State{\InContext{A}{\underline{\lambda x}.e};\;\Gamma;\;[(B,\Gamma')\bullet\Delta]}}
      {\State{\InContext{A_{\xcancel{B}}}{\xcancel{\lambda x}.\underline{e}};\;\{x \mapsto (B,\Gamma'),\,\Gamma\};\;\Delta}}
-\RuleNo{Lam-Elim}
+     \RuleNo{Lam-Elim}
 $$
+$$\textnormal{\textbf{I.e.} : variable $x$ becomes bound by $\Gamma$ with the top element of the stack of pending
+       applies $(B, \Gamma')$} $$
 
 $$
 \Rule{\State{\InContext{A}{\underline{x}};\;\{x\mapsto (B,\Gamma'),\,\Gamma\};\;\Delta}}
      {\State{\InContext{A}{\underline{B}};\;\Gamma';\;\Delta}}
-\RuleNo{BVar}
+     \RuleNo{BVar}
 $$
 
 \subsubsection{Example}
@@ -595,16 +597,24 @@ variables that are presented in the environments.
   & M' \textnormal{ is a term } M \textnormal{ where all nodes that are crossed over are crosed out }
 \end{align}
 
-Note that \eqref{exp1} substitudes term $B[\Gamma']$ instead of all occurence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). Each recurcive call of \eqref{exp2} substitudes all variables with respect to the corresponding context exactly in one argument term.
+Note that \eqref{exp1} substitutes term $B[\Gamma']$ instead of all occurrence of variable $x$ in the subtree of term $M$ that has an underlined node as a root (i.e. subtree $A$). Each recursive call of \eqref{exp2} substitutes all variables with respect to the corresponding context exactly in one argument term (since it is assumed that all variables have diffenert names and
+substition is performed in only in arguments with respect to an environment no confusion may appear (no renaming is needed)).
 
 Now consider TS for HLR. Note that:
 \begin{itemize}
 \item Only $[Lam-Elim]$ rule can change an expansion;
-\item The number of transitions without applying $[Lam-Elim]$ rule is limited since the definition of context, input term has a final size, and only $[Lam-Elim]$ rule expands the context; Hereafter we will denote a sequence of transitions without applying $[Lam-Elim]$ rule by $\overset{*}{\rightarrow}$;
+\item The number of transitions without applying $[Lam-Elim]$ rule is limited since in the definition of context, the input term
+  has a
+  finite size, and only $[Lam-Elim]$ rule expands the context; Hereafter we will denote a sequence of transitions without
+  applying $[Lam-Elim]$ rule by $\overset{*}{\rightarrow}$;
 \item The expansion function $exp$ cannot change a path from the root of term to the underlined node since:
   \begin{itemize}
-  \item recurcive call \eqref{exp1} can only change the subtree of the current term with underlined node as a root; \hfill{\textbf{(I)}}
-  \item recurcive call \eqref{exp2} can only change arguments of the current term that are above the underlined node; Moreover, each application of \eqref{exp2} change exactly one argument (that corresponds to the first element of the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact. \hfill{\textbf{(II)}}
+  \item recursive call \eqref{exp1} can only change the subtree of the current term with underlined node as a root;
+    \hfill{\textbf{(I)}}
+  \item recursive call \eqref{exp2} can only change arguments of the current term that are above the underlined node;
+    Moreover, each application of \eqref{exp2} changes exactly one argument (that corresponds to the first element of
+    the pair in $\Delta$) leaving all other arguments and the subtree of the current term with underlined node as a root intact.
+    \hfill{\textbf{(II)}}
   \end{itemize}
 \end{itemize}
 
@@ -640,9 +650,9 @@ reduction after applying the $exp$-function.
 \subsubsection{Theorem} HLR and HR coincide as follows:
 
 Suppose that we have some current TS state (denoted $\langle \dots \rangle$) with some expansion (denoted $\dots$)
-such that the next rule to be applied is $[Lam-Elim]$ and results in state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which
+such that the next rule to be applied is $[Lam-Elim]$ and results in state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ whose
 expansion is some term $M'_i$. Then TS make several new steps without applying $[Lam-Elim]$ rule and results in some
-state $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ which expansion is still term
+state $\langle A[\underline{\lambda x}. e];\ \Gamma;\ (B,\Gamma')\bullet\Delta \rangle$ whose expansion is still term
 $M'_i$. Then 
 \emph{\textbf{If} $[Lam-Elim]$ rule can be applied by extending environment $\Gamma$ with new binding 
   $x \mapsto (B,\Gamma')$ and expansion of the result is some term $M'_{i+1}$
@@ -662,7 +672,7 @@ $M'_i$. Then
 
 Base: trivial since first element being added to $\Gamma$ is a head redex by definition.
 
-Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some TS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ which expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not change the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
+Induction step. We know that after $i^{th}$ application of rule $[Lam-Elim]$ we got some TS state $\langle M_i;\ \Gamma_i;\ \Delta_i \rangle$ whose expansion is some term $M_i'$. As was mentioned above $\overset{*}{\rightarrow}$ has not changed the expansion and the number of steps in $\overset{*}{\rightarrow}$ is finite. Thus, we have two possible cases:
 
 first, TS got stuck and nothing to prove,
 
@@ -694,7 +704,7 @@ to state $(ii)$:
   \dots &
 \end{align}
 
-It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, if we apply head reduction to this term, it will results exactly in term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ (by head reduction definition) that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i'$ and the expansion of state $(ii)$ is $M_{i+1}'$. \hfill{\textbf{Qed}} \\ \\ 
+It is easy to see that the term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{\lambda x}.\; e[\Gamma]]$, has the head redex $(\lambda x,\ B)$ (since context is already empty). Thus, if we apply head reduction to this term, it will result exactly in the term $A_{\xcancel{B}}[\xcancel{\lambda x}.\; \underline{e}[\Gamma][x/B[\Gamma']]]$ (by head reduction definition) that is equal to the first component of state \eqref{ii3}. Following \textbf{(I)} and \textbf{(II)}, if we will continue to apply $exp$ function then elliminating the same $\Delta$ in both cases will lead no effect on argument $B$ and underlined subtrees. Thus, $(\lambda x,\ B)$ is a head redex in $M_i'$ and the expansion of state $(ii)$ is $M_{i+1}'$. \hfill{\textbf{Qed}} \\ \\ 
 
 \textbf{Consequences}:
 \begin{itemize}
@@ -702,7 +712,7 @@ It is easy to see that term in state in \eqref{i3}, $A'_{B[\Gamma']}[\underline{
 \item if head reduction terminates then head linear reduction terminates;
 \item Since expansion is not able to change a path from the root to the underlined node,
   the first component of the final state of TS for head linear reduction
-  contains a term which leftmost path is a part of the head normal form 
+  contains a term whose leftmost path is a part of the head normal form 
   and the expansion of the final state is a node of the Boehm-tree of the input term; \\
   Thus, a repeated application of head linear reduction to all arguments
   (complete head linear reduction) leeds to the normal form.
@@ -760,6 +770,8 @@ $$
      {\State{\InContext{A}{M[x]@\underline{B}};\;\Gamma';\;[\$\bullet\Delta]}},\;x\notin dom(\Gamma)
 \RuleNo{{\color{red}FVar-0}}
 $$
+$$ \textnormal{Note that $B$ here (and in all $[FVar-*] rules$) comes from the list of pending applies}$$
+$$ \textnormal{It is an invariant that $B$ has to be an argument of some application}$$
 
 $$
 \Rule{\State{\InContext{A}{\InContext{M}{\underline{x}}@B};\;\Gamma;\;[(B,\Gamma')\bullet C\bullet\Delta]}}
@@ -992,16 +1004,16 @@ There are two pointer types:
 \item Binder pointer (denoted as {\color{green}$\rightarrow$});
   from the bound variables binder pointer points to the dynamic binder in the history
   and for all other nodes it points points to the parent;
-  (these kind of pointer is omitted in these notes since they can
-  be easly defined by recurcive procedure)
-\item Pointer to the last incomplete application; there are two subtypes
+  (this kind of pointer is omitted in these notes since they can
+  be easly defined by recursive procedure)
+\item Pointer to the last pending application; there are two subtypes
   of this pointer:
   \begin{itemize}
   \item Thick brown pointer can binds either
     lambda node and application (in this case they arrise as \emph{spine redexes})
     or any other node and some application;
   \item Vioilet pointer has the same meaning
-    (pointer to the last incamplete application) together with $\$$
+    (pointer to the last pending application) together with $\$$
     in TS for CHLR;
   \item Dashed red pointer is used when the real colour
     (brown or violet) is not the metter.    
@@ -1012,7 +1024,7 @@ Rules to construct a traversal:
 \begin{itemize}
 \item $(BVar)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}
-  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is is a right child of $@$ $\longrightarrow$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is is the right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$x$}\ \ \tikzmark{15}{$=$}\ \ \tikzmark{16}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{brown}\draw[solid,line width=1mm,->] (3.north) to[bend right] (2.north);}
@@ -1029,7 +1041,7 @@ Rules to construct a traversal:
   \\ \\ NB: the colour of the added (red) pointer has to be the same as the colour of the first "red" pointer \\ \\
 \item $(Lam-Non-Elim)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$\lambda x$}
-  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@$ $\longrightarrow$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is the right child of $@$ $\longrightarrow$}
   \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$\lambda x$}\ \ \tikzmark{14}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{violet}\draw[line width=0.5mm,|->] (3.north) to[bend right] (2.north);}
@@ -1053,7 +1065,7 @@ Rules to construct a traversal:
   \\ \\ NB: the colour of the added (red) pointer has to be the same as the colour of the first "red" pointer \\ \\
 \item $(App)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@$}
-  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a left child of $@$ $\longrightarrow$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is the left child of $@$ $\longrightarrow$}
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@$}\ \ \tikzmark{13}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
     {\color{brown}\draw[solid,line width=1mm,->] (13.north) to[bend right] (12.north);}
@@ -1061,7 +1073,7 @@ Rules to construct a traversal:
 \item $(FVar-0)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}
-  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@_2$ $\longrightarrow$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is the right child of $@_2$ $\longrightarrow$}
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
@@ -1074,7 +1086,7 @@ Rules to construct a traversal:
 \item $(FVar-1)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}
-  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@_2$ $\longrightarrow$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is the right child of $@_2$ $\longrightarrow$}
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
@@ -1087,7 +1099,7 @@ Rules to construct a traversal:
 \item $(FVar-2)$
   \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{3}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$y$}
-  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is a right child of $@_2$ $\longrightarrow$}
+  \ \ \tikzmark{}{$\longrightarrow$ where $e$ is the right child of $@_2$ $\longrightarrow$}
   \ \ \tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$@_1$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{13}{$@_2$}
   \ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$y$}\ \ \tikzmark{}{$||$}\ \ \tikzmark{15}{$e$}\]
   \begin{tikzpicture}[remember picture,overlay]
@@ -1102,12 +1114,12 @@ Rules to construct a traversal:
 
 Note that $\Delta$ and $\Gamma$ can be easly defined from UNP TS state as follows:
 \begin{itemize}
-\item $\Delta$ can be construct by following incomplete application pointer and storing right childs of all reachable applications in reverse order with corresponding contexts (see next item how to define context from traversal);
-\item $\Gamma$ can be construct by following binder pointers, and when faces with a lambda--tokens $\lambda x$ which has a brown pointer to some application $@$, store $x \mapsto (e, \Gamma')$ where $e$ is a right child of apllication $@$ and $\Gamma'$ is a context (which is defined recursively from token $@$).
+\item $\Delta$ can be constructed by following pending application pointer and storing right childs of all reachable applications in reverse order with corresponding contexts (see next item how to define context from traversal);
+\item $\Gamma$ can be constructed by following binder pointers, and when faced with a lambda--token $\lambda x$ that has a brown pointer to some application $@$, store $x \mapsto (e, \Gamma')$ where $e$ is the right child of apllication $@$ and $\Gamma'$ is a context (which is defined recursively from token $@$).
 \end{itemize}
 
 \subsection{Example}
-Consider again $NPR$ example. It is possible to redefine rules described above to that will cross over nodes that will apear in normal form but if so then rules become more complex. Thus, instead one can reconstruct normal form from the whole traversal using $display$ function that is defined in next subsection.
+Consider again $NPR$ example.
 
 \[\tikzmark{}{$@_{10}$}\]
 $$\rightarrow^{(App)}$$
@@ -2329,7 +2341,7 @@ $(Lam-Elim)$\\
  $(BVar)$\\
 \[\tikzmark{1}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{2}{$\xcancel{@}$}\ \ \tikzmark{}{$\dots$}\ \
 \tikzmark{3}{$\xcancel{\lambda x}$}
-\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ \tikzmark{}{$\longrightarrow$ where $e$ is is a right child of $@$
+\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{4}{$x$}\ \ \tikzmark{}{$\longrightarrow$ where $e$ is is the right child of $@$
   $\longrightarrow$} \ \ \tikzmark{11}{}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{12}{$\xcancel{@}$}\ \ \tikzmark{}{$\dots$}\ \
 \tikzmark{13}{$\xcancel{\lambda x}$}\ \ \tikzmark{}{$\dots$}\ \ \tikzmark{14}{$\xcancel{x}$}\ \ \tikzmark{15}{$=$}\ \
 \tikzmark{16}{$e$}\]
