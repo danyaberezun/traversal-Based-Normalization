@@ -1,4 +1,4 @@
-module ToPdf (showPdf, showNormalFormPDF, showTraversalPdf) where
+module ToPdf (display, showPdf, showNormalFormPDF, showTraversalPdf) where
 import Data.List
 import Data.Char
 

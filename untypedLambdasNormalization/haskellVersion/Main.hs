@@ -188,11 +188,11 @@ main = do
     showTraversalPdf
     (runExamples examples_normalize_only)
     examples_normalize_only examples_normalize_only_names
-  writeFile "examples.tex" $
-    showPdf
-    (runExamples examples_picture)
-    examples_picture examples_picture_names
-  writeFile "examplesNormalForms.tex" $
-    showNormalFormPDF
-    (runExamples examples_normalize_only)
-    examples_normalize_only examples_normalize_only_names
+  -- writeFile "examples.tex" $
+  --   showPdf
+  --   (runExamples examples_picture)
+  --   examples_picture examples_picture_names
+  -- writeFile "examplesNormalForms.tex" $
+  --   showNormalFormPDF
+  --   (runExamples examples_normalize_only)
+  --   examples_normalize_only examples_normalize_only_names

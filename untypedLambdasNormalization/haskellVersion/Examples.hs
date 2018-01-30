@@ -15,6 +15,9 @@ examples_picture_names =
    "ex\\_LO3", "ex\\_LO4", "ex\\_1", "NPR", "mut three two", "plus 3 $2^2$"]
 
 examples_normalize_only :: [String]
+-- examples_normalize_only =
+--   ["f @ (\\ x . (f @ (\\ y . y)))"]
+
 examples_normalize_only =
   [plus_3_2_square, plus_x_n_square, ack_three] ++ examples_picture
 examples_normalize_only_names :: [String]
