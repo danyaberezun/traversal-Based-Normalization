@@ -1,0 +1,11 @@
+Folder contains an impelemntation of normalization procedure UNP for Untyped Lambda-Calculus (see chapter 3.5 of PhD-Thesis https://disser.spbu.ru/files/disser2/disser/5cp32FwxGH.pdf)
+
+Files:
+* UNP.hs contains an implemetation of normalization procedure UNP itself; result is a traversal
+* UNPNormalizer.hs contains functions extractNormalFormFromTheTraversal :: Traversal -> NormalForm and unp Cleanup :: Traversal -> Cleaned up Treaversal
+* Testing.hs contains function testExamples to run a test set
+* LambdaExpressionExamples.hs contains a set of examples
+
+Run tests:
+1. >  ghci Main.hs
+2. >> main
